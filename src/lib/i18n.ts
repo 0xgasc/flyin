@@ -202,7 +202,6 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'admin.awaiting_verification': { en: 'pilots awaiting verification', es: 'pilotos esperando verificación' },
     
     // Admin buttons and actions
-    'admin.approve': { en: 'Approve', es: 'Aprobar' },
     'admin.reject': { en: 'Reject', es: 'Rechazar' },
     'admin.assign': { en: 'Assign', es: 'Asignar' },
     'admin.assign_pilot': { en: 'Assign Pilot', es: 'Asignar Piloto' },
