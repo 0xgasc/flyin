@@ -140,12 +140,14 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'dashboard.sign_out': { en: 'Sign Out', es: 'Cerrar Sesión' },
     
     // Booking status
+    'status.all': { en: 'All', es: 'Todos' },
     'status.pending': { en: 'Pending', es: 'Pendiente' },
     'status.approved': { en: 'Approved', es: 'Aprobado' },
     'status.assigned': { en: 'Assigned', es: 'Asignado' },
     'status.confirmed': { en: 'Confirmed', es: 'Confirmado' },
     'status.completed': { en: 'Completed', es: 'Completado' },
     'status.cancelled': { en: 'Cancelled', es: 'Cancelado' },
+    'status.rejected': { en: 'Rejected', es: 'Rechazado' },
 
     // Common
     'common.minutes': { en: 'minutes', es: 'minutos' },
@@ -225,15 +227,6 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'admin.edit_booking': { en: 'Edit Booking', es: 'Editar Reserva' },
     'admin.mark_completed': { en: 'Mark Completed', es: 'Marcar como Completado' },
     
-    // Status translations
-    'status.all': { en: 'All', es: 'Todos' },
-    'status.pending': { en: 'Pending', es: 'Pendiente' },
-    'status.approved': { en: 'Approved', es: 'Aprobado' },
-    'status.assigned': { en: 'Assigned', es: 'Asignado' },
-    'status.confirmed': { en: 'Confirmed', es: 'Confirmado' },
-    'status.completed': { en: 'Completed', es: 'Completado' },
-    'status.cancelled': { en: 'Cancelled', es: 'Cancelado' },
-    'status.rejected': { en: 'Rejected', es: 'Rechazado' },
     
     // Form fields
     'form.full_name': { en: 'Full Name', es: 'Nombre Completo' },
