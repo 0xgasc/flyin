@@ -203,8 +203,6 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     
     // Admin buttons and actions
     'admin.assign': { en: 'Assign', es: 'Asignar' },
-    'admin.assign_pilot': { en: 'Assign Pilot', es: 'Asignar Piloto' },
-    'admin.assign_helicopter': { en: 'Assign Helicopter', es: 'Asignar Helicóptero' },
     'admin.assign_flight': { en: 'Assign Flight', es: 'Asignar Vuelo' },
     'admin.approve_as_is': { en: 'Approve As-Is', es: 'Aprobar Tal Como Está' },
     'admin.approve_with_changes': { en: 'Approve with Changes', es: 'Aprobar con Cambios' },
