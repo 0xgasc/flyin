@@ -87,17 +87,37 @@ export default function GuatemalaRealMap({
       <div className="rounded-xl overflow-hidden shadow-2xl">
         {/* Real Guatemala Map Container */}
         <div 
-          className="relative w-full h-96 sm:h-[500px] bg-center bg-contain bg-no-repeat border-4 border-green-500"
+          className="relative w-full h-96 sm:h-[500px] border-4 border-green-500"
           style={{
-            backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Guatemala_relief_location_map.jpg/800px-Guatemala_relief_location_map.jpg')`,
-            backgroundColor: '#e0f2fe',
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            backgroundColor: '#e8f4f8'
           }}
         >
-          {/* Dark overlay for better marker visibility */}
-          <div className="absolute inset-0 bg-black/20"></div>
+          {/* Guatemala SVG Outline */}
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            {/* Guatemala country outline - simplified shape */}
+            <path
+              d="M15 45 L25 40 L35 35 L45 30 L55 28 L65 30 L75 35 L85 40 L88 45 L90 50 L88 55 L85 60 L80 65 L75 70 L70 75 L65 78 L60 80 L55 82 L50 83 L45 82 L40 80 L35 78 L30 75 L25 70 L20 65 L15 60 L13 55 L12 50 Z"
+              fill="#a7c4bc"
+              stroke="#4a7c59"
+              strokeWidth="0.5"
+              opacity="0.6"
+            />
+            {/* Mountain ranges */}
+            <path
+              d="M20 50 L30 45 L40 50 L50 45 L60 50 L70 45 L80 50"
+              fill="none"
+              stroke="#4a7c59"
+              strokeWidth="0.3"
+              opacity="0.4"
+            />
+          </svg>
+          
+          {/* Subtle overlay for better marker visibility */}
+          <div className="absolute inset-0 bg-blue-50/40"></div>
           
           
           {/* Top branding overlay */}
