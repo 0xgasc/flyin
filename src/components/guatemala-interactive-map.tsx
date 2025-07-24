@@ -309,7 +309,6 @@ export default function GuatemalaInteractiveMap({
           </div>
         )}
       </div>
-      </div>
       
       {/* Legend */}
       <div className="mt-6 flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
