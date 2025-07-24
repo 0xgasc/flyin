@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
-import { MapPin, Calendar, Users, DollarSign, Navigation } from 'lucide-react'
+import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid } from 'lucide-react'
 import { MobileNav } from '@/components/mobile-nav'
 import { useTranslation } from '@/lib/i18n'
 import { format } from 'date-fns'
 // Helicopter selection moved to admin assignment workflow
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
+import GuatemalaMap from '@/components/guatemala-map'
+import DestinationSelectorModal from '@/components/destination-selector-modal'
+import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 
 interface Airport {
   id: string
@@ -41,6 +44,10 @@ export default function BookTransportPage() {
     isRoundTrip: false,
   })
   const [priceBredown, setPriceBreakdown] = useState<any>(null)
+  const [selectionMode, setSelectionMode] = useState<'dropdown' | 'map'>('dropdown')
+  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null)
+  const [showDestinationModal, setShowDestinationModal] = useState(false)
+  const [modalType, setModalType] = useState<'from' | 'to'>('from')
 
   useEffect(() => {
     fetchAirports()
@@ -76,6 +83,27 @@ export default function BookTransportPage() {
   }
 
   // Helicopter selection moved to admin workflow
+
+  const handleMapLocationSelect = (location: string, type: 'from' | 'to') => {
+    setFormData(prev => ({
+      ...prev,
+      [type === 'from' ? 'fromLocation' : 'toLocation']: location
+    }))
+  }
+
+  const handleDepartmentClick = (dept: Department) => {
+    setSelectedDepartment(dept)
+    setShowDestinationModal(true)
+    // Determine modal type based on current selections
+    if (!formData.fromLocation) {
+      setModalType('from')
+    } else if (!formData.toLocation) {
+      setModalType('to')
+    } else {
+      // Both are filled, let user choose
+      setModalType('from')
+    }
+  }
 
   const calculatePrice = useCallback(() => {
     const fromLoc = formData.fromLocation === 'custom' ? formData.fromCustom.toUpperCase() : formData.fromLocation
@@ -228,12 +256,43 @@ export default function BookTransportPage() {
           )}
 
           <div className="card-luxury space-y-6">
-            <h2 className="text-xl font-semibold flex items-center">
-              <MapPin className="h-5 w-5 mr-2 text-primary-600" />
-              {t('booking.form.route_details')}
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center">
+                <MapPin className="h-5 w-5 mr-2 text-primary-600" />
+                {t('booking.form.route_details')}
+              </h2>
+              
+              {/* Selection Mode Toggle */}
+              <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode('dropdown')}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    selectionMode === 'dropdown' 
+                      ? 'bg-white text-primary-600 shadow' 
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Grid className="h-4 w-4 inline mr-1" />
+                  List
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode('map')}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    selectionMode === 'map' 
+                      ? 'bg-white text-primary-600 shadow' 
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Map className="h-4 w-4 inline mr-1" />
+                  Map
+                </button>
+              </div>
+            </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            {selectionMode === 'dropdown' ? (
+              <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('booking.form.from')}
@@ -314,6 +373,42 @@ export default function BookTransportPage() {
                 )}
               </div>
             </div>
+            ) : (
+              /* Map Selection Mode */
+              <div className="space-y-6">
+                <div className="text-center text-gray-600 mb-4">
+                  <p className="text-sm">Click on any department in Guatemala to see available destinations</p>
+                </div>
+                
+                <GuatemalaMap 
+                  onDepartmentClick={handleDepartmentClick}
+                  selectedFrom={formData.fromLocation}
+                  selectedTo={formData.toLocation}
+                  mode="both"
+                />
+                
+                {/* Selected Locations Display */}
+                {(formData.fromLocation || formData.toLocation) && (
+                  <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-primary-900 mb-2">Selected Route:</h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">From:</span>
+                        <p className="font-medium text-primary-800">
+                          {formData.fromLocation || 'Not selected'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">To:</span>
+                        <p className="font-medium text-primary-800">
+                          {formData.toLocation || 'Not selected'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
 
@@ -567,6 +662,22 @@ export default function BookTransportPage() {
           </div>
         </form>
       </div>
+
+      {/* Destination Selector Modal */}
+      {showDestinationModal && selectedDepartment && (
+        <DestinationSelectorModal
+          department={selectedDepartment}
+          isOpen={showDestinationModal}
+          onClose={() => {
+            setShowDestinationModal(false)
+            setSelectedDepartment(null)
+          }}
+          onSelect={(destination) => {
+            handleMapLocationSelect(destination, modalType)
+          }}
+          type={modalType}
+        />
+      )}
     </div>
   )
 }
