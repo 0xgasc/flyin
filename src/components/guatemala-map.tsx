@@ -48,9 +48,9 @@ export default function GuatemalaMap({
             <g key={dept.id}>
               {/* Department Circle (simplified - in production, use actual polygon paths) */}
               <circle
-                cx={400 + (dept.coordinates[1] + 90.5) * 40}
-                cy={300 - (dept.coordinates[0] - 14.5) * 40}
-                r="20"
+                cx={100 + (dept.coordinates[1] + 92) * 8}
+                cy={500 - (dept.coordinates[0] - 13.5) * 20}
+                r="25"
                 fill={dept.color}
                 fillOpacity={
                   hoveredDept === dept.id ? 0.8 : 
@@ -69,8 +69,8 @@ export default function GuatemalaMap({
               {dept.airports.map((airport, idx) => (
                 <g key={idx}>
                   <text
-                    x={400 + (dept.coordinates[1] + 90.5) * 40}
-                    y={300 - (dept.coordinates[0] - 14.5) * 40 + 5}
+                    x={100 + (dept.coordinates[1] + 92) * 8}
+                    y={500 - (dept.coordinates[0] - 13.5) * 20 + 5}
                     textAnchor="middle"
                     className="fill-white font-bold text-xs pointer-events-none"
                   >
@@ -81,8 +81,8 @@ export default function GuatemalaMap({
               
               {/* Department Name */}
               <text
-                x={400 + (dept.coordinates[1] + 90.5) * 40}
-                y={300 - (dept.coordinates[0] - 14.5) * 40 + 35}
+                x={100 + (dept.coordinates[1] + 92) * 8}
+                y={500 - (dept.coordinates[0] - 13.5) * 20 + 35}
                 textAnchor="middle"
                 className="fill-gray-700 text-xs font-medium pointer-events-none"
               >
@@ -94,12 +94,12 @@ export default function GuatemalaMap({
           {/* Connection Line Between Selected Points */}
           {selectedFrom && selectedTo && (
             <line
-              x1={400 + (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[1] || 0 + 90.5) * 40}
-              y1={300 - (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[0] || 0 - 14.5) * 40}
-              x2={400 + (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[1] || 0 + 90.5) * 40}
-              y2={300 - (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[0] || 0 - 14.5) * 40}
+              x1={100 + (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[1] || 0 + 92) * 8}
+              y1={500 - (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[0] || 0 - 13.5) * 20}
+              x2={100 + (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[1] || 0 + 92) * 8}
+              y2={500 - (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[0] || 0 - 13.5) * 20}
               stroke="#3b82f6"
-              strokeWidth="2"
+              strokeWidth="3"
               strokeDasharray="5,5"
               className="animate-pulse"
             />
