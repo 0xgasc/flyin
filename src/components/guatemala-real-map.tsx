@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 
-interface GuatemalaSimpleMapProps {
+interface GuatemalaRealMapProps {
   onDepartmentClick?: (department: Department) => void
   selectedFrom?: string
   selectedTo?: string
@@ -62,12 +62,12 @@ const destinationCoordinates: Record<string, Array<{name: string, x: number, y: 
 // Flatten all destinations for easy mapping
 const allDestinations = Object.values(destinationCoordinates).flat()
 
-export default function GuatemalaSimpleMap({ 
+export default function GuatemalaRealMap({ 
   onDepartmentClick, 
   selectedFrom, 
   selectedTo,
   mode = 'both' 
-}: GuatemalaSimpleMapProps) {
+}: GuatemalaRealMapProps) {
   const [hoveredDestination, setHoveredDestination] = useState<string | null>(null)
 
   const handleDestinationClick = (destination: any) => {
@@ -98,6 +98,13 @@ export default function GuatemalaSimpleMap({
         >
           {/* Dark overlay for better marker visibility */}
           <div className="absolute inset-0 bg-black/20"></div>
+          
+          {/* OBVIOUS REAL MAP INDICATOR */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="bg-red-600 text-white px-8 py-4 rounded-xl text-2xl font-bold shadow-2xl animate-pulse">
+              🗺️ REAL GUATEMALA MAP 🗺️
+            </div>
+          </div>
           
           {/* Top branding overlay */}
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg z-10">

@@ -12,7 +12,7 @@ import { format } from 'date-fns'
 // Helicopter selection moved to admin assignment workflow
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
 import GuatemalaInteractiveMap from '@/components/guatemala-interactive-map'
-import GuatemalaSimpleMap from '@/components/guatemala-simple-map'
+import GuatemalaRealMap from '@/components/guatemala-real-map'
 import DestinationSelectorModal from '@/components/destination-selector-modal'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 
@@ -440,7 +440,7 @@ export default function BookTransportPage() {
                     mode="both"
                   />
                 ) : (
-                  <GuatemalaSimpleMap 
+                  <GuatemalaRealMap 
                     onDepartmentClick={handleDepartmentClick}
                     selectedFrom={formData.fromLocation}
                     selectedTo={formData.toLocation}
