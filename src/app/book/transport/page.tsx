@@ -11,7 +11,7 @@ import { useTranslation } from '@/lib/i18n'
 import { format } from 'date-fns'
 // Helicopter selection moved to admin assignment workflow
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
-import GuatemalaMap from '@/components/guatemala-map-v2'
+import GuatemalaInteractiveMap from '@/components/guatemala-interactive-map'
 import DestinationSelectorModal from '@/components/destination-selector-modal'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 
@@ -380,7 +380,7 @@ export default function BookTransportPage() {
                   <p className="text-sm">Click on any department in Guatemala to see available destinations</p>
                 </div>
                 
-                <GuatemalaMap 
+                <GuatemalaInteractiveMap 
                   onDepartmentClick={handleDepartmentClick}
                   selectedFrom={formData.fromLocation}
                   selectedTo={formData.toLocation}
