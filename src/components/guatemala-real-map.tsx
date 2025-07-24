@@ -89,22 +89,16 @@ export default function GuatemalaRealMap({
         <div 
           className="relative w-full h-96 sm:h-[500px] bg-center bg-contain bg-no-repeat border-4 border-green-500"
           style={{
-            backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/4/4e/Guatemala_location_map.svg'), url('https://i.imgur.com/7QyBq3K.png')`,
-            backgroundColor: '#dbeafe',
-            backgroundSize: 'contain, contain',
-            backgroundPosition: 'center, center',
-            backgroundRepeat: 'no-repeat, no-repeat'
+            backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Guatemala_relief_location_map.jpg/800px-Guatemala_relief_location_map.jpg')`,
+            backgroundColor: '#e0f2fe',
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         >
           {/* Dark overlay for better marker visibility */}
           <div className="absolute inset-0 bg-black/20"></div>
           
-          {/* OBVIOUS REAL MAP INDICATOR */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="bg-red-600 text-white px-8 py-4 rounded-xl text-2xl font-bold shadow-2xl animate-pulse">
-              🗺️ REAL GUATEMALA MAP 🗺️
-            </div>
-          </div>
           
           {/* Top branding overlay */}
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg z-10">
