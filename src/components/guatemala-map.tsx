@@ -39,7 +39,7 @@ export default function GuatemalaMap({
       <div className="relative bg-blue-50 rounded-lg p-4">
         {/* SVG Map */}
         <svg 
-          viewBox="0 0 800 600" 
+          viewBox="0 0 400 300" 
           className="w-full h-full touch-manipulation"
           style={{ 
             maxHeight: '500px',
@@ -51,9 +51,9 @@ export default function GuatemalaMap({
             <g key={dept.id}>
               {/* Department Circle (simplified - in production, use actual polygon paths) */}
               <circle
-                cx={100 + (dept.coordinates[1] + 92) * 8}
-                cy={500 - (dept.coordinates[0] - 13.5) * 20}
-                r="30"
+                cx={20 + (dept.coordinates[1] + 92.5) * 15}
+                cy={280 - (dept.coordinates[0] - 13) * 25}
+                r="18"
                 fill={dept.color}
                 fillOpacity={
                   hoveredDept === dept.id ? 0.8 : 
@@ -75,8 +75,8 @@ export default function GuatemalaMap({
               {dept.airports.map((airport, idx) => (
                 <g key={idx}>
                   <text
-                    x={100 + (dept.coordinates[1] + 92) * 8}
-                    y={500 - (dept.coordinates[0] - 13.5) * 20 + 5}
+                    x={20 + (dept.coordinates[1] + 92.5) * 15}
+                    y={280 - (dept.coordinates[0] - 13) * 25 + 3}
                     textAnchor="middle"
                     className="fill-white font-bold text-xs pointer-events-none"
                   >
@@ -87,8 +87,8 @@ export default function GuatemalaMap({
               
               {/* Department Name */}
               <text
-                x={100 + (dept.coordinates[1] + 92) * 8}
-                y={500 - (dept.coordinates[0] - 13.5) * 20 + 35}
+                x={20 + (dept.coordinates[1] + 92.5) * 15}
+                y={280 - (dept.coordinates[0] - 13) * 25 + 30}
                 textAnchor="middle"
                 className="fill-gray-700 text-xs font-medium pointer-events-none"
               >
@@ -100,10 +100,10 @@ export default function GuatemalaMap({
           {/* Connection Line Between Selected Points */}
           {selectedFrom && selectedTo && (
             <line
-              x1={100 + (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[1] || 0 + 92) * 8}
-              y1={500 - (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[0] || 0 - 13.5) * 20}
-              x2={100 + (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[1] || 0 + 92) * 8}
-              y2={500 - (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[0] || 0 - 13.5) * 20}
+              x1={20 + (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[1] || 0 + 92.5) * 15}
+              y1={280 - (guatemalaDepartments.find(d => d.destinations.includes(selectedFrom))?.coordinates[0] || 0 - 13) * 25}
+              x2={20 + (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[1] || 0 + 92.5) * 15}
+              y2={280 - (guatemalaDepartments.find(d => d.destinations.includes(selectedTo))?.coordinates[0] || 0 - 13) * 25}
               stroke="#3b82f6"
               strokeWidth="3"
               strokeDasharray="5,5"
