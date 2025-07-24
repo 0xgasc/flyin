@@ -11,7 +11,7 @@ import { useTranslation } from '@/lib/i18n'
 import { format } from 'date-fns'
 // Helicopter selection moved to admin assignment workflow
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
-import GuatemalaMap from '@/components/guatemala-map'
+import GuatemalaMap from '@/components/guatemala-map-v2'
 import DestinationSelectorModal from '@/components/destination-selector-modal'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 
