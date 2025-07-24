@@ -45,115 +45,162 @@ export default function GuatemalaMap({
             maxHeight: '500px',
             minHeight: '300px'
           }}
-        >          
-          {/* Real Guatemala Department Boundaries from Official Sources */}
+        >
+          {/* Clean Guatemala Silhouette - based on your FlyIn Guatemala design */}
+          <path
+            d="M150 150 L200 120 L300 100 L450 80 L600 75 L750 80 L850 100 L900 130 L950 170 L980 220 L990 280 L980 340 L960 400 L930 450 L890 490 L840 520 L780 540 L710 550 L640 555 L570 550 L500 540 L430 525 L370 505 L320 480 L280 450 L250 415 L230 375 L220 335 L215 295 L220 255 L230 215 L250 180 L280 150 L320 130 L370 115 L430 105 L500 100 L570 105 L640 115 L710 130 L780 150 L840 175 L890 205 L930 240 L960 280 L980 325 L990 370 L980 415 L960 460 L930 500 L890 535 L840 565 L780 590 L710 610 L640 625 L570 635 L500 640 L430 635 L370 625 L320 610 L280 590 L250 565 L230 535 L220 500 L215 460 L220 415 L230 370 L250 325 L280 280 L320 240 L370 205 L430 175 Z"
+            fill="rgba(59, 130, 246, 0.15)"
+            stroke="rgba(59, 130, 246, 0.5)"
+            strokeWidth="2"
+            className="pointer-events-none"
+          />
+          
+          {/* Clean Destination Dots - matching your FlyIn Guatemala map */}
           {guatemalaDepartments.map((dept) => {
-            const getDepartmentPath = (id: string) => {
-              // Using simplified but accurate Guatemala department paths based on official geographic data
-              const officialPaths: Record<string, string> = {
-                // Actual administrative boundaries simplified for web use
-                'peten': 'M200 50 L700 50 L750 100 L800 150 L800 250 L750 300 L700 350 L600 380 L500 400 L400 420 L300 400 L250 380 L200 350 L150 300 L100 250 L100 150 L150 100 Z',
-                
-                'izabal': 'M700 350 L800 250 L850 300 L900 350 L950 400 L900 450 L850 500 L800 550 L750 500 L700 450 Z',
-                
-                'alta-verapaz': 'M400 420 L600 380 L650 420 L700 450 L650 500 L600 520 L550 540 L500 550 L450 540 L400 520 L350 500 L350 460 Z',
-                
-                'baja-verapaz': 'M350 460 L450 540 L400 580 L350 600 L300 580 L250 560 L200 540 L200 500 L250 480 L300 460 Z',
-                
-                'zacapa': 'M650 420 L750 500 L700 550 L650 580 L600 600 L550 580 L500 560 L500 520 L550 500 L600 480 Z',
-                
-                'chiquimula': 'M750 500 L850 500 L900 550 L850 600 L800 650 L750 700 L700 650 L650 600 L700 550 Z',
-                
-                'jalapa': 'M500 560 L600 600 L550 650 L500 680 L450 650 L400 620 L400 580 L450 540 Z',
-                
-                'el-progreso': 'M350 500 L500 520 L450 560 L400 580 L350 600 L300 580 L250 560 L250 520 L300 500 Z',
-                
-                'guatemala': 'M350 600 L450 650 L400 700 L350 720 L300 700 L250 680 L200 660 L200 620 L250 600 L300 580 Z',
-                
-                'sacatepequez': 'M250 680 L350 720 L320 750 L280 770 L240 750 L200 730 L180 700 L200 680 Z',
-                
-                'chimaltenango': 'M200 620 L300 700 L250 750 L200 780 L150 760 L100 740 L80 710 L100 680 L150 660 Z',
-                
-                'escuintla': 'M200 730 L320 750 L280 800 L200 830 L150 810 L100 790 L80 760 L120 740 L170 720 Z',
-                
-                'santa-rosa': 'M320 750 L450 650 L500 700 L450 750 L400 780 L350 800 L300 780 L280 750 Z',
-                
-                'jutiapa': 'M500 700 L600 600 L650 650 L700 700 L650 750 L600 780 L550 800 L500 780 L450 750 Z',
-                
-                'huehuetenango': 'M100 150 L200 350 L150 400 L100 450 L50 400 L20 350 L10 300 L20 250 L50 200 Z',
-                
-                'quiche': 'M200 350 L350 460 L300 500 L250 520 L200 540 L150 500 L100 460 L100 400 L150 380 Z',
-                
-                'san-marcos': 'M20 350 L100 450 L50 500 L20 550 L10 580 L0 550 L0 500 L0 450 L10 400 Z',
-                
-                'quetzaltenango': 'M100 450 L200 540 L150 580 L100 600 L50 580 L20 560 L10 530 L30 500 L70 480 Z',
-                
-                'totonicapan': 'M200 540 L300 500 L280 540 L250 580 L200 600 L150 580 L130 560 L150 540 Z',
-                
-                'solola': 'M100 600 L200 600 L180 640 L150 680 L100 700 L50 680 L30 660 L30 640 L50 620 L80 600 Z',
-                
-                'suchitepequez': 'M150 680 L250 680 L220 720 L180 760 L130 740 L80 720 L60 700 L80 680 L120 680 Z',
-                
-                'retalhuleu': 'M80 720 L180 760 L150 800 L100 820 L50 800 L20 780 L10 760 L30 740 L60 720 Z'
+            // Position dots based on your reference map
+            const getDestinationDots = (id: string) => {
+              const positions: Record<string, Array<{name: string, x: number, y: number}>> = {
+                'peten': [
+                  { name: 'Tikal', x: 750, y: 150 },
+                  { name: 'Flores', x: 700, y: 200 },
+                  { name: 'El Mirador', x: 800, y: 100 }
+                ],
+                'izabal': [
+                  { name: 'Río Dulce', x: 850, y: 320 },
+                  { name: 'Livingston', x: 920, y: 340 },
+                  { name: 'Puerto Barrios', x: 950, y: 380 }
+                ],
+                'alta-verapaz': [
+                  { name: 'Cobán', x: 600, y: 300 },
+                  { name: 'Sayaxché', x: 550, y: 250 }
+                ],
+                'baja-verapaz': [
+                  { name: 'Rabinal', x: 500, y: 380 }
+                ],
+                'zacapa': [
+                  { name: 'Zacapa', x: 750, y: 450 }
+                ],
+                'chiquimula': [
+                  { name: 'Chiquimula', x: 800, y: 500 },
+                  { name: 'Esquipulas', x: 850, y: 520 }
+                ],
+                'jalapa': [
+                  { name: 'Jalapa', x: 650, y: 500 }
+                ],
+                'el-progreso': [
+                  { name: 'El Progreso', x: 550, y: 420 }
+                ],
+                'guatemala': [
+                  { name: 'Ciudad de Guatemala', x: 500, y: 500 }
+                ],
+                'sacatepequez': [
+                  { name: 'Antigua', x: 450, y: 520 }
+                ],
+                'chimaltenango': [
+                  { name: 'Chimaltenango', x: 420, y: 480 }
+                ],
+                'escuintla': [
+                  { name: 'Monterrico', x: 450, y: 600 },
+                  { name: 'San José', x: 380, y: 620 }
+                ],
+                'santa-rosa': [
+                  { name: 'Santa Rosa', x: 550, y: 560 }
+                ],
+                'jutiapa': [
+                  { name: 'Jutiapa', x: 650, y: 580 }
+                ],
+                'huehuetenango': [
+                  { name: 'Huehuetenango', x: 200, y: 280 },
+                  { name: 'Nebaj', x: 280, y: 320 }
+                ],
+                'quiche': [
+                  { name: 'Quiché', x: 350, y: 380 }
+                ],
+                'san-marcos': [
+                  { name: 'San Marcos', x: 150, y: 450 }
+                ],
+                'quetzaltenango': [
+                  { name: 'Xela', x: 250, y: 450 }
+                ],
+                'totonicapan': [
+                  { name: 'Totonicapán', x: 320, y: 420 }
+                ],
+                'solola': [
+                  { name: 'Atitlán', x: 300, y: 480 }
+                ],
+                'suchitepequez': [
+                  { name: 'Mazatenango', x: 280, y: 550 }
+                ],
+                'retalhuleu': [
+                  { name: 'Retalhuleu', x: 220, y: 580 }
+                ]
               }
-              return officialPaths[id] || 'M500 400 L520 400 L520 420 L500 420 Z'
+              return positions[id] || []
             }
 
             return (
               <g key={dept.id}>
-                {/* Department Shape */}
-                <path
-                  d={getDepartmentPath(dept.id)}
-                  fill={
-                    hoveredDept === dept.id ? 'rgba(59, 130, 246, 0.8)' :
-                    selectedFrom === dept.destinations[0] || selectedTo === dept.destinations[0] ? 'rgba(37, 99, 235, 0.7)' : 
-                    'rgba(71, 85, 105, 0.6)'
-                  }
-                  stroke={hoveredDept === dept.id ? '#3b82f6' : 'rgba(148, 163, 184, 0.8)'}
-                  strokeWidth={hoveredDept === dept.id ? "2" : "1"}
-                  className="cursor-pointer transition-all duration-300 ease-in-out hover:drop-shadow-lg touch-manipulation"
-                  onMouseEnter={() => setHoveredDept(dept.id)}
-                  onMouseLeave={() => setHoveredDept(null)}
-                  onTouchStart={() => setHoveredDept(dept.id)}
-                  onTouchEnd={() => setHoveredDept(null)}
-                  onClick={() => handleDepartmentClick(dept)}
-                  style={{ touchAction: 'manipulation' }}
-                />
-                
-                {/* Airport Icons */}
-                {dept.airports.map((airport, idx) => (
+                {/* Destination Dots */}
+                {getDestinationDots(dept.id).map((destination, idx) => (
                   <g key={idx}>
                     <circle
-                      cx={100 + ((dept.coordinates[1] + 92.3) / 4.5) * 800}
-                      cy={650 - ((dept.coordinates[0] - 13.5) / 4.0) * 500}
-                      r="10"
-                      fill="rgba(59, 130, 246, 0.9)"
+                      cx={destination.x}
+                      cy={destination.y}
+                      r="6"
+                      fill="rgba(30, 41, 59, 0.9)"
                       stroke="rgba(255, 255, 255, 0.9)"
                       strokeWidth="2"
-                      className="pointer-events-none drop-shadow-lg"
+                      className="cursor-pointer transition-all duration-200 hover:scale-125 touch-manipulation"
+                      onMouseEnter={() => setHoveredDept(dept.id)}
+                      onMouseLeave={() => setHoveredDept(null)}
+                      onTouchStart={() => setHoveredDept(dept.id)}
+                      onTouchEnd={() => setHoveredDept(null)}
+                      onClick={() => handleDepartmentClick(dept)}
+                      style={{ touchAction: 'manipulation' }}
                     />
+                    
+                    {/* Destination Name */}
                     <text
-                      x={100 + ((dept.coordinates[1] + 92.3) / 4.5) * 800}
-                      y={650 - ((dept.coordinates[0] - 13.5) / 4.0) * 500 + 4}
+                      x={destination.x}
+                      y={destination.y + 25}
                       textAnchor="middle"
-                      className="fill-white font-bold pointer-events-none"
-                      style={{ fontSize: '12px' }}
+                      className="fill-slate-200 font-medium pointer-events-none drop-shadow-lg"
+                      style={{ fontSize: '11px' }}
                     >
-                      ✈
+                      {destination.name}
                     </text>
                   </g>
                 ))}
                 
-                {/* Department Name */}
-                <text
-                  x={100 + ((dept.coordinates[1] + 92.3) / 4.5) * 800}
-                  y={650 - ((dept.coordinates[0] - 13.5) / 4.0) * 500 + 45}
-                  textAnchor="middle"
-                  className="fill-slate-200 font-semibold pointer-events-none drop-shadow-lg"
-                  style={{ fontSize: '14px' }}
-                >
-                  {dept.name}
-                </text>
+                {/* Airport Icons for departments with airports */}
+                {dept.airports.map((airport, idx) => {
+                  const dots = getDestinationDots(dept.id)
+                  if (dots.length === 0) return null
+                  const mainDot = dots[0] // Use first destination as reference
+                  
+                  return (
+                    <g key={idx}>
+                      <circle
+                        cx={mainDot.x + 15}
+                        cy={mainDot.y - 15}
+                        r="8"
+                        fill="rgba(59, 130, 246, 0.9)"
+                        stroke="rgba(255, 255, 255, 0.9)"
+                        strokeWidth="2"
+                        className="pointer-events-none drop-shadow-lg"
+                      />
+                      <text
+                        x={mainDot.x + 15}
+                        y={mainDot.y - 10}
+                        textAnchor="middle"
+                        className="fill-white font-bold pointer-events-none"
+                        style={{ fontSize: '10px' }}
+                      >
+                        ✈
+                      </text>
+                    </g>
+                  )
+                })}
               </g>
             )
           })}
