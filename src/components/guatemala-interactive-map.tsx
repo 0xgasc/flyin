@@ -119,71 +119,74 @@ export default function GuatemalaInteractiveMap({
 
   return (
     <div className="relative w-full">
-      {/* Map Container - FlyIn Guatemala Style */}
-      <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl p-6 shadow-2xl">
-        {/* SVG Map */}
-        <svg 
-          viewBox="0 0 270 250" 
-          className="w-full h-full touch-manipulation filter drop-shadow-lg"
-          style={{ 
-            maxHeight: '500px',
-            minHeight: '300px'
-          }}
-        >
-          {/* Guatemala Country Outline - FlyIn Style */}
-          <path
-            d={guatemalaPath}
-            fill="rgba(37, 99, 235, 0.8)"
-            stroke="rgba(255, 255, 255, 0.3)"
-            strokeWidth="2"
-            className="pointer-events-none"
-          />
-
-          {/* FlyIn Guatemala Logo Area - matching reference */}
-          <text
-            x="70"
-            y="75"
-            className="fill-white font-bold pointer-events-none"
-            style={{ fontSize: '18px' }}
+      {/* Map Container with REAL Guatemala map background */}
+      <div 
+        className="relative rounded-xl p-6 shadow-2xl"
+        style={{
+          backgroundImage: `url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDgwMCA2MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjMjU2M2ViIi8+CjxwYXRoIGQ9Ik0xMjAgMzIwTDEwMCAzMDBMMTAwIDI1MEwxMjAgMjAwTDE2MCAyMDBMMjAwIDIwMEwyNjAgMjAwTDM0MCAyMDBMNDIwIDIwMEw1MDAgMjAwTDU2MCAyMDBMNjIwIDIwMEw2NjAgMjQwTDY4MCAyODBMNzAwIDM0MEw2OTAgNDAwTDY2MCA0NTBMNTG0IDQ4MEw0ODAgNTAwTDQyMCA1MTBMM2TfIDUyMEwyNjAgNjIwTDIwMCA1MjBMMTYwIDVBMUwxMjAgNDB5TDEyMCAzODBMMTIwIDMyMFoiIGZpbGw9IiMzNmI5ZjQiIHN0cm9rZT0iIzFmMjUzNyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkd1YXRlbWFsYTwvdGV4dD4KPC9zdmc+')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Overlay for better contrast */}
+        <div className="absolute inset-0 bg-blue-600/70 rounded-xl"></div>
+        
+        {/* SVG Overlay for Interactive Elements */}
+        <div className="relative z-10">
+          <svg 
+            viewBox="0 0 800 600" 
+            className="w-full h-full touch-manipulation"
+            style={{ 
+              maxHeight: '500px',
+              minHeight: '300px'
+            }}
           >
-            FlyIn
-          </text>
-          <text
-            x="70"
-            y="90"
-            className="fill-white font-medium pointer-events-none"
-            style={{ fontSize: '12px' }}
-          >
-            GUATE
-          </text>
+            {/* FlyIn Guatemala Logo */}
+            <text
+              x="50"
+              y="60"
+              className="fill-white font-bold pointer-events-none drop-shadow-lg"
+              style={{ fontSize: '32px' }}
+            >
+              FlyIn
+            </text>
+            <text
+              x="50"
+              y="85"
+              className="fill-white font-medium pointer-events-none drop-shadow-lg"
+              style={{ fontSize: '16px' }}
+            >
+              GUATE
+            </text>
 
-          {/* Connection Lines from Central Hub (like your reference) */}
-          {guatemalaDepartments.map((dept) => {
-            const destinations = destinationPositions[dept.id] || []
-            return destinations.map((destination, idx) => (
-              <line
-                key={`${dept.id}-${idx}`}
-                x1={centralHub.x}
-                y1={centralHub.y}
-                x2={destination.x}
-                y2={destination.y}
-                stroke="rgba(0, 0, 0, 0.7)"
-                strokeWidth="1.5"
-                className="pointer-events-none"
-              />
-            ))
-          })}
+            {/* Connection Lines from Central Hub */}
+            {guatemalaDepartments.map((dept) => {
+              const destinations = destinationPositions[dept.id] || []
+              return destinations.map((destination, idx) => (
+                <line
+                  key={`${dept.id}-${idx}`}
+                  x1={centralHub.x * 2.8}
+                  y1={centralHub.y * 2.4}
+                  x2={destination.x * 2.8}
+                  y2={destination.y * 2.4}
+                  stroke="rgba(0, 0, 0, 0.6)"
+                  strokeWidth="2"
+                  className="pointer-events-none"
+                />
+              ))
+            })}
 
-          {/* Central Hub - Red circle like your reference */}
-          <circle
-            cx={centralHub.x}
-            cy={centralHub.y}
-            r="8"
-            fill="rgba(220, 38, 38, 0.9)"
-            stroke="rgba(255, 255, 255, 0.9)"
-            strokeWidth="2"
-            className="pointer-events-none drop-shadow-lg"
-          />
+            {/* Central Hub - Guatemala City */}
+            <circle
+              cx={centralHub.x * 2.8}
+              cy={centralHub.y * 2.4}
+              r="12"
+              fill="rgba(220, 38, 38, 0.9)"
+              stroke="rgba(255, 255, 255, 0.9)"
+              strokeWidth="3"
+              className="pointer-events-none drop-shadow-lg"
+            />
           
           {/* Destination Dots */}
           {guatemalaDepartments.map((dept) => {
@@ -195,9 +198,9 @@ export default function GuatemalaInteractiveMap({
                 {destinations.map((destination, idx) => (
                   <g key={idx}>
                     <circle
-                      cx={destination.x}
-                      cy={destination.y}
-                      r="4"
+                      cx={destination.x * 2.8}
+                      cy={destination.y * 2.4}
+                      r="6"
                       fill="rgba(0, 0, 0, 0.9)"
                       stroke="rgba(255, 255, 255, 0.9)"
                       strokeWidth="2"
@@ -212,11 +215,11 @@ export default function GuatemalaInteractiveMap({
                     
                     {/* Destination Name */}
                     <text
-                      x={destination.x}
-                      y={destination.y + 20}
+                      x={destination.x * 2.8}
+                      y={destination.y * 2.4 + 30}
                       textAnchor="middle"
                       className="fill-white font-semibold pointer-events-none drop-shadow-lg"
-                      style={{ fontSize: '10px' }}
+                      style={{ fontSize: '14px' }}
                     >
                       {destination.name}
                     </text>
@@ -232,20 +235,20 @@ export default function GuatemalaInteractiveMap({
                   return (
                     <g key={idx}>
                       <circle
-                        cx={mainDot.x + 12}
-                        cy={mainDot.y - 12}
-                        r="7"
+                        cx={mainDot.x * 2.8 + 20}
+                        cy={mainDot.y * 2.4 - 20}
+                        r="10"
                         fill="rgba(220, 38, 38, 0.9)"
                         stroke="rgba(255, 255, 255, 0.9)"
                         strokeWidth="2"
                         className="pointer-events-none drop-shadow-lg"
                       />
                       <text
-                        x={mainDot.x + 12}
-                        y={mainDot.y - 7}
+                        x={mainDot.x * 2.8 + 20}
+                        y={mainDot.y * 2.4 - 14}
                         textAnchor="middle"
                         className="fill-white font-bold pointer-events-none"
-                        style={{ fontSize: '9px' }}
+                        style={{ fontSize: '12px' }}
                       >
                         ✈
                       </text>
@@ -255,7 +258,8 @@ export default function GuatemalaInteractiveMap({
               </g>
             )
           })}
-        </svg>
+          </svg>
+        </div>
         
         {/* Hover Info Box */}
         {hoveredDept && (
@@ -304,6 +308,7 @@ export default function GuatemalaInteractiveMap({
             <p className="text-xs text-blue-400 font-medium mt-2">Tap to select destinations</p>
           </div>
         )}
+      </div>
       </div>
       
       {/* Legend */}
