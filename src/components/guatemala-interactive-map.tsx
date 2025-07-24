@@ -123,10 +123,7 @@ export default function GuatemalaInteractiveMap({
       <div 
         className="relative rounded-xl p-6 shadow-2xl"
         style={{
-          backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/4/4e/Guatemala_location_map.svg')`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundColor: '#2563eb'
         }}
       >
         {/* Overlay for better contrast */}
@@ -142,6 +139,15 @@ export default function GuatemalaInteractiveMap({
               minHeight: '300px'
             }}
           >
+            {/* Guatemala Country Outline */}
+            <path
+              d="M100 150 L50 120 L40 80 L60 40 L100 30 L150 25 L200 30 L250 40 L300 60 L350 90 L380 130 L390 170 L380 210 L350 250 L300 280 L250 290 L200 285 L150 275 L100 260 L70 230 L50 190 L60 150 Z"
+              fill="rgba(34, 197, 94, 0.3)"
+              stroke="rgba(34, 197, 94, 0.8)"
+              strokeWidth="2"
+              className="pointer-events-none"
+            />
+            
             {/* FlyIn Guatemala Logo */}
             <text
               x="50"
@@ -259,9 +265,9 @@ export default function GuatemalaInteractiveMap({
           </svg>
         </div>
         
-        {/* Hover Info Box */}
+        {/* Hover Info Box - Positioned outside map area to prevent interference */}
         {hoveredDept && (
-          <div className="absolute top-4 left-4 right-4 md:right-4 md:left-auto bg-slate-800/95 backdrop-blur-sm border border-slate-600 rounded-xl shadow-2xl p-3 md:p-4 max-w-xs mx-auto md:mx-0 z-20">
+          <div className="absolute -top-2 -right-2 bg-slate-800/95 backdrop-blur-sm border border-slate-600 rounded-xl shadow-2xl p-3 md:p-4 max-w-xs z-20 pointer-events-none">
             <h3 className="font-semibold text-base md:text-lg mb-2 text-slate-100">{getDepartmentInfo(hoveredDept)?.name}</h3>
             
             {getDepartmentInfo(hoveredDept)?.airports.length! > 0 && (
