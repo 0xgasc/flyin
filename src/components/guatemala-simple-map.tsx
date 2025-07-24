@@ -87,10 +87,13 @@ export default function GuatemalaSimpleMap({
       <div className="rounded-xl overflow-hidden shadow-2xl">
         {/* Real Guatemala Map Container */}
         <div 
-          className="relative w-full h-96 sm:h-[500px] bg-center bg-cover bg-no-repeat"
+          className="relative w-full h-96 sm:h-[500px] bg-center bg-contain bg-no-repeat border-4 border-green-500"
           style={{
-            backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Guatemala_location_map.svg/800px-Guatemala_location_map.svg.png')`,
-            backgroundColor: '#e6f3ff'
+            backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/4/4e/Guatemala_location_map.svg'), url('https://i.imgur.com/7QyBq3K.png')`,
+            backgroundColor: '#dbeafe',
+            backgroundSize: 'contain, contain',
+            backgroundPosition: 'center, center',
+            backgroundRepeat: 'no-repeat, no-repeat'
           }}
         >
           {/* Dark overlay for better marker visibility */}
@@ -99,7 +102,8 @@ export default function GuatemalaSimpleMap({
           {/* Top branding overlay */}
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg z-10">
             <h3 className="font-bold text-blue-800 text-sm">FlyIn Guatemala</h3>
-            <p className="text-xs text-blue-600">Real Map View</p>
+            <p className="text-xs text-blue-600">Real Map View ✓</p>
+            <p className="text-xs text-green-600">Guatemala Geography</p>
           </div>
 
           {/* Guatemala City - Central Hub */}
