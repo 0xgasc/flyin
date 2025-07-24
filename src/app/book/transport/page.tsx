@@ -376,7 +376,7 @@ export default function BookTransportPage() {
             ) : (
               /* Map Selection Mode */
               <div className="space-y-6">
-                <div className="text-center text-gray-600 mb-4">
+                <div className="text-center text-slate-300 mb-6">
                   <p className="text-sm">Click on any department in Guatemala to see available destinations</p>
                 </div>
                 
@@ -389,18 +389,18 @@ export default function BookTransportPage() {
                 
                 {/* Selected Locations Display */}
                 {(formData.fromLocation || formData.toLocation) && (
-                  <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-primary-900 mb-2">Selected Route:</h3>
+                  <div className="bg-slate-800/30 border border-slate-600 rounded-xl p-4 backdrop-blur-sm">
+                    <h3 className="font-semibold text-slate-200 mb-2">Selected Route:</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-600">From:</span>
-                        <p className="font-medium text-primary-800">
+                        <span className="text-slate-400">From:</span>
+                        <p className="font-medium text-blue-400">
                           {formData.fromLocation || 'Not selected'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-gray-600">To:</span>
-                        <p className="font-medium text-primary-800">
+                        <span className="text-slate-400">To:</span>
+                        <p className="font-medium text-blue-400">
                           {formData.toLocation || 'Not selected'}
                         </p>
                       </div>
