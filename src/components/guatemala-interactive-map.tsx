@@ -123,8 +123,8 @@ export default function GuatemalaInteractiveMap({
       <div 
         className="relative rounded-xl p-6 shadow-2xl"
         style={{
-          backgroundImage: `url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDgwMCA2MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjMjU2M2ViIi8+CjxwYXRoIGQ9Ik0xMjAgMzIwTDEwMCAzMDBMMTAwIDI1MEwxMjAgMjAwTDE2MCAyMDBMMjAwIDIwMEwyNjAgMjAwTDM0MCAyMDBMNDIwIDIwMEw1MDAgMjAwTDU2MCAyMDBMNjIwIDIwMEw2NjAgMjQwTDY4MCAyODBMNzAwIDM0MEw2OTAgNDAwTDY2MCA0NTBMNTG0IDQ4MEw0ODAgNTAwTDQyMCA1MTBMM2TfIDUyMEwyNjAgNjIwTDIwMCA1MjBMMTYwIDVBMUwxMjAgNDB5TDEyMCAzODBMMTIwIDMyMFoiIGZpbGw9IiMzNmI5ZjQiIHN0cm9rZT0iIzFmMjUzNyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkd1YXRlbWFsYTwvdGV4dD4KPC9zdmc+')`,
-          backgroundSize: 'cover',
+          backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/4/4e/Guatemala_location_map.svg')`,
+          backgroundSize: 'contain',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
@@ -204,11 +204,9 @@ export default function GuatemalaInteractiveMap({
                       fill="rgba(0, 0, 0, 0.9)"
                       stroke="rgba(255, 255, 255, 0.9)"
                       strokeWidth="2"
-                      className="cursor-pointer transition-all duration-200 hover:scale-125 touch-manipulation shadow-lg"
+                      className="cursor-pointer transition-transform duration-150 hover:scale-110"
                       onMouseEnter={() => setHoveredDept(dept.id)}
                       onMouseLeave={() => setHoveredDept(null)}
-                      onTouchStart={() => setHoveredDept(dept.id)}
-                      onTouchEnd={() => setHoveredDept(null)}
                       onClick={() => handleDepartmentClick(dept)}
                       style={{ touchAction: 'manipulation' }}
                     />
@@ -263,7 +261,7 @@ export default function GuatemalaInteractiveMap({
         
         {/* Hover Info Box */}
         {hoveredDept && (
-          <div className="absolute top-4 left-4 right-4 md:right-4 md:left-auto bg-slate-800/95 backdrop-blur-sm border border-slate-600 rounded-xl shadow-2xl p-3 md:p-4 max-w-xs mx-auto md:mx-0 z-10">
+          <div className="absolute top-4 left-4 right-4 md:right-4 md:left-auto bg-slate-800/95 backdrop-blur-sm border border-slate-600 rounded-xl shadow-2xl p-3 md:p-4 max-w-xs mx-auto md:mx-0 z-20">
             <h3 className="font-semibold text-base md:text-lg mb-2 text-slate-100">{getDepartmentInfo(hoveredDept)?.name}</h3>
             
             {getDepartmentInfo(hoveredDept)?.airports.length! > 0 && (
