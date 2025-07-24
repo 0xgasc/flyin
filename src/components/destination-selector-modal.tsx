@@ -31,17 +31,17 @@ export default function DestinationSelectorModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center p-0 md:p-4 z-50">
+      <div className="bg-white rounded-t-xl md:rounded-xl shadow-xl w-full md:max-w-md max-h-[90vh] md:max-h-[80vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold">
+            <h2 className="text-lg md:text-xl font-bold">
               Select {type === 'from' ? 'Departure' : 'Destination'} in {department.name}
             </h2>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors"
+              className="text-white hover:text-gray-200 transition-colors p-1 -m-1"
             >
               <X className="h-6 w-6" />
             </button>
@@ -49,7 +49,7 @@ export default function DestinationSelectorModal({
         </div>
 
         {/* Content */}
-        <div className="p-4 overflow-y-auto max-h-[60vh]">
+        <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 140px)' }}>
           {/* Airports Section */}
           {department.airports.length > 0 && (
             <div className="mb-6">
@@ -62,10 +62,10 @@ export default function DestinationSelectorModal({
                   <button
                     key={airport.code}
                     onClick={() => setSelectedDestination(airport.name)}
-                    className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                    className={`w-full text-left p-3 rounded-lg border-2 transition-all touch-manipulation ${
                       selectedDestination === airport.name
                         ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-gray-200 hover:border-gray-300 active:border-primary-300'
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -89,15 +89,15 @@ export default function DestinationSelectorModal({
               <MapPin className="h-5 w-5 mr-2 text-primary-600" />
               Cities & Destinations
             </h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {department.destinations.map((destination) => (
                 <button
                   key={destination}
                   onClick={() => setSelectedDestination(destination)}
-                  className={`p-3 rounded-lg border-2 transition-all ${
+                  className={`p-3 rounded-lg border-2 transition-all touch-manipulation ${
                     selectedDestination === destination
                       ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      : 'border-gray-200 hover:border-gray-300 active:border-primary-300'
                   }`}
                 >
                   <p className="font-medium text-sm">{destination}</p>
