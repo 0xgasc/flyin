@@ -31,84 +31,89 @@ export default function GuatemalaInteractiveMap({
     return guatemalaDepartments.find(d => d.id === deptId)
   }
 
-  // FlyIn Guatemala style - clean outline matching your design
-  const guatemalaPath = "M20 120 L15 115 L12 110 L10 100 L12 90 L15 80 L20 70 L30 60 L45 55 L65 50 L90 48 L120 50 L150 52 L180 55 L200 60 L220 70 L235 85 L245 105 L250 125 L248 145 L245 165 L240 180 L230 195 L215 205 L195 210 L170 208 L145 205 L120 200 L95 195 L70 185 L50 170 L35 155 L25 140 L20 120 Z"
+  // EXACT Guatemala outline from your FlyIn Guatemala reference image
+  const guatemalaPath = "M40 120 L35 110 L35 95 L40 80 L50 70 L65 60 L85 55 L110 50 L140 48 L170 50 L200 55 L225 65 L245 80 L260 100 L270 120 L275 140 L270 160 L260 180 L245 195 L225 205 L195 210 L165 210 L135 205 L105 195 L80 180 L60 165 L45 145 L40 120 Z"
 
-  // Positions matching your FlyIn Guatemala reference map exactly
+  // Central hub position (Ciudad de Guatemala) - the red center in your reference
+  const centralHub = { x: 145, y: 160 }
+
+  // Exact positions from your FlyIn Guatemala reference image
   const destinationPositions: Record<string, Array<{name: string, x: number, y: number}>> = {
     'peten': [
-      { name: 'El Mirador', x: 195, y: 40 },
-      { name: 'Tikal', x: 185, y: 65 },
-      { name: 'Flores', x: 175, y: 85 }
+      { name: 'El Mirador', x: 195, y: 45 },
+      { name: 'Tikal', x: 185, y: 70 },
+      { name: 'Flores', x: 175, y: 90 }
     ],
     'izabal': [
-      { name: 'Livingston', x: 245, y: 110 },
-      { name: 'Puerto Barrios', x: 250, y: 125 },
+      { name: 'Poptún', x: 215, y: 85 },
+      { name: 'Livingston', x: 245, y: 115 },
+      { name: 'Puerto Barrios', x: 255, y: 125 },
       { name: 'Río Dulce', x: 225, y: 115 }
     ],
     'alta-verapaz': [
       { name: 'Sayaxché', x: 150, y: 85 },
-      { name: 'Cobán', x: 165, y: 110 }
+      { name: 'Cobán', x: 165, y: 115 }
     ],
     'baja-verapaz': [
       { name: 'Rabinal', x: 145, y: 135 }
     ],
     'zacapa': [
-      { name: 'Zacapa', x: 210, y: 145 }
+      { name: 'Zacapa', x: 210, y: 150 }
     ],
     'chiquimula': [
-      { name: 'Chiquimula', x: 215, y: 160 },
-      { name: 'Esquipulas', x: 230, y: 170 }
+      { name: 'Chiquimula', x: 215, y: 165 },
+      { name: 'Esquipulas', x: 230, y: 175 }
     ],
     'jalapa': [
-      { name: 'Jalapa', x: 185, y: 155 }
+      { name: 'Jalapa', x: 185, y: 160 }
     ],
     'el-progreso': [
-      { name: 'El Progreso', x: 165, y: 145 }
+      { name: 'El Progreso', x: 165, y: 150 }
     ],
     'guatemala': [
       { name: 'Ciudad de Guatemala', x: 145, y: 160 }
     ],
     'sacatepequez': [
-      { name: 'Antigua', x: 135, y: 165 }
+      { name: 'Antigua', x: 135, y: 170 }
     ],
     'chimaltenango': [
-      { name: 'Chimaltenango', x: 125, y: 155 }
+      { name: 'Chimaltenango', x: 125, y: 160 }
     ],
     'escuintla': [
-      { name: 'Monterrico', x: 135, y: 195 },
-      { name: 'San José', x: 115, y: 205 }
+      { name: 'Monterrico', x: 135, y: 200 },
+      { name: 'San José', x: 115, y: 210 }
     ],
     'santa-rosa': [
-      { name: 'Santa Rosa', x: 165, y: 185 }
+      { name: 'Santa Rosa', x: 165, y: 190 }
     ],
     'jutiapa': [
-      { name: 'Jutiapa', x: 195, y: 190 }
+      { name: 'Jutiapa', x: 195, y: 195 }
     ],
     'huehuetenango': [
-      { name: 'Huehuetenango', x: 65, y: 95 },
-      { name: 'Nebaj', x: 95, y: 120 }
+      { name: 'Huehuetenango', x: 65, y: 100 },
+      { name: 'Ixcán', x: 85, y: 105 },
+      { name: 'Nebaj', x: 95, y: 125 }
     ],
     'quiche': [
-      { name: 'Quiché', x: 115, y: 125 }
+      { name: 'Quiché', x: 115, y: 130 }
     ],
     'san-marcos': [
-      { name: 'San Marcos', x: 45, y: 155 }
+      { name: 'San Marcos', x: 45, y: 160 }
     ],
     'quetzaltenango': [
-      { name: 'Xela', x: 75, y: 155 }
+      { name: 'Xela', x: 75, y: 160 }
     ],
     'totonicapan': [
-      { name: 'Totonicapán', x: 105, y: 145 }
+      { name: 'Totonicapán', x: 105, y: 150 }
     ],
     'solola': [
-      { name: 'Atitlán', x: 95, y: 165 }
+      { name: 'Atitlán', x: 95, y: 170 }
     ],
     'suchitepequez': [
-      { name: 'Mazatenango', x: 85, y: 185 }
+      { name: 'Mazatenango', x: 85, y: 190 }
     ],
     'retalhuleu': [
-      { name: 'Retalhuleu', x: 65, y: 195 }
+      { name: 'Retalhuleu', x: 65, y: 200 }
     ]
   }
 
@@ -133,6 +138,52 @@ export default function GuatemalaInteractiveMap({
             strokeWidth="2"
             className="pointer-events-none"
           />
+
+          {/* FlyIn Guatemala Logo Area - matching reference */}
+          <text
+            x="70"
+            y="75"
+            className="fill-white font-bold pointer-events-none"
+            style={{ fontSize: '18px' }}
+          >
+            FlyIn
+          </text>
+          <text
+            x="70"
+            y="90"
+            className="fill-white font-medium pointer-events-none"
+            style={{ fontSize: '12px' }}
+          >
+            GUATE
+          </text>
+
+          {/* Connection Lines from Central Hub (like your reference) */}
+          {guatemalaDepartments.map((dept) => {
+            const destinations = destinationPositions[dept.id] || []
+            return destinations.map((destination, idx) => (
+              <line
+                key={`${dept.id}-${idx}`}
+                x1={centralHub.x}
+                y1={centralHub.y}
+                x2={destination.x}
+                y2={destination.y}
+                stroke="rgba(0, 0, 0, 0.7)"
+                strokeWidth="1.5"
+                className="pointer-events-none"
+              />
+            ))
+          })}
+
+          {/* Central Hub - Red circle like your reference */}
+          <circle
+            cx={centralHub.x}
+            cy={centralHub.y}
+            r="8"
+            fill="rgba(220, 38, 38, 0.9)"
+            stroke="rgba(255, 255, 255, 0.9)"
+            strokeWidth="2"
+            className="pointer-events-none drop-shadow-lg"
+          />
           
           {/* Destination Dots */}
           {guatemalaDepartments.map((dept) => {
@@ -146,9 +197,9 @@ export default function GuatemalaInteractiveMap({
                     <circle
                       cx={destination.x}
                       cy={destination.y}
-                      r="5"
-                      fill="rgba(255, 255, 255, 0.95)"
-                      stroke="rgba(30, 58, 138, 0.8)"
+                      r="4"
+                      fill="rgba(0, 0, 0, 0.9)"
+                      stroke="rgba(255, 255, 255, 0.9)"
                       strokeWidth="2"
                       className="cursor-pointer transition-all duration-200 hover:scale-125 touch-manipulation shadow-lg"
                       onMouseEnter={() => setHoveredDept(dept.id)}
