@@ -12,6 +12,7 @@ import { format } from 'date-fns'
 // Helicopter selection moved to admin assignment workflow
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
 import GuatemalaInteractiveMap from '@/components/guatemala-interactive-map'
+import GuatemalaSimpleMap from '@/components/guatemala-simple-map'
 import DestinationSelectorModal from '@/components/destination-selector-modal'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 
@@ -45,6 +46,7 @@ export default function BookTransportPage() {
   })
   const [priceBredown, setPriceBreakdown] = useState<any>(null)
   const [selectionMode, setSelectionMode] = useState<'dropdown' | 'map'>('dropdown')
+  const [mapStyle, setMapStyle] = useState<'custom' | 'real'>('custom')
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null)
   const [showDestinationModal, setShowDestinationModal] = useState(false)
   const [modalType, setModalType] = useState<'from' | 'to'>('from')
@@ -92,6 +94,21 @@ export default function BookTransportPage() {
   }
 
   const handleDepartmentClick = (dept: Department) => {
+    // For real map (Leaflet), if department has only one destination, select it directly
+    if (mapStyle === 'real' && dept.destinations.length === 1) {
+      const destination = dept.destinations[0]
+      if (!formData.fromLocation) {
+        setFormData(prev => ({ ...prev, fromLocation: destination }))
+      } else if (!formData.toLocation) {
+        setFormData(prev => ({ ...prev, toLocation: destination }))
+      } else {
+        // Both filled, replace from location
+        setFormData(prev => ({ ...prev, fromLocation: destination }))
+      }
+      return
+    }
+    
+    // For custom map or departments with multiple destinations, show modal
     setSelectedDepartment(dept)
     setShowDestinationModal(true)
     // Determine modal type based on current selections
@@ -263,31 +280,61 @@ export default function BookTransportPage() {
               </h2>
               
               {/* Selection Mode Toggle */}
-              <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
-                <button
-                  type="button"
-                  onClick={() => setSelectionMode('dropdown')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    selectionMode === 'dropdown' 
-                      ? 'bg-white text-primary-600 shadow' 
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
-                >
-                  <Grid className="h-4 w-4 inline mr-1" />
-                  List
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectionMode('map')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    selectionMode === 'map' 
-                      ? 'bg-white text-primary-600 shadow' 
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
-                >
-                  <Map className="h-4 w-4 inline mr-1" />
-                  Map
-                </button>
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+                  <button
+                    type="button"
+                    onClick={() => setSelectionMode('dropdown')}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      selectionMode === 'dropdown' 
+                        ? 'bg-white text-primary-600 shadow' 
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <Grid className="h-4 w-4 inline mr-1" />
+                    List
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectionMode('map')}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      selectionMode === 'map' 
+                        ? 'bg-white text-primary-600 shadow' 
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <Map className="h-4 w-4 inline mr-1" />
+                    Map
+                  </button>
+                </div>
+                
+                {/* Map Style Toggle - Only show when in map mode */}
+                {selectionMode === 'map' && (
+                  <div className="flex items-center space-x-2 bg-blue-100 rounded-lg p-1">
+                    <button
+                      type="button"
+                      onClick={() => setMapStyle('custom')}
+                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                        mapStyle === 'custom' 
+                          ? 'bg-white text-blue-600 shadow' 
+                          : 'text-blue-600 hover:text-blue-800'
+                      }`}
+                    >
+                      FlyIn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMapStyle('real')}
+                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                        mapStyle === 'real' 
+                          ? 'bg-white text-blue-600 shadow' 
+                          : 'text-blue-600 hover:text-blue-800'
+                      }`}
+                    >
+                      Real Map
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -377,15 +424,29 @@ export default function BookTransportPage() {
               /* Map Selection Mode */
               <div className="space-y-6">
                 <div className="text-center text-slate-300 mb-6">
-                  <p className="text-sm">Click on any department in Guatemala to see available destinations</p>
+                  <p className="text-sm">
+                    {mapStyle === 'custom' 
+                      ? 'Click on any department in Guatemala to see available destinations'
+                      : 'Click on any marker to select destinations - Real Guatemala geography!'
+                    }
+                  </p>
                 </div>
                 
-                <GuatemalaInteractiveMap 
-                  onDepartmentClick={handleDepartmentClick}
-                  selectedFrom={formData.fromLocation}
-                  selectedTo={formData.toLocation}
-                  mode="both"
-                />
+                {mapStyle === 'custom' ? (
+                  <GuatemalaInteractiveMap 
+                    onDepartmentClick={handleDepartmentClick}
+                    selectedFrom={formData.fromLocation}
+                    selectedTo={formData.toLocation}
+                    mode="both"
+                  />
+                ) : (
+                  <GuatemalaSimpleMap 
+                    onDepartmentClick={handleDepartmentClick}
+                    selectedFrom={formData.fromLocation}
+                    selectedTo={formData.toLocation}
+                    mode="both"
+                  />
+                )}
                 
                 {/* Selected Locations Display */}
                 {(formData.fromLocation || formData.toLocation) && (
