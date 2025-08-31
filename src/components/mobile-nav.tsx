@@ -123,26 +123,28 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
               {customActions}
             </div>
             
-            {/* Desktop navigation */}
-            <div className="hidden md:flex items-center space-x-6">
-              {navItems.filter(item => item.show).map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm hover:text-luxury-gold transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              {profile && (
-                <button
-                  onClick={handleSignOut}
-                  className="text-sm hover:text-luxury-gold transition-colors"
-                >
-                  Sign Out
-                </button>
-              )}
-            </div>
+            {/* Desktop navigation - only show if no custom actions provided */}
+            {!customActions && (
+              <div className="hidden md:flex items-center space-x-6">
+                {navItems.filter(item => item.show).map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-sm hover:text-luxury-gold transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                {profile && (
+                  <button
+                    onClick={handleSignOut}
+                    className="text-sm hover:text-luxury-gold transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Mobile menu button */}
             <button

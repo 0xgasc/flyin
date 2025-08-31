@@ -67,13 +67,8 @@ export default function HomePage() {
             label: t('nav.pilot_opportunities'),
             icon: <Users className="h-5 w-5" />,
             show: !profile // Only show for unauthenticated users
-          },
-          ...(profile?.role === 'admin' ? [{
-            href: '/admin',
-            label: 'Admin Panel',
-            icon: <Users className="h-5 w-5" />,
-            show: true
-          }] : [])
+          }
+          // Note: Admin Panel is already handled by the built-in navItems
         ]}
       />
 
