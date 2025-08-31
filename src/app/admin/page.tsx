@@ -1048,6 +1048,31 @@ export default function AdminDashboard() {
       if (!confirm('Are you sure you want to delete this experience?')) return
       
       try {
+        // First check if there are any bookings referencing this experience
+        const { data: bookings, error: bookingsError } = await supabase
+          .from('bookings')
+          .select('id, client:profiles(full_name)')
+          .eq('experience_id', id)
+        
+        if (bookingsError) throw bookingsError
+        
+        if (bookings && bookings.length > 0) {
+          const clientNames = bookings.map(b => (b.client as any)?.full_name || 'Unknown').join(', ')
+          const confirmDelete = confirm(
+            `This experience has ${bookings.length} booking(s) from: ${clientNames}.\n\nDeleting this experience will also delete all associated bookings. Are you sure you want to continue?`
+          )
+          if (!confirmDelete) return
+          
+          // Delete bookings first
+          const { error: deleteBookingsError } = await supabase
+            .from('bookings')
+            .delete()
+            .eq('experience_id', id)
+          
+          if (deleteBookingsError) throw deleteBookingsError
+        }
+        
+        // Now delete the experience (experience_images will cascade delete automatically)
         const { error } = await supabase
           .from('experiences')
           .delete()
@@ -1057,7 +1082,7 @@ export default function AdminDashboard() {
         await fetchExperiences()
       } catch (error) {
         console.error('Error deleting experience:', error)
-        alert('Failed to delete experience')
+        alert(`Failed to delete experience: ${error.message || 'Unknown error'}`)
       }
     }
 

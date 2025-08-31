@@ -14,19 +14,43 @@ export default function ClearAuthPage() {
   useEffect(() => {
     const clearAuth = async () => {
       try {
-        addLog('🔄 Step 1: Clearing localStorage...')
-        localStorage.clear()
-        setStep(1)
+        addLog('🔄 Step 1: Signing out from Supabase...')
+        // Import dynamically to avoid SSR issues
+        const { supabase } = await import('@/lib/supabase')
+        const { useAuthStore } = await import('@/lib/auth-store')
         
+        try {
+          await supabase.auth.signOut()
+          addLog('✅ Supabase sign out complete')
+        } catch (supabaseError) {
+          addLog(`⚠️ Supabase sign out error: ${supabaseError}`)
+        }
+        
+        // Force reset auth store
+        try {
+          const { hardReset } = useAuthStore.getState()
+          hardReset()
+          addLog('✅ Auth store hard reset')
+        } catch (storeError) {
+          addLog(`⚠️ Store reset error: ${storeError}`)
+        }
+        
+        setStep(1)
         await new Promise(resolve => setTimeout(resolve, 500))
         
-        addLog('🔄 Step 2: Clearing sessionStorage...')
-        sessionStorage.clear()
+        addLog('🔄 Step 2: Clearing localStorage...')
+        localStorage.clear()
         setStep(2)
         
         await new Promise(resolve => setTimeout(resolve, 500))
         
-        addLog('🔄 Step 3: Clearing cookies...')
+        addLog('🔄 Step 3: Clearing sessionStorage...')
+        sessionStorage.clear()
+        setStep(3)
+        
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        addLog('🔄 Step 4: Clearing cookies...')
         // Clear cookies
         const cookies = document.cookie.split(';')
         for (let cookie of cookies) {
@@ -38,15 +62,30 @@ export default function ClearAuthPage() {
             document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`
           }
         }
-        setStep(3)
+        setStep(4)
+        
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        addLog('🔄 Step 5: Clearing service worker cache...')
+        try {
+          if ('serviceWorker' in navigator && 'caches' in window) {
+            const cacheNames = await caches.keys()
+            await Promise.all(cacheNames.map(name => caches.delete(name)))
+            addLog('✅ Service worker cache cleared')
+          }
+        } catch (cacheError) {
+          addLog(`⚠️ Cache clear error: ${cacheError}`)
+        }
+        setStep(5)
         
         await new Promise(resolve => setTimeout(resolve, 500))
         
         addLog('✅ All cleared! Redirecting in 2 seconds...')
-        setStep(4)
+        setStep(6)
         
         setTimeout(() => {
-          window.location.href = '/'
+          // Force a hard reload to ensure everything is fresh
+          window.location.replace('/')
         }, 2000)
         
       } catch (error) {
@@ -55,7 +94,7 @@ export default function ClearAuthPage() {
         
         // Force redirect anyway
         setTimeout(() => {
-          window.location.href = '/'
+          window.location.replace('/')
         }, 3000)
       }
     }
@@ -67,16 +106,16 @@ export default function ClearAuthPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
         <div className="text-center mb-6">
-          {step < 4 ? (
+          {step < 6 ? (
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           ) : (
             <div className="text-green-600 text-6xl mb-4">✅</div>
           )}
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {step < 4 ? 'Clearing Authentication' : 'Authentication Cleared!'}
+            {step < 6 ? 'Clearing Authentication' : 'Authentication Cleared!'}
           </h1>
           <p className="text-gray-600">
-            {step < 4 ? 'Clearing auth cache...' : 'Redirecting to home page...'}
+            {step < 6 ? `Step ${step}/5: Clearing auth data...` : 'Redirecting to home page...'}
           </p>
         </div>
         
