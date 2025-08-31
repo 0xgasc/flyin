@@ -83,12 +83,12 @@ export default function BookExperiencesPage() {
         const uniqueCategories = Array.from(new Set(mappedData.map((exp: any) => exp.category).filter(Boolean)))
         setCategories(uniqueCategories)
       } else {
-        console.log('No experiences found or error:', error)
+        console.warn('No experiences found or table does not exist yet:', error?.message || 'Unknown error')
         // Fallback to demo data
         setDemoExperiences()
       }
-    } catch (err) {
-      console.error('Error fetching experiences:', err)
+    } catch (err: any) {
+      console.warn('Database table may not exist yet, using demo data:', err?.message || err)
       setDemoExperiences()
     } finally {
       setLoading(false)

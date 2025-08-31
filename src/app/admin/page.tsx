@@ -68,6 +68,53 @@ export default function AdminDashboard() {
   const router = useRouter()
   const { profile } = useAuthStore()
   const { t } = useTranslation()
+  
+  // Auth guard - redirect if not authenticated or not admin
+  useEffect(() => {
+    if (profile === null) {
+      // Still loading profile
+      return
+    }
+    if (!profile) {
+      // No user, redirect to login
+      router.push('/login')
+      return
+    }
+    if (profile.role !== 'admin') {
+      // Not admin, redirect to home
+      router.push('/')
+      return
+    }
+  }, [profile, router])
+
+  // Don't render anything if not properly authenticated
+  if (profile === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin panel...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!profile || profile.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-4">You need admin permissions to access this page.</p>
+          <button
+            onClick={() => router.push('/')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Return Home
+          </button>
+        </div>
+      </div>
+    )
+  }
   const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'choppers' | 'analytics' | 'experiences' | 'destinations'>('bookings')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [pilots, setPilots] = useState<Pilot[]>([])
