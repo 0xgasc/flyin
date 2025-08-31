@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
-import { IrysUpload } from '@/components/IrysUpload'
+import IrysUpload from '@/components/IrysUpload'
 import { ArrowLeft, Plus, Trash2, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 
@@ -478,7 +478,7 @@ export default function EditDestinationPage() {
         {showImageUpload && (
           <IrysUpload
             onUploadComplete={handleImageUpload}
-            onCancel={() => setShowImageUpload(false)}
+            onClose={() => setShowImageUpload(false)}
           />
         )}
       </div>
