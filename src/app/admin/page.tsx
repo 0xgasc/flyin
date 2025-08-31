@@ -587,11 +587,11 @@ export default function AdminDashboard() {
         setExperiences(data)
       }
       if (error) {
-        console.error('Error fetching experiences:', error)
+        console.warn('Error fetching experiences (table may not exist yet):', error.message)
         setExperiences([])
       }
     } catch (err) {
-      console.error('Error:', err)
+      console.warn('Error fetching experiences:', err)
       setExperiences([])
     } finally {
       setLoading(false)
@@ -618,11 +618,11 @@ export default function AdminDashboard() {
         setDestinations(data)
       }
       if (error) {
-        console.error('Error fetching destinations:', error)
+        console.warn('Error fetching destinations (table may not exist yet):', error.message)
         setDestinations([])
       }
     } catch (err) {
-      console.error('Error:', err)
+      console.warn('Error fetching destinations:', err)
       setDestinations([])
     } finally {
       setLoading(false)
