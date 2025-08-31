@@ -1080,7 +1080,7 @@ export default function AdminDashboard() {
         
         if (error) throw error
         await fetchExperiences()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting experience:', error)
         alert(`Failed to delete experience: ${error.message || 'Unknown error'}`)
       }
