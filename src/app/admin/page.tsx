@@ -9,8 +9,9 @@ import { supabase } from '@/lib/supabase'
 import { 
   Plane, Calendar, MapPin, Clock, Users, CheckCircle, 
   AlertCircle, XCircle, DollarSign, BarChart3, UserCheck,
-  Plus 
+  Plus, Edit, Trash2, Upload, Image as ImageIcon, Eye
 } from 'lucide-react'
+import IrysUpload from '@/components/IrysUpload'
 import { HELICOPTER_FLEET } from '@/types/helicopters'
 import { format } from 'date-fns'
 
@@ -67,11 +68,13 @@ export default function AdminDashboard() {
   const router = useRouter()
   const { profile } = useAuthStore()
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'choppers' | 'analytics'>('bookings')
+  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'choppers' | 'analytics' | 'experiences' | 'destinations'>('bookings')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [pilots, setPilots] = useState<Pilot[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [transactions, setTransactions] = useState<any[]>([])
+  const [experiences, setExperiences] = useState<any[]>([])
+  const [destinations, setDestinations] = useState<any[]>([])
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0) // 0 = current week, -1 = previous, +1 = next
@@ -156,6 +159,10 @@ export default function AdminDashboard() {
         fetchMaintenanceRecords()
       } else if (activeTab === 'analytics') {
         fetchFinancialData()
+      } else if (activeTab === 'experiences') {
+        fetchExperiences()
+      } else if (activeTab === 'destinations') {
+        fetchDestinations()
       }
     }
   }, [profile, activeTab, statusFilter])
@@ -560,6 +567,68 @@ export default function AdminDashboard() {
     }
   }
 
+  const fetchExperiences = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('experiences')
+        .select(`
+          *,
+          experience_images (
+            id,
+            image_url,
+            caption,
+            is_primary,
+            order_index
+          )
+        `)
+        .order('created_at', { ascending: false })
+
+      if (data) {
+        setExperiences(data)
+      }
+      if (error) {
+        console.error('Error fetching experiences:', error)
+        setExperiences([])
+      }
+    } catch (err) {
+      console.error('Error:', err)
+      setExperiences([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchDestinations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('destinations')
+        .select(`
+          *,
+          destination_images (
+            id,
+            image_url,
+            caption,
+            is_primary,
+            order_index
+          )
+        `)
+        .order('created_at', { ascending: false })
+
+      if (data) {
+        setDestinations(data)
+      }
+      if (error) {
+        console.error('Error fetching destinations:', error)
+        setDestinations([])
+      }
+    } catch (err) {
+      console.error('Error:', err)
+      setDestinations([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const updateBookingStatus = async (bookingId: string, status: string, pilotId?: string, helicopterId?: string) => {
     setRefreshing(true)
     try {
@@ -923,6 +992,419 @@ export default function AdminDashboard() {
     }
   }
 
+  // Experiences Management Component
+  const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) => {
+    const [showImageUpload, setShowImageUpload] = useState(false)
+    const [selectedExperienceId, setSelectedExperienceId] = useState<string | null>(null)
+
+    const handleDeleteExperience = async (id: string) => {
+      if (!confirm('Are you sure you want to delete this experience?')) return
+      
+      try {
+        const { error } = await supabase
+          .from('experiences')
+          .delete()
+          .eq('id', id)
+        
+        if (error) throw error
+        await fetchExperiences()
+      } catch (error) {
+        console.error('Error deleting experience:', error)
+        alert('Failed to delete experience')
+      }
+    }
+
+    const handleToggleActive = async (id: string, currentStatus: boolean) => {
+      try {
+        const { error } = await supabase
+          .from('experiences')
+          .update({ is_active: !currentStatus })
+          .eq('id', id)
+        
+        if (error) throw error
+        await fetchExperiences()
+      } catch (error) {
+        console.error('Error updating experience status:', error)
+      }
+    }
+
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Experience Management</h1>
+          <div className="flex gap-3">
+            <Link
+              href="/admin/experiences/new"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2"
+            >
+              <Plus className="w-5 h-5" />
+              <span>New Experience</span>
+            </Link>
+            <Link
+              href="/admin/experiences/import"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2"
+            >
+              <Upload className="w-5 h-5" />
+              <span>Bulk Import</span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Experience
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Location
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Duration
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Price
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    Loading experiences...
+                  </td>
+                </tr>
+              ) : experiences.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    No experiences found
+                  </td>
+                </tr>
+              ) : (
+                experiences.map((experience: any) => (
+                  <tr key={experience.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {experience.image_url ? (
+                          <img
+                            className="h-10 w-10 rounded-full object-cover"
+                            src={experience.image_url}
+                            alt={experience.name}
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                            <ImageIcon className="w-5 h-5 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{experience.name}</div>
+                          <div className="text-sm text-gray-500">{experience.category || 'helitour'}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center text-sm text-gray-900">
+                        <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+                        {experience.location}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center text-sm text-gray-900">
+                        <Clock className="w-4 h-4 mr-1 text-gray-400" />
+                        {experience.duration_hours}h
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">${experience.base_price}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => handleToggleActive(experience.id, experience.is_active)}
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          experience.is_active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {experience.is_active ? 'Active' : 'Inactive'}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedExperienceId(experience.id)
+                            setShowImageUpload(true)
+                          }}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <ImageIcon className="w-4 h-4" />
+                        </button>
+                        <Link
+                          href={`/admin/experiences/${experience.id}/edit`}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                        <button
+                          onClick={() => handleDeleteExperience(experience.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Image Upload Modal */}
+        {showImageUpload && selectedExperienceId && (
+          <IrysUpload
+            onUploadComplete={async (url) => {
+              try {
+                await supabase
+                  .from('experiences')
+                  .update({ image_url: url })
+                  .eq('id', selectedExperienceId)
+
+                await supabase
+                  .from('experience_images')
+                  .insert({
+                    experience_id: selectedExperienceId,
+                    image_url: url,
+                    is_primary: true,
+                    order_index: 0
+                  })
+
+                await fetchExperiences()
+                setShowImageUpload(false)
+                setSelectedExperienceId(null)
+              } catch (error) {
+                console.error('Error updating image:', error)
+              }
+            }}
+            onClose={() => {
+              setShowImageUpload(false)
+              setSelectedExperienceId(null)
+            }}
+          />
+        )}
+      </div>
+    )
+  }
+
+  // Destinations Management Component
+  const DestinationsManagement = ({ destinations, fetchDestinations, loading }: any) => {
+    const [showImageUpload, setShowImageUpload] = useState(false)
+    const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null)
+
+    const handleDeleteDestination = async (id: string) => {
+      if (!confirm('Are you sure you want to delete this destination?')) return
+      
+      try {
+        const { error } = await supabase
+          .from('destinations')
+          .delete()
+          .eq('id', id)
+        
+        if (error) throw error
+        await fetchDestinations()
+      } catch (error) {
+        console.error('Error deleting destination:', error)
+        alert('Failed to delete destination')
+      }
+    }
+
+    const handleToggleActive = async (id: string, currentStatus: boolean) => {
+      try {
+        const { error } = await supabase
+          .from('destinations')
+          .update({ is_active: !currentStatus })
+          .eq('id', id)
+        
+        if (error) throw error
+        await fetchDestinations()
+      } catch (error) {
+        console.error('Error updating destination status:', error)
+      }
+    }
+
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Destination Management</h1>
+          <div className="flex gap-3">
+            <Link
+              href="/admin/destinations/new"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2"
+            >
+              <Plus className="w-5 h-5" />
+              <span>New Destination</span>
+            </Link>
+            <Link
+              href="/admin/destinations/import"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2"
+            >
+              <Upload className="w-5 h-5" />
+              <span>Bulk Import</span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Destination
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Location
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Features
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    Loading destinations...
+                  </td>
+                </tr>
+              ) : destinations.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    No destinations found
+                  </td>
+                </tr>
+              ) : (
+                destinations.map((destination: any) => (
+                  <tr key={destination.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {destination.destination_images?.find((img: any) => img.is_primary)?.image_url ? (
+                          <img
+                            className="h-10 w-10 rounded-full object-cover"
+                            src={destination.destination_images.find((img: any) => img.is_primary).image_url}
+                            alt={destination.name}
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                            <MapPin className="w-5 h-5 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{destination.name}</div>
+                          <div className="text-sm text-gray-500">{destination.description?.substring(0, 50)}...</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{destination.location || 'N/A'}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">
+                        {destination.features?.length > 0 ? (
+                          <span>{destination.features.slice(0, 2).join(', ')}{destination.features.length > 2 && '...'}</span>
+                        ) : (
+                          'No features'
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => handleToggleActive(destination.id, destination.is_active)}
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          destination.is_active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {destination.is_active ? 'Active' : 'Inactive'}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedDestinationId(destination.id)
+                            setShowImageUpload(true)
+                          }}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <ImageIcon className="w-4 h-4" />
+                        </button>
+                        <Link
+                          href={`/admin/destinations/${destination.id}/edit`}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                        <button
+                          onClick={() => handleDeleteDestination(destination.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Image Upload Modal */}
+        {showImageUpload && selectedDestinationId && (
+          <IrysUpload
+            onUploadComplete={async (url) => {
+              try {
+                await supabase
+                  .from('destination_images')
+                  .insert({
+                    destination_id: selectedDestinationId,
+                    image_url: url,
+                    is_primary: true,
+                    order_index: 0
+                  })
+
+                await fetchDestinations()
+                setShowImageUpload(false)
+                setSelectedDestinationId(null)
+              } catch (error) {
+                console.error('Error updating image:', error)
+              }
+            }}
+            onClose={() => {
+              setShowImageUpload(false)
+              setSelectedDestinationId(null)
+            }}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-luxury-black text-white p-6">
@@ -1019,6 +1501,26 @@ export default function AdminDashboard() {
             }`}
           >
             📊 {t('admin.analytics')}
+          </button>
+          <button
+            onClick={() => setActiveTab('experiences')}
+            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
+              activeTab === 'experiences'
+                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🎯 Experiences
+          </button>
+          <button
+            onClick={() => setActiveTab('destinations')}
+            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
+              activeTab === 'destinations'
+                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            📍 Destinations
           </button>
         </div>
 
@@ -2092,6 +2594,24 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Experiences Tab */}
+        {activeTab === 'experiences' && (
+          <ExperiencesManagement 
+            experiences={experiences}
+            fetchExperiences={fetchExperiences}
+            loading={loading}
+          />
+        )}
+
+        {/* Destinations Tab */}
+        {activeTab === 'destinations' && (
+          <DestinationsManagement
+            destinations={destinations}
+            fetchDestinations={fetchDestinations}
+            loading={loading}
+          />
         )}
       </div>
 
