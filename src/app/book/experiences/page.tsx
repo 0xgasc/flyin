@@ -52,20 +52,38 @@ export default function BookExperiencesPage() {
   })
 
   useEffect(() => {
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.warn('⏰ Fetch timeout, falling back to demo data')
+        setDemoExperiences()
+        setLoading(false)
+      }
+    }, 10000) // 10 second timeout
+
     fetchExperiences()
+
+    return () => clearTimeout(timeoutId)
   }, [])
 
   const fetchExperiences = async () => {
+    console.log('🔄 fetchExperiences started')
+    setLoading(true) // Ensure loading is set to true at start
+    
     try {
       // First try the regular experiences table
+      console.log('📡 Querying experiences table...')
       const { data, error } = await supabase
         .from('experiences')
         .select('*')
         .eq('is_active', true)
         .order('base_price')
 
+      console.log('📊 Query result:', { dataLength: data?.length, error: error?.message })
+
       if (data && data.length > 0) {
         // Map the data to include multilingual fields with defaults
+        console.log('✅ Processing real experiences data')
         const mappedData = data.map((exp: any) => ({
           ...exp,
           name_es: exp.name_es || exp.name,
@@ -83,14 +101,15 @@ export default function BookExperiencesPage() {
         const uniqueCategories = Array.from(new Set(mappedData.map((exp: any) => exp.category).filter(Boolean)))
         setCategories(uniqueCategories)
       } else {
-        console.warn('No experiences found or table does not exist yet:', error?.message || 'Unknown error')
+        console.warn('⚠️ No experiences found, using demo data:', error?.message || 'Table empty')
         // Fallback to demo data
         setDemoExperiences()
       }
     } catch (err: any) {
-      console.warn('Database table may not exist yet, using demo data:', err?.message || err)
+      console.error('❌ Error in fetchExperiences:', err?.message || err)
       setDemoExperiences()
     } finally {
+      console.log('✅ fetchExperiences completed, setting loading to false')
       setLoading(false)
     }
   }
