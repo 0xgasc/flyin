@@ -5,9 +5,19 @@ import { MapPin, Sparkles, Users, UserPlus } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
+import { useAuthStore } from '@/lib/auth-store'
+import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
   const { t } = useTranslation()
+  const { profile } = useAuthStore()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+  }
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -15,15 +25,40 @@ export default function HomePage() {
         customActions={
           <div className="hidden md:flex items-center space-x-6">
             <LanguageSwitcher />
-            <Link href="/pilot/join" className="hover:text-luxury-gold transition-colors text-sm">
-              {t('nav.pilot_opportunities')}
-            </Link>
-            <Link href="/login" className="hover:text-luxury-gold transition-colors text-sm">
-              {t('nav.login')}
-            </Link>
-            <Link href="/register" className="btn-luxury text-sm">
-              {t('nav.register')}
-            </Link>
+            {!profile && (
+              <Link href="/pilot/join" className="hover:text-luxury-gold transition-colors text-sm">
+                {t('nav.pilot_opportunities')}
+              </Link>
+            )}
+            {profile ? (
+              // Authenticated user actions
+              <>
+                <span className="text-sm text-gray-300">
+                  {profile.full_name || profile.email}
+                </span>
+                {profile.role === 'admin' && (
+                  <Link href="/admin" className="hover:text-luxury-gold transition-colors text-sm">
+                    Admin Panel
+                  </Link>
+                )}
+                <button 
+                  onClick={handleSignOut}
+                  className="hover:text-luxury-gold transition-colors text-sm"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              // Unauthenticated user actions
+              <>
+                <Link href="/login" className="hover:text-luxury-gold transition-colors text-sm">
+                  {t('nav.login')}
+                </Link>
+                <Link href="/register" className="btn-luxury text-sm">
+                  {t('nav.register')}
+                </Link>
+              </>
+            )}
           </div>
         }
         additionalMobileItems={[
@@ -31,8 +66,14 @@ export default function HomePage() {
             href: '/pilot/join',
             label: t('nav.pilot_opportunities'),
             icon: <Users className="h-5 w-5" />,
+            show: !profile // Only show for unauthenticated users
+          },
+          ...(profile?.role === 'admin' ? [{
+            href: '/admin',
+            label: 'Admin Panel',
+            icon: <Users className="h-5 w-5" />,
             show: true
-          }
+          }] : [])
         ]}
       />
 
