@@ -62,7 +62,8 @@ function LoginContent() {
         } else {
           // Profile exists, redirect based on role
           if (profile?.role === 'admin') {
-            router.push('/admin')
+            // Admins go to dashboard by default, but can access admin panel if explicitly requested
+            router.push(redirect.includes('/admin') ? redirect : '/dashboard')
           } else if (profile?.role === 'pilot') {
             router.push('/pilot')
           } else {

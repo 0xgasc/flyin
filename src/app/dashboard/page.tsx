@@ -432,6 +432,11 @@ export default function DashboardPage() {
               Balance: <span className="font-bold text-luxury-gold">${profile?.account_balance?.toFixed(2) || '0.00'}</span>
             </div>
             <LanguageSwitcher />
+            {profile?.role === 'admin' && (
+              <Link href="/admin" className="text-sm hover:text-luxury-gold transition-colors">
+                Admin Panel
+              </Link>
+            )}
             <Link href="/dashboard" className="text-sm hover:text-luxury-gold transition-colors">
               {profile?.full_name || profile?.email}
             </Link>
