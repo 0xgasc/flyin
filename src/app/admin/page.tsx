@@ -1492,9 +1492,9 @@ export default function AdminDashboard() {
             <span className="text-2xl font-bold">FlyInGuate - Admin</span>
           </Link>
           <div className="flex items-center space-x-6">
-            <div className="text-sm">
+            <Link href="/dashboard" className="text-sm hover:text-luxury-gold transition-colors">
               {profile?.full_name || profile?.email}
-            </div>
+            </Link>
             <button
               onClick={async () => {
                 await supabase.auth.signOut()
