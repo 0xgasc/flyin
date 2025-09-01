@@ -30,6 +30,7 @@ interface Experience {
   image_url: string | null
   category_name_en: string | null
   category_name_es: string | null
+  type: 'experience' | 'destination'
 }
 
 export default function BookExperiencesPage() {
@@ -52,18 +53,7 @@ export default function BookExperiencesPage() {
   })
 
   useEffect(() => {
-    // Add a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      if (loading) {
-        console.warn('⏰ Fetch timeout, falling back to demo data')
-        setDemoExperiences()
-        setLoading(false)
-      }
-    }, 10000) // 10 second timeout
-
     fetchExperiences()
-
-    return () => clearTimeout(timeoutId)
   }, [])
 
   const fetchExperiences = async () => {
@@ -71,223 +61,100 @@ export default function BookExperiencesPage() {
     setLoading(true) // Ensure loading is set to true at start
     
     try {
-      // First try the regular experiences table
-      console.log('📡 Querying experiences table...')
-      const { data, error } = await supabase
-        .from('experiences')
-        .select('*')
-        .eq('is_active', true)
-        .order('base_price')
+      // Fetch both experiences and destinations
+      console.log('📡 Querying experiences and destinations...')
+      const [experiencesResponse, destinationsResponse] = await Promise.all([
+        supabase
+          .from('experiences')
+          .select('*')
+          .eq('is_active', true)
+          .order('base_price'),
+        supabase
+          .from('destinations')
+          .select('*')
+          .eq('is_active', true)
+          .order('name')
+      ])
 
-      console.log('📊 Query result:', { dataLength: data?.length, error: error?.message })
+      console.log('📊 Query results:', { 
+        experiencesCount: experiencesResponse.data?.length || 0, 
+        destinationsCount: destinationsResponse.data?.length || 0,
+        experiencesError: experiencesResponse.error?.message,
+        destinationsError: destinationsResponse.error?.message
+      })
 
-      if (data && data.length > 0) {
-        // Map the data to include multilingual fields with defaults
-        console.log('✅ Processing real experiences data')
-        const mappedData = data.map((exp: any) => ({
+      const allItems = []
+      const allCategories = new Set(['experiences', 'destinations'])
+
+      // Process experiences
+      if (experiencesResponse.data && experiencesResponse.data.length > 0) {
+        const mappedExperiences = experiencesResponse.data.map((exp: any) => ({
           ...exp,
+          type: 'experience',
           name_es: exp.name_es || exp.name,
           description_es: exp.description_es || exp.description,
           includes_es: exp.includes_es || exp.includes,
-          duration_minutes: exp.duration_minutes || Math.round(exp.duration_hours * 60),
+          duration_minutes: exp.duration_minutes || Math.round((exp.duration_hours || 1) * 60),
+          duration_hours: exp.duration_hours || 1,
           min_passengers: exp.min_passengers || 1,
-          aircraft_options: exp.aircraft_options || [{"aircraft": "Robinson R44 II", "capacity": 3, "price": exp.base_price}],
+          max_passengers: exp.max_passengers || 4,
+          base_price: exp.base_price || 500,
+          aircraft_options: exp.aircraft_options || [{"aircraft": "Robinson R44 II", "capacity": 3, "price": exp.base_price || 500}],
           route_waypoints: exp.route_waypoints || [],
-          category: exp.category || 'scenic',
-          category_name_en: exp.category || 'Scenic Tours',
-          category_name_es: exp.category || 'Tours Panorámicos'
+          category: 'experiences',
+          category_name_en: 'Experiences',
+          category_name_es: 'Experiencias',
+          includes: exp.includes || ['Professional pilot', 'Safety briefing']
         }))
-        setExperiences(mappedData)
-        const uniqueCategories = Array.from(new Set(mappedData.map((exp: any) => exp.category).filter(Boolean)))
-        setCategories(uniqueCategories)
+        allItems.push(...mappedExperiences)
+      }
+
+      // Process destinations
+      if (destinationsResponse.data && destinationsResponse.data.length > 0) {
+        const mappedDestinations = destinationsResponse.data.map((dest: any) => ({
+          id: dest.id,
+          name: dest.name,
+          name_es: dest.name,
+          description: dest.description || '',
+          description_es: dest.description || '',
+          type: 'destination',
+          duration_hours: 0.5, // Default for destinations
+          duration_minutes: 30,
+          base_price: dest.metadata?.pricing?.robinson_r66_1_2 || 300,
+          max_passengers: 4,
+          min_passengers: 1,
+          includes: dest.features || ['Professional pilot', 'VIP transport'],
+          includes_es: dest.features || ['Piloto profesional', 'Transporte VIP'],
+          location: dest.location || 'Guatemala',
+          aircraft_options: [{"aircraft": "Robinson R44 II", "capacity": 3, "price": dest.metadata?.pricing?.robinson_r66_1_2 || 300}],
+          route_waypoints: [dest.name],
+          category: 'destinations',
+          image_url: null,
+          category_name_en: 'Destinations',
+          category_name_es: 'Destinos'
+        }))
+        allItems.push(...mappedDestinations)
+      }
+
+      if (allItems.length > 0) {
+        console.log('✅ Processing combined data:', allItems.length, 'items')
+        setExperiences(allItems)
+        setCategories(Array.from(allCategories))
       } else {
-        console.warn('⚠️ No experiences found, using demo data:', error?.message || 'Table empty')
-        // Fallback to demo data
-        setDemoExperiences()
+        console.warn('⚠️ No data found in database')
+        setExperiences([])
+        setCategories(['experiences', 'destinations'])
       }
     } catch (err: any) {
       console.error('❌ Error in fetchExperiences:', err?.message || err)
-      setDemoExperiences()
+      setExperiences([])
+      setCategories(['experiences', 'destinations'])
     } finally {
       console.log('✅ fetchExperiences completed, setting loading to false')
       setLoading(false)
     }
   }
 
-  const setDemoExperiences = () => {
-    const demoData: Experience[] = [
-      {
-        id: '1',
-        name: 'Heli-Tour Ciudad, Antigua & Laguna Calderas',
-        name_es: 'Heli-Tour Ciudad, Antigua y Laguna Calderas',
-        description: 'Panoramic tour of Guatemala City, colonial Antigua, Pacaya Volcano, and Amatitlán Lake in 35 unforgettable minutes',
-        description_es: 'Tour panorámico de Ciudad de Guatemala, la colonial Antigua, volcán Pacaya y lago de Amatitlán en 35 minutos inolvidables',
-        duration_hours: 0.58,
-        duration_minutes: 35,
-        base_price: 479,
-        max_passengers: 3,
-        min_passengers: 2,
-        includes: ['Professional pilot', 'Aerial photography', 'Safety briefing', 'Stunning views'],
-        includes_es: ['Piloto profesional', 'Fotografía aérea', 'Briefing de seguridad', 'Vistas impresionantes'],
-        location: 'Guatemala City - Antigua',
-        aircraft_options: [{"aircraft": "Robinson R44 II", "capacity": 3, "price": 479}],
-        route_waypoints: ['Guatemala City', 'Antigua Guatemala', 'Pacaya Volcano', 'Lake Amatitlán'],
-        category: 'scenic',
-        image_url: null,
-        category_name_en: 'Scenic Tours',
-        category_name_es: 'Tours Panorámicos'
-      },
-      {
-        id: '2',
-        name: 'Panoramic Overflight - 45 min',
-        name_es: 'Sobrevuelo Panorámico - 45 min',
-        description: 'Extended panoramic tour featuring Guatemala City, Antigua, surrounding volcanoes, and pristine lakes',
-        description_es: 'Tour panorámico extendido que incluye Ciudad de Guatemala, Antigua, volcanes circundantes y lagos prístinos',
-        duration_hours: 0.75,
-        duration_minutes: 45,
-        base_price: 745,
-        max_passengers: 4,
-        min_passengers: 2,
-        includes: ['Professional pilot', 'Extended route', 'Multiple aircraft options', 'Scenic photography stops'],
-        includes_es: ['Piloto profesional', 'Ruta extendida', 'Múltiples opciones de aeronave', 'Paradas fotográficas panorámicas'],
-        location: 'Guatemala City - Antigua - Volcanoes',
-        aircraft_options: [{"aircraft": "Robinson R44 II", "capacity": 3, "price": 745}, {"aircraft": "Robinson R66", "capacity": 4, "price": 979}],
-        route_waypoints: ['Guatemala City', 'Antigua Guatemala', 'Agua Volcano', 'Fuego Volcano', 'Acatenango Volcano'],
-        category: 'scenic',
-        image_url: null,
-        category_name_en: 'Scenic Tours',
-        category_name_es: 'Tours Panorámicos'
-      },
-      {
-        id: '3',
-        name: 'Romantic Heli-Tour',
-        name_es: 'Heli-Tour Romántico',
-        description: 'Special romantic helicopter experience with flowers, champagne, and photography time for unforgettable moments',
-        description_es: 'Experiencia romántica especial en helicóptero con flores, champán y tiempo para fotografías en momentos inolvidables',
-        duration_hours: 0.58,
-        duration_minutes: 35,
-        base_price: 525,
-        max_passengers: 2,
-        min_passengers: 2,
-        includes: ['Professional pilot', 'Fresh flowers', 'Champagne service', 'Professional photography', 'Romantic setup'],
-        includes_es: ['Piloto profesional', 'Flores frescas', 'Servicio de champán', 'Fotografía profesional', 'Ambiente romántico'],
-        location: 'Romantic scenic route',
-        aircraft_options: [{"aircraft": "Robinson R44 II", "capacity": 2, "price": 525}],
-        route_waypoints: ['Romantic viewpoints', 'Sunset locations', 'Private moments'],
-        category: 'romantic',
-        image_url: null,
-        category_name_en: 'Romantic Experiences',
-        category_name_es: 'Experiencias Románticas'
-      },
-      {
-        id: '4',
-        name: 'Four Volcanoes Tour',
-        name_es: 'Tour de Cuatro Volcanes',
-        description: 'Epic helicopter journey to witness Guatemala\'s most spectacular volcanoes: Agua, Fuego, Acatenango, and Pacaya',
-        description_es: 'Épico viaje en helicóptero para presenciar los volcanes más espectaculares de Guatemala: Agua, Fuego, Acatenango y Pacaya',
-        duration_hours: 2.5,
-        duration_minutes: 150,
-        base_price: 1899,
-        max_passengers: 4,
-        min_passengers: 2,
-        includes: ['Professional pilot', 'Four volcano circuit', 'Geological insights', 'Aerial photography', 'Safety equipment'],
-        includes_es: ['Piloto profesional', 'Circuito de cuatro volcanes', 'Conocimientos geológicos', 'Fotografía aérea', 'Equipo de seguridad'],
-        location: 'Volcano circuit',
-        aircraft_options: [{"aircraft": "Robinson R66", "capacity": 4, "price": 1899}, {"aircraft": "Airbus H125", "capacity": 5, "price": 2299}],
-        route_waypoints: ['Agua Volcano', 'Fuego Volcano', 'Acatenango Volcano', 'Pacaya Volcano'],
-        category: 'volcano',
-        image_url: null,
-        category_name_en: 'Volcano Tours',
-        category_name_es: 'Tours de Volcanes'
-      },
-      {
-        id: '5',
-        name: 'Tikal National Park Expedition',
-        name_es: 'Expedición Parque Nacional Tikal',
-        description: 'Full day helicopter expedition to Tikal with guided tour of ancient Mayan pyramids and jungle exploration',
-        description_es: 'Expedición de día completo en helicóptero a Tikal con tour guiado de pirámides mayas antiguas y exploración de la selva',
-        duration_hours: 8.0,
-        duration_minutes: 480,
-        base_price: 4500,
-        max_passengers: 6,
-        min_passengers: 2,
-        includes: ['Round trip helicopter', 'Professional guide', 'Tikal entrance fees', 'Lunch', 'Mayan ruins tour', 'Jungle wildlife'],
-        includes_es: ['Helicóptero ida y vuelta', 'Guía profesional', 'Tarifas de entrada a Tikal', 'Almuerzo', 'Tour ruinas mayas', 'Vida silvestre de la selva'],
-        location: 'Tikal, Petén',
-        aircraft_options: [{"aircraft": "Bell 206 LongRanger", "capacity": 6, "price": 4500}, {"aircraft": "Airbus AS 350", "capacity": 5, "price": 5200}],
-        route_waypoints: ['Guatemala City', 'Flores', 'Tikal National Park', 'El Mirador viewpoint'],
-        category: 'cultural',
-        image_url: null,
-        category_name_en: 'Cultural Tours',
-        category_name_es: 'Tours Culturales'
-      },
-      {
-        id: '6',
-        name: 'Lake Atitlán Complete Experience',
-        name_es: 'Experiencia Completa Lago Atitlán',
-        description: 'Helicopter flight to stunning Lake Atitlán with hotel landing, boat tour, and indigenous village visits',
-        description_es: 'Vuelo en helicóptero al impresionante Lago Atitlán con aterrizaje en hotel, tour en lancha y visitas a pueblos indígenas',
-        duration_hours: 5.0,
-        duration_minutes: 300,
-        base_price: 2299,
-        max_passengers: 4,
-        min_passengers: 2,
-        includes: ['Helicopter to lake', 'Hotel Casa Palopó landing', 'Boat tour', 'Indigenous villages', 'Local lunch', 'Cultural experience'],
-        includes_es: ['Helicóptero al lago', 'Aterrizaje Hotel Casa Palopó', 'Tour en lancha', 'Pueblos indígenas', 'Almuerzo local', 'Experiencia cultural'],
-        location: 'Lake Atitlán',
-        aircraft_options: [{"aircraft": "Robinson R66", "capacity": 4, "price": 2299}, {"aircraft": "Bell 206", "capacity": 4, "price": 2699}],
-        route_waypoints: ['Guatemala City', 'Lake Atitlán', 'Panajachel', 'Santiago Atitlán', 'San Pedro'],
-        category: 'cultural',
-        image_url: null,
-        category_name_en: 'Cultural Tours',
-        category_name_es: 'Tours Culturales'
-      },
-      {
-        id: '7',
-        name: 'Monterrico Beach Experience',
-        name_es: 'Experiencia Playa Monterrico',
-        description: 'Helicopter flight to Guatemala\'s famous black sand beaches with beach time and turtle conservation visit',
-        description_es: 'Vuelo en helicóptero a las famosas playas de arena negra de Guatemala con tiempo en la playa y visita de conservación de tortugas',
-        duration_hours: 4.0,
-        duration_minutes: 240,
-        base_price: 1599,
-        max_passengers: 4,
-        min_passengers: 2,
-        includes: ['Beach helicopter landing', 'Black sand beaches', 'Turtle conservation center', 'Lunch included', 'Beach time'],
-        includes_es: ['Aterrizaje en helicóptero en playa', 'Playas de arena negra', 'Centro de conservación de tortugas', 'Almuerzo incluido', 'Tiempo en playa'],
-        location: 'Monterrico, Pacific Coast',
-        aircraft_options: [{"aircraft": "Robinson R66", "capacity": 4, "price": 1599}, {"aircraft": "Bell 206", "capacity": 4, "price": 1899}],
-        route_waypoints: ['Guatemala City', 'Pacific Coast', 'Monterrico Beach', 'Turtle Sanctuary'],
-        category: 'beach',
-        image_url: null,
-        category_name_en: 'Beach & Coast',
-        category_name_es: 'Playa y Costa'
-      },
-      {
-        id: '8',
-        name: 'Seven Volcanoes + Atitlán Tour',
-        name_es: 'Tour Siete Volcanes + Atitlán',
-        description: 'Ultimate helicopter experience covering seven volcanoes and Lake Atitlán in one spectacular journey',
-        description_es: 'Experiencia definitiva en helicóptero cubriendo siete volcanes y el Lago Atitlán en un viaje espectacular',
-        duration_hours: 3.5,
-        duration_minutes: 210,
-        base_price: 3299,
-        max_passengers: 4,
-        min_passengers: 2,
-        includes: ['Seven volcano circuit', 'Lake Atitlán overflight', 'Professional commentary', 'Aerial photography', 'Premium experience'],
-        includes_es: ['Circuito de siete volcanes', 'Sobrevuelo Lago Atitlán', 'Comentario profesional', 'Fotografía aérea', 'Experiencia premium'],
-        location: 'Multi-volcano circuit',
-        aircraft_options: [{"aircraft": "Bell 206 LongRanger", "capacity": 4, "price": 3299}, {"aircraft": "Airbus AS 350", "capacity": 5, "price": 3799}],
-        route_waypoints: ['All major volcanoes', 'Lake Atitlán', 'Scenic viewpoints'],
-        category: 'volcano',
-        image_url: null,
-        category_name_en: 'Volcano Tours',
-        category_name_es: 'Tours de Volcanes'
-      }
-    ]
-    setExperiences(demoData)
-    setCategories(['scenic', 'romantic', 'volcano', 'cultural', 'beach'])
-  }
 
   const getDisplayName = (experience: Experience) => {
     return locale === 'es' && experience.name_es ? experience.name_es : experience.name
@@ -334,18 +201,27 @@ export default function BookExperiencesPage() {
     setError('')
 
     try {
+      const booking = {
+        client_id: profile.id,
+        booking_type: selectedExperience.type === 'destination' ? 'transport' : 'experience',
+        scheduled_date: formData.date,
+        scheduled_time: formData.time,
+        passenger_count: formData.passengers,
+        notes: formData.notes,
+        total_price: calculatePrice(),
+      }
+
+      // Add the appropriate ID field based on type
+      if (selectedExperience.type === 'destination') {
+        booking.to_location = selectedExperience.name
+        booking.from_location = 'Guatemala City' // Default departure
+      } else {
+        booking.experience_id = selectedExperience.id
+      }
+
       const { data, error } = await supabase
         .from('bookings')
-        .insert({
-          client_id: profile.id,
-          booking_type: 'experience',
-          experience_id: selectedExperience.id,
-          scheduled_date: formData.date,
-          scheduled_time: formData.time,
-          passenger_count: formData.passengers,
-          notes: formData.notes,
-          total_price: calculatePrice(),
-        })
+        .insert(booking)
         .select()
 
       if (error) throw error
@@ -390,7 +266,9 @@ export default function BookExperiencesPage() {
       </nav>
 
       <div className="container mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('services.experiences.cta')}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          {locale === 'es' ? 'Experiencias y Destinos' : 'Experiences & Destinations'}
+        </h1>
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
@@ -423,7 +301,12 @@ export default function BookExperiencesPage() {
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
-                  {t(`category.${category}`)}
+                  {category === 'experiences' 
+                    ? (locale === 'es' ? 'Experiencias' : 'Experiences')
+                    : category === 'destinations'
+                    ? (locale === 'es' ? 'Destinos' : 'Destinations') 
+                    : category
+                  }
                 </button>
               ))}
             </div>
