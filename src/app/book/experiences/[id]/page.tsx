@@ -396,14 +396,19 @@ export default function ExperienceDetailPage() {
                   onChange={(e) => setFormData({...formData, passengers: parseInt(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
-                  {experience && Array.from(
-                    {length: experience.max_passengers - experience.min_passengers + 1}, 
-                    (_, i) => experience.min_passengers + i
-                  ).map((num) => (
-                    <option key={num} value={num}>
-                      {num} {num === 1 ? 'passenger' : 'passengers'}
-                    </option>
-                  ))}
+                  {(() => {
+                    const minPass = experience?.min_passengers || 1;
+                    const maxPass = experience?.max_passengers || 8;
+                    const passengers = [];
+                    for (let i = minPass; i <= maxPass; i++) {
+                      passengers.push(
+                        <option key={i} value={i}>
+                          {i} {i === 1 ? 'passenger' : 'passengers'}
+                        </option>
+                      );
+                    }
+                    return passengers;
+                  })()}
                 </select>
               </div>
 
