@@ -115,7 +115,7 @@ export default function AdminDashboard() {
       </div>
     )
   }
-  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'choppers' | 'analytics' | 'experiences' | 'destinations'>('bookings')
+  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'aircrafts' | 'analytics' | 'experiences' | 'destinations'>('bookings')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [pilots, setPilots] = useState<Pilot[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
         fetchUsers()
       } else if (activeTab === 'transactions') {
         fetchTransactions()
-      } else if (activeTab === 'choppers') {
+      } else if (activeTab === 'aircrafts') {
         fetchHelicopters()
         fetchMaintenanceRecords()
       } else if (activeTab === 'analytics') {
@@ -1516,7 +1516,7 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            📅 {t('admin.bookings')}
+            {t('admin.bookings')}
           </button>
           <button
             onClick={() => setActiveTab('calendar')}
@@ -1526,7 +1526,7 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            🗓️ {t('admin.flight_calendar')}
+            {t('admin.flight_calendar')}
           </button>
           <button
             onClick={() => setActiveTab('users')}
@@ -1536,7 +1536,7 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            👥 {t('admin.users')}
+            {t('admin.users')}
           </button>
           <button
             onClick={() => setActiveTab('pilots')}
@@ -1546,7 +1546,7 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            🚁 {t('admin.pilots')}
+            {t('admin.pilots')}
           </button>
           <button
             onClick={() => setActiveTab('transactions')}
@@ -1556,17 +1556,17 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            💰 {t('admin.transactions')}
+            {t('admin.transactions')}
           </button>
           <button
-            onClick={() => setActiveTab('choppers')}
+            onClick={() => setActiveTab('aircrafts'))
             className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'choppers'
+              activeTab === 'aircrafts'
                 ? 'bg-white text-primary-700 border-b-2 border-primary-600'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            🚁 {t('admin.choppers')}
+            Aircrafts
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
@@ -1576,7 +1576,7 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            📊 {t('admin.analytics')}
+            {t('admin.analytics')}
           </button>
           <button
             onClick={() => setActiveTab('experiences')}
@@ -1586,7 +1586,7 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            🎯 Experiences
+            Experiences
           </button>
           <button
             onClick={() => setActiveTab('destinations')}
@@ -1596,7 +1596,7 @@ export default function AdminDashboard() {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            📍 Destinations
+            Destinations
           </button>
         </div>
 
@@ -1716,7 +1716,7 @@ export default function AdminDashboard() {
                             }}
                             className="block w-full px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
                           >
-                            🚁 {t('admin.assign_pilot_aircraft')}
+                            {t('admin.assign_pilot_aircraft')}
                           </button>
                         )}
                       </div>
@@ -1741,7 +1741,7 @@ export default function AdminDashboard() {
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
-                  🗓️ This Week
+                  This Week
                 </button>
                 <button 
                   onClick={() => setCurrentWeekOffset(currentWeekOffset - 1)}
@@ -1758,7 +1758,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Helicopter Fleet Status */}
+            {/* Aircraft Fleet Status */}
             <div className="grid md:grid-cols-4 gap-4 mb-8">
               {HELICOPTER_FLEET.map((helicopter, index) => {
                 const helicopterBookings = bookings.filter(b => b.helicopter_id === helicopter.id && b.status !== 'cancelled')
@@ -2159,7 +2159,7 @@ export default function AdminDashboard() {
                               />
                               <div className="flex-1 text-xs text-gray-600">
                                 <p className="mb-1">📄 Payment verification document</p>
-                                <p className="mb-1">📅 Uploaded with transaction</p>
+                                <p className="mb-1">Uploaded with transaction</p>
                                 <p>🔍 Click to enlarge and verify details</p>
                               </div>
                             </div>
@@ -2264,7 +2264,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === 'choppers' && (
+        {activeTab === 'aircrafts' && (
           <div>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold text-gray-900">Fleet Management</h1>
@@ -2325,7 +2325,7 @@ export default function AdminDashboard() {
 
             {/* Helicopters Table */}
             <div className="card-luxury">
-              <h2 className="text-xl font-semibold mb-4">Helicopter Fleet</h2>
+              <h2 className="text-xl font-semibold mb-4">Aircraft Fleet</h2>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
