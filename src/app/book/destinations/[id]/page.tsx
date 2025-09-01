@@ -218,11 +218,11 @@ export default function DestinationDetailPage() {
           <div className="space-y-4">
             {images.length > 0 ? (
               <div className="relative">
-                <div className="aspect-w-16 aspect-h-10 bg-gray-200 rounded-lg overflow-hidden">
+                <div className="relative w-full bg-gray-200 rounded-lg overflow-hidden">
                   <img
                     src={images[currentImageIndex]?.image_url}
                     alt={images[currentImageIndex]?.caption || destination.name}
-                    className="w-full h-96 object-cover"
+                    className="w-full h-64 sm:h-80 md:h-96 object-cover object-center"
                   />
                 </div>
                 
@@ -244,7 +244,7 @@ export default function DestinationDetailPage() {
                 )}
               </div>
             ) : (
-              <div className="aspect-w-16 aspect-h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded-lg flex items-center justify-center">
                 <Camera className="w-12 h-12 text-gray-400" />
               </div>
             )}
@@ -256,7 +256,7 @@ export default function DestinationDetailPage() {
                   <button
                     key={image.id}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 ${
+                    className={`flex-shrink-0 w-20 h-14 sm:h-16 rounded-lg overflow-hidden border-2 ${
                       index === currentImageIndex ? 'border-primary-600' : 'border-gray-300'
                     }`}
                   >
@@ -441,9 +441,9 @@ export default function DestinationDetailPage() {
                   onChange={(e) => setFormData({...formData, passengers: parseInt(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
-                  {Array.from({length: 8}, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1} {i + 1 === 1 ? 'passenger' : 'passengers'}
+                  {Array.from({length: 8}, (_, i) => i + 1).map((num) => (
+                    <option key={num} value={num}>
+                      {num} {num === 1 ? 'passenger' : 'passengers'}
                     </option>
                   ))}
                 </select>
