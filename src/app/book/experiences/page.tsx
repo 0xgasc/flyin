@@ -201,7 +201,7 @@ export default function BookExperiencesPage() {
     setError('')
 
     try {
-      const booking = {
+      const booking: any = {
         client_id: profile.id,
         booking_type: selectedExperience.type === 'destination' ? 'transport' : 'experience',
         scheduled_date: formData.date,
