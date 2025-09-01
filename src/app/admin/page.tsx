@@ -1559,7 +1559,7 @@ export default function AdminDashboard() {
             {t('admin.transactions')}
           </button>
           <button
-            onClick={() => setActiveTab('aircrafts'))
+            onClick={() => setActiveTab('aircrafts')}
             className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
               activeTab === 'aircrafts'
                 ? 'bg-white text-primary-700 border-b-2 border-primary-600'
