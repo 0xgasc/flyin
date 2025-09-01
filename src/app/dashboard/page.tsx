@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
-import { Plane, Plus, Calendar, MapPin, Clock, DollarSign } from 'lucide-react'
+import { Plane, Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface Booking {
@@ -29,6 +29,8 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [paymentLoading, setPaymentLoading] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
 
   useEffect(() => {
     if (profile?.id) {
@@ -52,6 +54,11 @@ export default function DashboardPage() {
     if (data) setBookings(data)
     if (error) console.error('Error fetching bookings:', error)
     setLoading(false)
+  }
+
+  const openPaymentModal = (booking: Booking) => {
+    setSelectedBooking(booking)
+    setShowPaymentModal(true)
   }
 
   const handlePayBooking = async (bookingId: string, amount: number) => {
@@ -109,6 +116,7 @@ export default function DashboardPage() {
       
       // Refresh bookings
       fetchBookings()
+      setShowPaymentModal(false)
       
     } catch (error: any) {
       console.error('Payment error:', error)
@@ -116,6 +124,78 @@ export default function DashboardPage() {
     } finally {
       setPaymentLoading(false)
     }
+  }
+
+  const handleBankDepositPayment = async (bookingId: string, amount: number, proofFile: File | null) => {
+    setPaymentLoading(true)
+    try {
+      let proofUrl = ''
+      
+      // Upload proof if provided
+      if (proofFile) {
+        const fileExt = proofFile.name.split('.').pop()
+        const fileName = `booking-payments/${bookingId}/${Date.now()}.${fileExt}`
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('payment-proofs')
+          .upload(fileName, proofFile)
+        
+        if (uploadError) {
+          throw new Error('Failed to upload payment proof. Please try again.')
+        }
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('payment-proofs')
+          .getPublicUrl(fileName)
+        
+        proofUrl = publicUrl
+      }
+
+      // Create pending payment transaction
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: profile?.id,
+          type: 'deposit',
+          amount: amount,
+          payment_method: 'bank_deposit',
+          status: 'pending',
+          reference: `Booking payment - ${bookingId}`,
+          proof_url: proofUrl,
+          metadata: { booking_id: bookingId }
+        })
+      
+      if (transactionError) throw transactionError
+
+      // Update booking to show payment pending
+      const { error: bookingError } = await supabase
+        .from('bookings')
+        .update({ 
+          payment_status: 'processing'
+        })
+        .eq('id', bookingId)
+      
+      if (bookingError) console.warn('Booking update failed:', bookingError)
+
+      alert(`Bank deposit initiated!\n\nYour payment is being processed. You'll receive confirmation within 24 hours.`)
+      
+      fetchBookings()
+      setShowPaymentModal(false)
+      
+    } catch (error: any) {
+      console.error('Bank deposit error:', error)
+      alert('Bank deposit failed: ' + error.message)
+    } finally {
+      setPaymentLoading(false)
+    }
+  }
+
+  const handleCreditCardPayment = () => {
+    alert('Credit Card payment coming soon! Please use Bank Deposit or Account Balance for now.')
+  }
+
+  const handleCryptoPayment = () => {
+    alert('Crypto payment coming soon! We\'ll be integrating stablecoin payments via StablePay.')
   }
 
   const getStatusColor = (status: string) => {
@@ -237,10 +317,10 @@ export default function DashboardPage() {
                     {booking.status === 'approved' && booking.payment_status !== 'paid' && (
                       <>
                         <button 
-                          onClick={() => handlePayBooking(booking.id, booking.total_price)}
+                          onClick={() => openPaymentModal(booking)}
                           className="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700 flex items-center"
                         >
-                          💳 Confirm & Pay
+                          💳 Choose Payment
                         </button>
                         <p className="text-xs text-gray-500 text-center">Flight approved!<br/>Ready for payment</p>
                       </>
@@ -249,10 +329,10 @@ export default function DashboardPage() {
                     {booking.status === 'assigned' && booking.payment_status !== 'paid' && (
                       <>
                         <button 
-                          onClick={() => handlePayBooking(booking.id, booking.total_price)}
+                          onClick={() => openPaymentModal(booking)}
                           className="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700 flex items-center"
                         >
-                          💳 Confirm & Pay
+                          💳 Choose Payment
                         </button>
                         <div className="bg-blue-50 border border-blue-200 rounded p-2">
                           <p className="text-xs text-blue-800 font-medium text-center">
@@ -292,6 +372,229 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Payment Modal */}
+      {showPaymentModal && selectedBooking && (
+        <PaymentModal 
+          booking={selectedBooking}
+          onClose={() => setShowPaymentModal(false)}
+          onPayAccountBalance={() => handlePayBooking(selectedBooking.id, selectedBooking.total_price)}
+          onPayBankDeposit={(proofFile) => handleBankDepositPayment(selectedBooking.id, selectedBooking.total_price, proofFile)}
+          onPayCreditCard={handleCreditCardPayment}
+          onPayCrypto={handleCryptoPayment}
+          loading={paymentLoading}
+        />
+      )}
+    </div>
+  )
+}
+
+// Payment Modal Component
+function PaymentModal({ 
+  booking, 
+  onClose, 
+  onPayAccountBalance, 
+  onPayBankDeposit, 
+  onPayCreditCard, 
+  onPayCrypto,
+  loading 
+}: {
+  booking: Booking
+  onClose: () => void
+  onPayAccountBalance: () => void
+  onPayBankDeposit: (proofFile: File | null) => void
+  onPayCreditCard: () => void
+  onPayCrypto: () => void
+  loading: boolean
+}) {
+  const { profile } = useAuthStore()
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'balance' | 'bank' | 'card' | 'crypto'>('balance')
+  const [proofFile, setProofFile] = useState<File | null>(null)
+  
+  const handleBankDepositSubmit = () => {
+    if (!proofFile) {
+      alert('Please upload payment proof before submitting.')
+      return
+    }
+    onPayBankDeposit(proofFile)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-screen overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Choose Payment Method</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+            disabled={loading}
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h3 className="font-semibold text-gray-900">
+            {booking.booking_type === 'transport' 
+              ? `${booking.from_location} → ${booking.to_location}`
+              : booking.experiences?.name
+            }
+          </h3>
+          <p className="text-sm text-gray-600">
+            {new Date(booking.scheduled_date).toLocaleDateString()} at {booking.scheduled_time}
+          </p>
+          <p className="text-xl font-bold text-primary-900 mt-2">
+            ${booking.total_price}
+          </p>
+        </div>
+
+        <div className="space-y-3 mb-6">
+          {/* Account Balance */}
+          <button
+            onClick={() => setSelectedPaymentMethod('balance')}
+            className={`w-full p-4 rounded-lg border-2 transition-colors ${
+              selectedPaymentMethod === 'balance'
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center">
+              <DollarSign className="w-6 h-6 text-primary-600 mr-3" />
+              <div className="text-left">
+                <div className="font-semibold">Account Balance</div>
+                <div className="text-sm text-gray-600">
+                  Current: ${profile?.account_balance?.toFixed(2) || '0.00'}
+                  {(!profile?.account_balance || profile.account_balance < booking.total_price) && (
+                    <span className="text-red-600 ml-1">(Insufficient)</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* Bank Deposit */}
+          <button
+            onClick={() => setSelectedPaymentMethod('bank')}
+            className={`w-full p-4 rounded-lg border-2 transition-colors ${
+              selectedPaymentMethod === 'bank'
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center">
+              <Building2 className="w-6 h-6 text-blue-600 mr-3" />
+              <div className="text-left">
+                <div className="font-semibold">Bank Deposit</div>
+                <div className="text-sm text-gray-600">Transfer to our account</div>
+              </div>
+            </div>
+          </button>
+
+          {/* Credit Card */}
+          <button
+            onClick={() => setSelectedPaymentMethod('card')}
+            className={`w-full p-4 rounded-lg border-2 transition-colors ${
+              selectedPaymentMethod === 'card'
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center">
+              <CreditCard className="w-6 h-6 text-green-600 mr-3" />
+              <div className="text-left">
+                <div className="font-semibold">Credit Card</div>
+                <div className="text-sm text-gray-600">Coming Soon</div>
+              </div>
+            </div>
+          </button>
+
+          {/* Crypto */}
+          <button
+            onClick={() => setSelectedPaymentMethod('crypto')}
+            className={`w-full p-4 rounded-lg border-2 transition-colors ${
+              selectedPaymentMethod === 'crypto'
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center">
+              <Coins className="w-6 h-6 text-orange-600 mr-3" />
+              <div className="text-left">
+                <div className="font-semibold">Cryptocurrency</div>
+                <div className="text-sm text-gray-600">USDC, USDT via StablePay</div>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* Bank Deposit Details */}
+        {selectedPaymentMethod === 'bank' && (
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h4 className="font-semibold text-blue-900 mb-3">Bank Transfer Instructions</h4>
+            <div className="text-sm text-blue-800 space-y-1">
+              <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
+              <p><strong>Account Number:</strong> 1234567890</p>
+              <p><strong>Bank:</strong> Banco Industrial</p>
+              <p><strong>Amount:</strong> ${booking.total_price}</p>
+              <p><strong>Reference:</strong> Booking {booking.id.slice(0, 8)}</p>
+            </div>
+            
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-blue-900 mb-2">
+                Upload Payment Proof
+              </label>
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+                className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+              />
+              {proofFile && (
+                <p className="text-xs text-green-600 mt-1">✓ {proofFile.name}</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Payment Button */}
+        <div className="flex space-x-3">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          
+          <button
+            onClick={() => {
+              switch (selectedPaymentMethod) {
+                case 'balance':
+                  onPayAccountBalance()
+                  break
+                case 'bank':
+                  handleBankDepositSubmit()
+                  break
+                case 'card':
+                  onPayCreditCard()
+                  break
+                case 'crypto':
+                  onPayCrypto()
+                  break
+              }
+            }}
+            disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.account_balance || profile.account_balance < booking.total_price))}
+            className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Processing...' : 
+             selectedPaymentMethod === 'balance' ? 'Pay Now' :
+             selectedPaymentMethod === 'bank' ? 'Submit Proof' :
+             selectedPaymentMethod === 'card' ? 'Coming Soon' :
+             'Coming Soon'
+            }
+          </button>
+        </div>
       </div>
     </div>
   )
