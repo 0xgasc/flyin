@@ -38,7 +38,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({ 
         user: null, // Don't persist user to avoid stale auth
         profile: null, // Don't persist profile either
-        loading: state.loading 
+        loading: false // Don't persist loading state
       }),
     }
   )
