@@ -53,7 +53,17 @@ export default function BookExperiencesPage() {
   })
 
   useEffect(() => {
+    // Add timeout to prevent infinite spinning
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.warn('⏰ Query timeout after 15 seconds')
+        setLoading(false)
+      }
+    }, 15000)
+    
     fetchExperiences()
+    
+    return () => clearTimeout(timeoutId)
   }, [])
 
   const fetchExperiences = async () => {
@@ -142,13 +152,23 @@ export default function BookExperiencesPage() {
         setCategories(Array.from(allCategories))
       } else {
         console.warn('⚠️ No data found in database')
+        console.log('💡 Tip: Have you imported the CSV data using the SQL file in Supabase?')
+        console.log('📂 File: supabase/import-data.sql')
         setExperiences([])
         setCategories(['experiences', 'destinations'])
+        setError(locale === 'es' 
+          ? 'No se encontraron datos. Por favor importa los datos en Supabase primero.'
+          : 'No data found. Please import the data in Supabase first.'
+        )
       }
     } catch (err: any) {
       console.error('❌ Error in fetchExperiences:', err?.message || err)
       setExperiences([])
       setCategories(['experiences', 'destinations'])
+      setError(locale === 'es' 
+        ? 'Error al cargar los datos. Revisa la consola para más detalles.'
+        : 'Error loading data. Check console for details.'
+      )
     } finally {
       console.log('✅ fetchExperiences completed, setting loading to false')
       setLoading(false)
