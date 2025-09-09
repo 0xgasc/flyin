@@ -1364,10 +1364,140 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     )
   }
 
+  // Sortable Destination Row Component
+  const SortableDestinationRow = ({ destination, onDelete, onToggleActive }: any) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: destination.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <tr
+        ref={setNodeRef}
+        style={style}
+        className={`hover:bg-gray-50 ${isDragging ? 'z-50' : ''}`}
+      >
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="flex items-center">
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing mr-3 p-1 hover:bg-gray-100 rounded"
+            >
+              <GripVertical className="w-4 h-4 text-gray-400" />
+            </div>
+            <div>
+              <div className="text-sm font-medium text-gray-900">{destination.name}</div>
+              <div className="text-sm text-gray-500 max-w-md truncate">{destination.description}</div>
+            </div>
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+            {destination.location}
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="flex flex-wrap gap-1">
+            {destination.features?.slice(0, 3).map((feature: string, index: number) => (
+              <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {feature}
+              </span>
+            ))}
+            {destination.features?.length > 3 && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                +{destination.features.length - 3}
+              </span>
+            )}
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <button
+            onClick={() => onToggleActive(destination.id, destination.is_active)}
+            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+              destination.is_active 
+                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                : 'bg-red-100 text-red-800 hover:bg-red-200'
+            }`}
+          >
+            {destination.is_active ? 'Active' : 'Inactive'}
+          </button>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <div className="flex space-x-2">
+            <Link
+              href={`/admin/destinations/${destination.id}/edit`}
+              className="text-indigo-600 hover:text-indigo-900"
+            >
+              <Edit className="w-4 h-4" />
+            </Link>
+            <button
+              onClick={() => onDelete(destination.id)}
+              className="text-red-600 hover:text-red-900"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  };
+
   // Destinations Management Component
   const DestinationsManagement = ({ destinations, fetchDestinations, loading }: any) => {
     const [showImageUpload, setShowImageUpload] = useState(false)
     const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null)
+    
+    const sensors = useSensors(
+      useSensor(PointerSensor),
+      useSensor(KeyboardSensor, {
+        coordinateGetter: sortableKeyboardCoordinates,
+      })
+    )
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (active.id !== over?.id) {
+        const oldIndex = destinations.findIndex((dest: any) => dest.id === active.id);
+        const newIndex = destinations.findIndex((dest: any) => dest.id === over?.id);
+        
+        const newOrder = arrayMove(destinations, oldIndex, newIndex);
+        
+        // Update order_index for all affected items
+        try {
+          const updates = newOrder.map((dest: any, index: number) => ({
+            id: dest.id,
+            order_index: index
+          }));
+
+          // Update each destination with new order_index
+          for (const update of updates) {
+            await supabase
+              .from('destinations')
+              .update({ order_index: update.order_index })
+              .eq('id', update.id);
+          }
+
+          // Refresh the list
+          await fetchDestinations();
+        } catch (error) {
+          console.error('Error updating destination order:', error);
+          alert('Failed to update destination order');
+        }
+      }
+    };
 
     const handleDeleteDestination = async (id: string) => {
       if (!confirm('Are you sure you want to delete this destination?')) return
@@ -1444,94 +1574,38 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                    Loading destinations...
-                  </td>
-                </tr>
-              ) : destinations.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                    No destinations found
-                  </td>
-                </tr>
-              ) : (
-                destinations.map((destination: any) => (
-                  <tr key={destination.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {destination.destination_images?.find((img: any) => img.is_primary)?.image_url ? (
-                          <img
-                            className="h-10 w-10 rounded-full object-cover"
-                            src={destination.destination_images.find((img: any) => img.is_primary).image_url}
-                            alt={destination.name}
-                          />
-                        ) : (
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <MapPin className="w-5 h-5 text-gray-400" />
-                          </div>
-                        )}
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{destination.name}</div>
-                          <div className="text-sm text-gray-500">{destination.description?.substring(0, 50)}...</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{destination.location || 'N/A'}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {destination.features?.length > 0 ? (
-                          <span>{destination.features.slice(0, 2).join(', ')}{destination.features.length > 2 && '...'}</span>
-                        ) : (
-                          'No features'
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => handleToggleActive(destination.id, destination.is_active)}
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          destination.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {destination.is_active ? 'Active' : 'Inactive'}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => {
-                            setSelectedDestinationId(destination.id)
-                            setShowImageUpload(true)
-                          }}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          <ImageIcon className="w-4 h-4" />
-                        </button>
-                        <Link
-                          href={`/admin/destinations/${destination.id}/edit`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteDestination(destination.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <tbody className="bg-white divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                      Loading destinations...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
+                ) : destinations.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                      No destinations found
+                    </td>
+                  </tr>
+                ) : (
+                  <SortableContext items={destinations.map((dest: any) => dest.id)} strategy={verticalListSortingStrategy}>
+                    {destinations.map((destination: any) => (
+                      <SortableDestinationRow
+                        key={destination.id}
+                        destination={destination}
+                        onDelete={handleDeleteDestination}
+                        onToggleActive={handleToggleActive}
+                      />
+                    ))}
+                  </SortableContext>
+                )}
+              </tbody>
+            </DndContext>
             </table>
           </div>
         </div>
