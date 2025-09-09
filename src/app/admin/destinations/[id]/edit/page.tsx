@@ -124,21 +124,52 @@ export default function EditDestinationPage() {
     setSaving(true)
 
     try {
+      // Only update core fields that definitely exist in the database schema
+      const updateData: any = {
+        name: formData.name,
+        description: formData.description,
+        location: formData.location,
+        coordinates: formData.coordinates,
+        features: formData.features,
+        is_active: formData.is_active,
+        updated_at: new Date().toISOString()
+      }
+
+      // Add new metadata fields only if they have values (to handle missing columns gracefully)
+      if (formData.highlights && formData.highlights.length > 0) {
+        updateData.highlights = formData.highlights
+      }
+      if (formData.requirements && formData.requirements.length > 0) {
+        updateData.requirements = formData.requirements
+      }
+      if (formData.meeting_point) {
+        updateData.meeting_point = formData.meeting_point
+      }
+      if (formData.best_time) {
+        updateData.best_time = formData.best_time
+      }
+      if (formData.difficulty_level) {
+        updateData.difficulty_level = formData.difficulty_level
+      }
+
+      console.log('🔄 Updating destination with data:', updateData)
+
       const { error } = await supabase
         .from('destinations')
-        .update({
-          ...formData,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', params.id)
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Database error:', error)
+        throw error
+      }
 
+      console.log('✅ Destination updated successfully')
       alert('Destination updated successfully!')
       router.push('/admin')
-    } catch (error) {
-      console.error('Error updating destination:', error)
-      alert('Failed to update destination')
+    } catch (error: any) {
+      console.error('❌ Error updating destination:', error)
+      alert(`Failed to update destination: ${error?.message || error}`)
     } finally {
       setSaving(false)
     }

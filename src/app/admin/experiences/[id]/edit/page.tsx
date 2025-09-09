@@ -133,21 +133,55 @@ export default function EditExperiencePage() {
     setSaving(true)
 
     try {
+      // Only update core fields that definitely exist in the database schema
+      const updateData: any = {
+        name: formData.name,
+        description: formData.description,
+        category: formData.category,
+        location: formData.location,
+        duration_hours: formData.duration_hours,
+        base_price: formData.base_price,
+        max_passengers: formData.max_passengers,
+        is_active: formData.is_active,
+        includes: formData.includes,
+        updated_at: new Date().toISOString()
+      }
+
+      // Add new metadata fields only if they have values (to handle missing columns gracefully)
+      if (formData.duration_minutes !== undefined && formData.duration_minutes > 0) {
+        updateData.duration_minutes = formData.duration_minutes
+      }
+      if (formData.min_passengers !== undefined && formData.min_passengers > 0) {
+        updateData.min_passengers = formData.min_passengers
+      }
+      if (formData.highlights && formData.highlights.length > 0) {
+        updateData.highlights = formData.highlights
+      }
+      if (formData.requirements && formData.requirements.length > 0) {
+        updateData.requirements = formData.requirements
+      }
+      if (formData.meeting_point) {
+        updateData.meeting_point = formData.meeting_point
+      }
+
+      console.log('🔄 Updating experience with data:', updateData)
+
       const { error } = await supabase
         .from('experiences')
-        .update({
-          ...formData,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', params.id)
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Database error:', error)
+        throw error
+      }
 
+      console.log('✅ Experience updated successfully')
       alert('Experience updated successfully!')
       router.push('/admin')
-    } catch (error) {
-      console.error('Error updating experience:', error)
-      alert('Failed to update experience')
+    } catch (error: any) {
+      console.error('❌ Error updating experience:', error)
+      alert(`Failed to update experience: ${error?.message || error}`)
     } finally {
       setSaving(false)
     }
