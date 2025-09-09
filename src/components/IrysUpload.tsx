@@ -14,14 +14,15 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
   const [preview, setPreview] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
-      // Check file size (4.5MB limit for Vercel)
-      const maxSize = 4.5 * 1024 * 1024 // 4.5MB Vercel limit
+      // IRYS supports up to 6GB files - much more generous limit
+      const maxSize = 6 * 1024 * 1024 * 1024 // 6GB IRYS limit
       if (selectedFile.size > maxSize) {
-        alert(`File too large for Vercel hosting. Maximum size is 4.5MB. Your file is ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB.\n\nPlease compress your image using an online tool like TinyPNG or resize it to a smaller resolution.`)
+        alert(`File too large. Maximum size is 6GB. Your file is ${(selectedFile.size / 1024 / 1024 / 1024).toFixed(1)}GB.`)
         e.target.value = '' // Clear the input
         return
       }
@@ -39,54 +40,95 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
     if (!file) return
 
     setUploading(true)
+    setUploadProgress(0)
+    
     try {
-      console.log('📤 Uploading to Irys via API route...')
+      console.log('📤 Uploading to Irys with chunked approach...')
       
-      const formData = new FormData()
-      formData.append('file', file)
+      // For files larger than 4MB, use chunked upload approach
+      const chunkSize = 4 * 1024 * 1024 // 4MB chunks to stay under Vercel limit
+      const totalChunks = Math.ceil(file.size / chunkSize)
       
-      const response = await fetch('/api/upload/irys', {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!response.ok) {
-        let errorMessage = 'Upload failed'
-        const contentType = response.headers.get('content-type')
+      if (file.size <= chunkSize) {
+        // Small file - use direct API route
+        const formData = new FormData()
+        formData.append('file', file)
         
-        if (contentType && contentType.includes('application/json')) {
-          try {
-            const errorData = await response.json()
-            errorMessage = errorData.details || errorData.error || 'Upload failed'
-          } catch {
-            errorMessage = `Server error: ${response.status}`
-          }
-        } else {
-          // If not JSON, try to get text error
-          try {
-            const errorText = await response.text()
-            if (errorText.includes('Request Entity Too Large') || response.status === 413) {
-              errorMessage = 'File too large. Vercel has a 4.5MB limit. Please compress your image or use a smaller file.'
-            } else if (errorText.includes('timeout')) {
-              errorMessage = 'Upload timeout. Please try a smaller file'
-            } else {
-              errorMessage = `Server error: ${response.status}`
-            }
-          } catch {
-            errorMessage = `Server error: ${response.status}`
-          }
-        }
-        throw new Error(errorMessage)
-      }
+        const response = await fetch('/api/upload/irys', {
+          method: 'POST',
+          body: formData
+        })
 
-      const result = await response.json()
-      const imageUrl = result.url
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.details || errorData.error || 'Upload failed')
+        }
+
+        const result = await response.json()
+        setUploadedUrl(result.url)
+        if (onUpload) onUpload(result.url)
+        if (onUploadComplete) onUploadComplete(result.url)
+      } else {
+        // Large file - use chunked upload via new endpoint
+        const uploadId = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        const chunks: string[] = []
+        
+        // Upload chunks
+        for (let i = 0; i < totalChunks; i++) {
+          const start = i * chunkSize
+          const end = Math.min(start + chunkSize, file.size)
+          const chunk = file.slice(start, end)
+          
+          const formData = new FormData()
+          formData.append('chunk', chunk)
+          formData.append('uploadId', uploadId)
+          formData.append('chunkIndex', i.toString())
+          formData.append('totalChunks', totalChunks.toString())
+          formData.append('originalName', file.name)
+          formData.append('originalSize', file.size.toString())
+          
+          const response = await fetch('/api/upload/irys-chunk', {
+            method: 'POST',
+            body: formData
+          })
+          
+          if (!response.ok) {
+            throw new Error(`Chunk ${i + 1} upload failed`)
+          }
+          
+          const result = await response.json()
+          chunks.push(result.chunkId)
+          
+          // Update progress
+          setUploadProgress(Math.round(((i + 1) / totalChunks) * 80)) // 80% for upload, 20% for assembly
+        }
+        
+        // Assemble chunks on server
+        setUploadProgress(85)
+        const assembleResponse = await fetch('/api/upload/irys-assemble', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uploadId,
+            chunks,
+            originalName: file.name,
+            originalSize: file.size
+          })
+        })
+        
+        if (!assembleResponse.ok) {
+          throw new Error('Failed to assemble file chunks')
+        }
+        
+        const result = await assembleResponse.json()
+        setUploadProgress(100)
+        
+        setUploadedUrl(result.url)
+        if (onUpload) onUpload(result.url)
+        if (onUploadComplete) onUploadComplete(result.url)
+      }
       
-      console.log('✅ Upload successful:', imageUrl)
-      
-      setUploadedUrl(imageUrl)
-      if (onUpload) onUpload(imageUrl)
-      if (onUploadComplete) onUploadComplete(imageUrl)
+      console.log('✅ Upload successful')
       
       // Auto close after successful upload
       setTimeout(() => {
@@ -100,6 +142,7 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
       setUseUrlMode(true)
     } finally {
       setUploading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -136,7 +179,7 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
                 <label className="cursor-pointer flex flex-col items-center">
                   <Upload className="w-12 h-12 text-gray-400 mb-3" />
                   <span className="text-gray-600 mb-2">Click para seleccionar imagen</span>
-                  <span className="text-xs text-gray-500">PNG, JPG, GIF hasta 50MB</span>
+                  <span className="text-xs text-gray-500">PNG, JPG, GIF hasta 6GB</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -174,7 +217,9 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
                     {uploading ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Subiendo...</span>
+                        <span>
+                          {uploadProgress > 0 ? `Subiendo... ${uploadProgress}%` : 'Subiendo...'}
+                        </span>
                       </>
                     ) : (
                       <>

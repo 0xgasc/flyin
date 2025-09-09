@@ -14,9 +14,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@bundlr-network/client": "^0.11.17",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@irys/sdk": "^0.2.11",
     "@irys/upload": "^0.0.15",
     "@irys/upload-ethereum": "^0.0.16",
     "@supabase/ssr": "^0.6.1",

@@ -14,14 +14,14 @@ export async function POST(request: NextRequest) {
     const contentLength = request.headers.get('content-length')
     console.log(`📏 Content-Length header: ${contentLength} bytes`)
     
-    // For Vercel, we need to handle the 4.5MB limit more gracefully
-    const vercelLimit = 4.5 * 1024 * 1024 // 4.5MB Vercel limit
-    if (contentLength && parseInt(contentLength) > vercelLimit) {
-      console.warn(`⚠️ File size ${contentLength} exceeds Vercel limit of ${vercelLimit} bytes`)
+    // This endpoint handles files up to 4MB - larger files use chunked upload
+    const directUploadLimit = 4 * 1024 * 1024 // 4MB for direct upload
+    if (contentLength && parseInt(contentLength) > directUploadLimit) {
+      console.warn(`⚠️ File size ${contentLength} exceeds direct upload limit - should use chunked upload`)
       return NextResponse.json(
         { 
-          error: `File too large for Vercel deployment. Maximum size is 4.5MB. Please use a smaller image or compress it first.`,
-          tip: 'You can use online tools to compress images before uploading.'
+          error: `File too large for direct upload. Use chunked upload for files over 4MB.`,
+          tip: 'The client should automatically handle this via chunked upload.'
         },
         { status: 413 }
       )
@@ -41,12 +41,12 @@ export async function POST(request: NextRequest) {
     console.log(`📁 Received file: ${file.name} (${file.size} bytes)`)
     
     // Double-check file size after receiving
-    const maxSize = 4.5 * 1024 * 1024 // 4.5MB for Vercel
+    const maxSize = 4 * 1024 * 1024 // 4MB for direct upload
     if (file.size > maxSize) {
       return NextResponse.json(
         { 
-          error: `File too large. Maximum size is 4.5MB on Vercel. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`,
-          tip: 'Please compress your image or use a smaller file.'
+          error: `File too large for direct upload. Maximum size is 4MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`,
+          tip: 'Large files should use chunked upload automatically.'
         },
         { status: 413 }
       )
