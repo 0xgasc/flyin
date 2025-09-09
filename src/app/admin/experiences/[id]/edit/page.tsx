@@ -15,8 +15,10 @@ interface Experience {
   category: string
   location: string
   duration_hours: number
+  duration_minutes?: number
   base_price: number
   max_passengers: number
+  min_passengers?: number
   is_active: boolean
   includes: string[]
   highlights: string[]
@@ -328,9 +330,24 @@ export default function EditExperiencePage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="0"
+                    max="59"
+                    value={formData.duration_minutes || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Base Price ($)
@@ -340,6 +357,19 @@ export default function EditExperiencePage() {
                     min="0"
                     value={formData.base_price}
                     onChange={(e) => setFormData(prev => ({ ...prev, base_price: parseFloat(e.target.value) }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Min Passengers
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.min_passengers || 1}
+                    onChange={(e) => setFormData(prev => ({ ...prev, min_passengers: parseInt(e.target.value) }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -436,6 +466,61 @@ export default function EditExperiencePage() {
                     </button>
                   </div>
                 </div>
+              </div>
+
+              {/* Requirements */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Requirements
+                </label>
+                <div className="space-y-2">
+                  {formData.requirements.map((requirement, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{requirement}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFromArray('requirements', index)}
+                        className="p-2 text-red-600 hover:text-red-800"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={newRequirement}
+                      onChange={(e) => setNewRequirement(e.target.value)}
+                      placeholder="Add requirement..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToArray('requirements', newRequirement)
+                        setNewRequirement('')
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Meeting Point */}
+              <div>
+                <label htmlFor="meeting_point" className="block text-sm font-medium text-gray-700 mb-2">
+                  Meeting Point
+                </label>
+                <input
+                  type="text"
+                  id="meeting_point"
+                  value={formData.meeting_point}
+                  onChange={(e) => setFormData(prev => ({ ...prev, meeting_point: e.target.value }))}
+                  placeholder="e.g., La Aurora International Airport, Main Terminal"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
 
               <div className="flex items-center space-x-3">

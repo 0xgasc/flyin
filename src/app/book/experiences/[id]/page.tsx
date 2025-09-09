@@ -10,7 +10,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { 
   ArrowLeft, Clock, Users, MapPin, CheckCircle, 
   Calendar, DollarSign, Plane, Star, Camera,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, AlertTriangle
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -339,6 +339,32 @@ export default function ExperienceDetailPage() {
                       <span className="text-gray-700">{waypoint}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Requirements */}
+            {experience.requirements && experience.requirements.length > 0 && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Requirements</h3>
+                <div className="space-y-2">
+                  {experience.requirements.map((requirement, index) => (
+                    <div key={index} className="flex items-start">
+                      <AlertTriangle className="w-5 h-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">{requirement}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Meeting Point */}
+            {experience.meeting_point && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Meeting Point</h3>
+                <div className="flex items-start">
+                  <MapPin className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <p className="text-gray-700">{experience.meeting_point}</p>
                 </div>
               </div>
             )}
