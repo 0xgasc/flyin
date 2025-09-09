@@ -1143,7 +1143,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     const [selectedExperienceId, setSelectedExperienceId] = useState<string | null>(null)
     
     const sensors = useSensors(
-      useSensor(PointerSensor),
+      useSensor(PointerSensor, {
+        activationConstraint: {
+          distance: 8, // Reduced distance for more responsive drag
+        },
+      }),
       useSensor(KeyboardSensor, {
         coordinateGetter: sortableKeyboardCoordinates,
       })
@@ -1158,26 +1162,36 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         
         const newOrder = arrayMove(experiences, oldIndex, newIndex);
         
-        // Update order_index for all affected items
+        // Immediately update local state for instant visual feedback
+        const optimisticOrder = newOrder.map((exp: any, index: number) => ({
+          ...exp,
+          order_index: index
+        }));
+        setExperiences(optimisticOrder);
+        
+        // Update database in background with batch operation
         try {
           const updates = newOrder.map((exp: any, index: number) => ({
             id: exp.id,
             order_index: index
           }));
 
-          // Update each experience with new order_index
-          for (const update of updates) {
-            await supabase
-              .from('experiences')
-              .update({ order_index: update.order_index })
-              .eq('id', update.id);
-          }
+          // Use Promise.all for concurrent updates instead of sequential
+          await Promise.all(
+            updates.map(update =>
+              supabase
+                .from('experiences')
+                .update({ order_index: update.order_index })
+                .eq('id', update.id)
+            )
+          );
 
-          // Refresh the list
-          await fetchExperiences();
+          console.log('✅ Experience order updated successfully');
         } catch (error) {
-          console.error('Error updating experience order:', error);
-          alert('Failed to update experience order');
+          console.error('❌ Error updating experience order:', error);
+          // Rollback on failure - refetch to restore correct order
+          await fetchExperiences();
+          alert('Failed to update experience order - reverted changes');
         }
       }
     };
@@ -1460,7 +1474,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null)
     
     const sensors = useSensors(
-      useSensor(PointerSensor),
+      useSensor(PointerSensor, {
+        activationConstraint: {
+          distance: 8, // Reduced distance for more responsive drag
+        },
+      }),
       useSensor(KeyboardSensor, {
         coordinateGetter: sortableKeyboardCoordinates,
       })
@@ -1475,26 +1493,36 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         
         const newOrder = arrayMove(destinations, oldIndex, newIndex);
         
-        // Update order_index for all affected items
+        // Immediately update local state for instant visual feedback
+        const optimisticOrder = newOrder.map((dest: any, index: number) => ({
+          ...dest,
+          order_index: index
+        }));
+        setDestinations(optimisticOrder);
+        
+        // Update database in background with batch operation
         try {
           const updates = newOrder.map((dest: any, index: number) => ({
             id: dest.id,
             order_index: index
           }));
 
-          // Update each destination with new order_index
-          for (const update of updates) {
-            await supabase
-              .from('destinations')
-              .update({ order_index: update.order_index })
-              .eq('id', update.id);
-          }
+          // Use Promise.all for concurrent updates instead of sequential
+          await Promise.all(
+            updates.map(update =>
+              supabase
+                .from('destinations')
+                .update({ order_index: update.order_index })
+                .eq('id', update.id)
+            )
+          );
 
-          // Refresh the list
-          await fetchDestinations();
+          console.log('✅ Destination order updated successfully');
         } catch (error) {
-          console.error('Error updating destination order:', error);
-          alert('Failed to update destination order');
+          console.error('❌ Error updating destination order:', error);
+          // Rollback on failure - refetch to restore correct order
+          await fetchDestinations();
+          alert('Failed to update destination order - reverted changes');
         }
       }
     };
