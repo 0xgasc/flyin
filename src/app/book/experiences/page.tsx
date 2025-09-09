@@ -31,6 +31,7 @@ interface Experience {
   category_name_en: string | null
   category_name_es: string | null
   type: 'experience' | 'destination'
+  order_index?: number | null
   experience_images?: Array<{
     id: string
     image_url: string
@@ -113,7 +114,9 @@ export default function BookExperiencesPage() {
         experiencesCount: experiencesResponse.data?.length || 0, 
         destinationsCount: destinationsResponse.data?.length || 0,
         experiencesError: experiencesResponse.error?.message,
-        destinationsError: destinationsResponse.error?.message
+        destinationsError: destinationsResponse.error?.message,
+        firstExperience: experiencesResponse.data?.[0],
+        firstDestination: destinationsResponse.data?.[0]
       })
 
       const allItems = []
@@ -124,15 +127,18 @@ export default function BookExperiencesPage() {
         const experienceItems = experiencesResponse.data.map(exp => ({
           ...exp,
           type: 'experience' as const,
-          category: 'experiences'
+          category: 'experiences',
+          experience_images: exp.experience_images || []
         }))
         allItems.push(...experienceItems)
         console.log('✅ Added', experienceItems.length, 'experiences')
+        console.log('First experience with images:', experienceItems[0])
       }
 
       // Process destinations  
       if (destinationsResponse.data && destinationsResponse.data.length > 0) {
         const destinationItems = destinationsResponse.data.map(dest => ({
+          ...dest,
           id: dest.id,
           name: dest.name,
           name_es: null,
@@ -153,15 +159,23 @@ export default function BookExperiencesPage() {
           category_name_en: 'Destinations',
           category_name_es: 'Destinos',
           type: 'destination' as const,
-          destination_images: dest.destination_images || []
+          destination_images: dest.destination_images || [],
+          order_index: dest.order_index
         }))
         allItems.push(...destinationItems)
         console.log('✅ Added', destinationItems.length, 'destinations')
       }
 
-      setExperiences(allItems)
+      // Sort all items by order_index to maintain proper ordering across both types
+      const sortedItems = allItems.sort((a, b) => {
+        const aOrder = a.order_index ?? 999
+        const bOrder = b.order_index ?? 999
+        return aOrder - bOrder
+      })
+      
+      setExperiences(sortedItems)
       setCategories(Array.from(allCategories))
-      console.log('✅ Total items loaded:', allItems.length)
+      console.log('✅ Total items loaded:', sortedItems.length, 'Order:', sortedItems.map(i => ({ name: i.name, order: i.order_index })))
       
     } catch (error) {
       console.error('❌ Error fetching data:', error)
