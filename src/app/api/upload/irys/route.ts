@@ -2,9 +2,30 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Uploader } from '@irys/upload'
 import { Ethereum } from '@irys/upload-ethereum'
 
+// Configure API route to accept larger files
+export const runtime = 'nodejs'
+export const maxDuration = 60 // 60 seconds timeout
+
 export async function POST(request: NextRequest) {
   try {
     console.log('🚀 Starting Irys upload...')
+    
+    // Check content length header first
+    const contentLength = request.headers.get('content-length')
+    console.log(`📏 Content-Length header: ${contentLength} bytes`)
+    
+    // For Vercel, we need to handle the 4.5MB limit more gracefully
+    const vercelLimit = 4.5 * 1024 * 1024 // 4.5MB Vercel limit
+    if (contentLength && parseInt(contentLength) > vercelLimit) {
+      console.warn(`⚠️ File size ${contentLength} exceeds Vercel limit of ${vercelLimit} bytes`)
+      return NextResponse.json(
+        { 
+          error: `File too large for Vercel deployment. Maximum size is 4.5MB. Please use a smaller image or compress it first.`,
+          tip: 'You can use online tools to compress images before uploading.'
+        },
+        { status: 413 }
+      )
+    }
     
     // Get form data from request
     const formData = await request.formData()
@@ -19,12 +40,15 @@ export async function POST(request: NextRequest) {
     
     console.log(`📁 Received file: ${file.name} (${file.size} bytes)`)
     
-    // Check file size (limit to 50MB)
-    const maxSize = 50 * 1024 * 1024 // 50MB
+    // Double-check file size after receiving
+    const maxSize = 4.5 * 1024 * 1024 // 4.5MB for Vercel
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: `File too large. Maximum size is ${maxSize / 1024 / 1024}MB` },
-        { status: 400 }
+        { 
+          error: `File too large. Maximum size is 4.5MB on Vercel. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`,
+          tip: 'Please compress your image or use a smaller file.'
+        },
+        { status: 413 }
       )
     }
     

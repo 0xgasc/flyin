@@ -18,10 +18,11 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
-      // Check file size (50MB limit)
-      const maxSize = 50 * 1024 * 1024 // 50MB
+      // Check file size (4.5MB limit for Vercel)
+      const maxSize = 4.5 * 1024 * 1024 // 4.5MB Vercel limit
       if (selectedFile.size > maxSize) {
-        alert(`File too large. Maximum size is ${maxSize / 1024 / 1024}MB. Your file is ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB.`)
+        alert(`File too large for Vercel hosting. Maximum size is 4.5MB. Your file is ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB.\n\nPlease compress your image using an online tool like TinyPNG or resize it to a smaller resolution.`)
+        e.target.value = '' // Clear the input
         return
       }
       
@@ -64,8 +65,8 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
           // If not JSON, try to get text error
           try {
             const errorText = await response.text()
-            if (errorText.includes('Request Entity Too Large')) {
-              errorMessage = 'File too large. Please use a smaller image (max 50MB)'
+            if (errorText.includes('Request Entity Too Large') || response.status === 413) {
+              errorMessage = 'File too large. Vercel has a 4.5MB limit. Please compress your image or use a smaller file.'
             } else if (errorText.includes('timeout')) {
               errorMessage = 'Upload timeout. Please try a smaller file'
             } else {
