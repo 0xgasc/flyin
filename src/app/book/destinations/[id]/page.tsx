@@ -10,7 +10,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { 
   ArrowLeft, MapPin, CheckCircle, 
   Calendar, DollarSign, Plane, Star, Camera,
-  ChevronLeft, ChevronRight, Navigation
+  ChevronLeft, ChevronRight, Navigation, AlertTriangle, Clock
 } from 'lucide-react'
 
 interface Destination {
@@ -20,6 +20,11 @@ interface Destination {
   location: string
   coordinates: { lat: number; lng: number }
   features: string[]
+  highlights?: string[]
+  requirements?: string[]
+  meeting_point?: string
+  best_time?: string
+  difficulty_level?: string
   is_active: boolean
   metadata: any
   created_at: string
@@ -314,6 +319,68 @@ export default function DestinationDetailPage() {
                       <span className="text-gray-700">{feature}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Highlights */}
+            {destination.highlights && destination.highlights.length > 0 && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Highlights</h3>
+                <div className="space-y-2">
+                  {destination.highlights.map((highlight, index) => (
+                    <div key={index} className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700">{highlight}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Requirements */}
+            {destination.requirements && destination.requirements.length > 0 && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Requirements</h3>
+                <div className="space-y-2">
+                  {destination.requirements.map((requirement, index) => (
+                    <div key={index} className="flex items-start">
+                      <AlertTriangle className="w-5 h-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">{requirement}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Meeting Point */}
+            {destination.meeting_point && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Meeting Point</h3>
+                <div className="flex items-start">
+                  <MapPin className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <p className="text-gray-700">{destination.meeting_point}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Best Time */}
+            {destination.best_time && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Best Time to Visit</h3>
+                <div className="flex items-start">
+                  <Clock className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <p className="text-gray-700">{destination.best_time}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Difficulty Level */}
+            {destination.difficulty_level && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Difficulty Level</h3>
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+                  {destination.difficulty_level.charAt(0).toUpperCase() + destination.difficulty_level.slice(1)}
                 </div>
               </div>
             )}

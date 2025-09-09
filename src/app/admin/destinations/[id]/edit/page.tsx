@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import IrysUpload from '@/components/IrysUpload'
-import { ArrowLeft, Plus, Trash2, ImageIcon } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, ImageIcon, X } from 'lucide-react'
 import Link from 'next/link'
 
 interface Destination {
@@ -15,6 +15,11 @@ interface Destination {
   location: string
   coordinates: { lat: number; lng: number }
   features: string[]
+  highlights?: string[]
+  requirements?: string[]
+  meeting_point?: string
+  best_time?: string
+  difficulty_level?: string
   is_active: boolean
   metadata: any
 }
@@ -42,10 +47,17 @@ export default function EditDestinationPage() {
     location: '',
     coordinates: { lat: 14.5891, lng: -90.5515 }, // Default Guatemala coordinates
     features: [] as string[],
+    highlights: [] as string[],
+    requirements: [] as string[],
+    meeting_point: '',
+    best_time: '',
+    difficulty_level: '',
     is_active: true
   })
 
   const [newFeature, setNewFeature] = useState('')
+  const [newHighlight, setNewHighlight] = useState('')
+  const [newRequirement, setNewRequirement] = useState('')
 
   useEffect(() => {
     if (!profile || profile.role !== 'admin') {
@@ -77,6 +89,11 @@ export default function EditDestinationPage() {
           location: data.location || '',
           coordinates: data.coordinates || { lat: 14.5891, lng: -90.5515 },
           features: data.features || [],
+          highlights: data.highlights || [],
+          requirements: data.requirements || [],
+          meeting_point: data.meeting_point || '',
+          best_time: data.best_time || '',
+          difficulty_level: data.difficulty_level || '',
           is_active: data.is_active || true
         })
       }
@@ -195,20 +212,19 @@ export default function EditDestinationPage() {
     }
   }
 
-  const addFeature = () => {
-    if (newFeature.trim()) {
+  const addToArray = (field: 'features' | 'highlights' | 'requirements', value: string) => {
+    if (value.trim()) {
       setFormData(prev => ({
         ...prev,
-        features: [...prev.features, newFeature.trim()]
+        [field]: [...(prev[field] as string[]), value.trim()]
       }))
-      setNewFeature('')
     }
   }
 
-  const removeFeature = (index: number) => {
+  const removeFromArray = (field: 'features' | 'highlights' | 'requirements', index: number) => {
     setFormData(prev => ({
       ...prev,
-      features: prev.features.filter((_, i) => i !== index)
+      [field]: (prev[field] as string[]).filter((_, i) => i !== index)
     }))
   }
 
@@ -340,7 +356,7 @@ export default function EditDestinationPage() {
                       <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{feature}</span>
                       <button
                         type="button"
-                        onClick={() => removeFeature(index)}
+                        onClick={() => removeFromArray('features', index)}
                         className="text-red-600 hover:text-red-800"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -357,13 +373,145 @@ export default function EditDestinationPage() {
                     />
                     <button
                       type="button"
-                      onClick={addFeature}
+                      onClick={() => {
+                        addToArray('features', newFeature)
+                        setNewFeature('')
+                      }}
                       className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
+              </div>
+
+              {/* Highlights */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Highlights
+                </label>
+                <div className="space-y-2">
+                  {formData.highlights.map((highlight, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{highlight}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFromArray('highlights', index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={newHighlight}
+                      onChange={(e) => setNewHighlight(e.target.value)}
+                      placeholder="Add highlight..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToArray('highlights', newHighlight)
+                        setNewHighlight('')
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Requirements */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Requirements
+                </label>
+                <div className="space-y-2">
+                  {formData.requirements.map((requirement, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{requirement}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFromArray('requirements', index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={newRequirement}
+                      onChange={(e) => setNewRequirement(e.target.value)}
+                      placeholder="Add requirement..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToArray('requirements', newRequirement)
+                        setNewRequirement('')
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Meeting Point */}
+              <div>
+                <label htmlFor="meeting_point" className="block text-sm font-medium text-gray-700 mb-2">
+                  Meeting Point
+                </label>
+                <input
+                  type="text"
+                  id="meeting_point"
+                  value={formData.meeting_point}
+                  onChange={(e) => setFormData(prev => ({ ...prev, meeting_point: e.target.value }))}
+                  placeholder="e.g., Hotel lobby, Airport terminal, etc."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Best Time */}
+              <div>
+                <label htmlFor="best_time" className="block text-sm font-medium text-gray-700 mb-2">
+                  Best Time to Visit
+                </label>
+                <input
+                  type="text"
+                  id="best_time"
+                  value={formData.best_time}
+                  onChange={(e) => setFormData(prev => ({ ...prev, best_time: e.target.value }))}
+                  placeholder="e.g., Early morning for clear views"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Difficulty Level */}
+              <div>
+                <label htmlFor="difficulty_level" className="block text-sm font-medium text-gray-700 mb-2">
+                  Difficulty Level
+                </label>
+                <select
+                  id="difficulty_level"
+                  value={formData.difficulty_level}
+                  onChange={(e) => setFormData(prev => ({ ...prev, difficulty_level: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select difficulty...</option>
+                  <option value="easy">Easy</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="challenging">Challenging</option>
+                  <option value="extreme">Extreme</option>
+                </select>
               </div>
 
               <div className="flex items-center space-x-3">
