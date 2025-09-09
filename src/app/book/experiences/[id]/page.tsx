@@ -27,6 +27,9 @@ interface Experience {
   min_passengers: number
   includes: string[]
   includes_es: string[] | null
+  highlights?: string[]
+  requirements?: string[]
+  meeting_point?: string
   location: string
   aircraft_options: any
   route_waypoints: string[]

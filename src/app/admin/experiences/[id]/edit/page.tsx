@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import IrysUpload from '@/components/IrysUpload'
-import { ArrowLeft, Plus, Trash2, ImageIcon } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, ImageIcon, X } from 'lucide-react'
 import Link from 'next/link'
 
 interface Experience {
@@ -50,8 +50,10 @@ export default function EditExperiencePage() {
     category: 'helitour',
     location: '',
     duration_hours: 1,
+    duration_minutes: 0,
     base_price: 100,
     max_passengers: 10,
+    min_passengers: 1,
     is_active: true,
     includes: [] as string[],
     highlights: [] as string[],
@@ -93,8 +95,10 @@ export default function EditExperiencePage() {
           category: data.category || 'helitour',
           location: data.location || '',
           duration_hours: data.duration_hours || 1,
+          duration_minutes: data.duration_minutes || 0,
           base_price: data.base_price || 100,
           max_passengers: data.max_passengers || 10,
+          min_passengers: data.min_passengers || 1,
           is_active: data.is_active || true,
           includes: data.includes || [],
           highlights: data.highlights || [],
