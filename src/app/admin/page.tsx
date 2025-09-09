@@ -9,11 +9,30 @@ import { supabase } from '@/lib/supabase'
 import { 
   Plane, Calendar, MapPin, Clock, Users, CheckCircle, 
   AlertCircle, XCircle, DollarSign, BarChart3, UserCheck,
-  Plus, Edit, Trash2, Upload, Image as ImageIcon, Eye
+  Plus, Edit, Trash2, Upload, Image as ImageIcon, Eye, GripVertical
 } from 'lucide-react'
 import IrysUpload from '@/components/IrysUpload'
 import { HELICOPTER_FLEET } from '@/types/helicopters'
 import { format } from 'date-fns'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import {
+  CSS,
+} from '@dnd-kit/utilities';
 
 interface Booking {
   id: string
@@ -630,7 +649,7 @@ export default function AdminDashboard() {
             order_index
           )
         `)
-        .order('created_at', { ascending: false })
+        .order('order_index', { ascending: true, nullsFirst: false })
 
       if (data) {
         setExperiences(data)
@@ -1042,9 +1061,126 @@ export default function AdminDashboard() {
   }
 
   // Experiences Management Component
-  const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) => {
+  // Sortable Row Component
+const SortableExperienceRow = ({ experience, onDelete, onToggleActive, onImageUpload }: any) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: experience.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style} className={isDragging ? 'bg-gray-50' : ''}>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center">
+          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mr-3">
+            <GripVertical className="w-4 h-4 text-gray-400" />
+          </div>
+          <div>
+            <div className="text-sm font-medium text-gray-900">{experience.name}</div>
+            <div className="text-sm text-gray-500 max-w-xs truncate">{experience.description}</div>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        {experience.location}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        {experience.duration_hours}h {experience.duration_minutes ? `${experience.duration_minutes}m` : ''}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        ${experience.base_price}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <button
+          onClick={() => onToggleActive(experience.id, experience.is_active)}
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+            experience.is_active
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {experience.is_active ? 'Active' : 'Inactive'}
+        </button>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => onImageUpload(experience.id)}
+            className="text-blue-600 hover:text-blue-900"
+          >
+            <ImageIcon className="w-4 h-4" />
+          </button>
+          <Link
+            href={`/admin/experiences/${experience.id}/edit`}
+            className="text-indigo-600 hover:text-indigo-900"
+          >
+            <Edit className="w-4 h-4" />
+          </Link>
+          <button
+            onClick={() => onDelete(experience.id)}
+            className="text-red-600 hover:text-red-900"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) => {
     const [showImageUpload, setShowImageUpload] = useState(false)
     const [selectedExperienceId, setSelectedExperienceId] = useState<string | null>(null)
+    
+    const sensors = useSensors(
+      useSensor(PointerSensor),
+      useSensor(KeyboardSensor, {
+        coordinateGetter: sortableKeyboardCoordinates,
+      })
+    );
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (active.id !== over?.id) {
+        const oldIndex = experiences.findIndex((exp: any) => exp.id === active.id);
+        const newIndex = experiences.findIndex((exp: any) => exp.id === over?.id);
+        
+        const newOrder = arrayMove(experiences, oldIndex, newIndex);
+        
+        // Update order_index for all affected items
+        try {
+          const updates = newOrder.map((exp: any, index: number) => ({
+            id: exp.id,
+            order_index: index
+          }));
+
+          // Update each experience with new order_index
+          for (const update of updates) {
+            await supabase
+              .from('experiences')
+              .update({ order_index: update.order_index })
+              .eq('id', update.id);
+          }
+
+          // Refresh the list
+          await fetchExperiences();
+        } catch (error) {
+          console.error('Error updating experience order:', error);
+          alert('Failed to update experience order');
+        }
+      }
+    };
 
     const handleDeleteExperience = async (id: string) => {
       if (!confirm('Are you sure you want to delete this experience?')) return
@@ -1149,97 +1285,45 @@ export default function AdminDashboard() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                    Loading experiences...
-                  </td>
-                </tr>
-              ) : experiences.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                    No experiences found
-                  </td>
-                </tr>
-              ) : (
-                experiences.map((experience: any) => (
-                  <tr key={experience.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {experience.image_url ? (
-                          <img
-                            className="h-10 w-10 rounded-full object-cover"
-                            src={experience.image_url}
-                            alt={experience.name}
-                          />
-                        ) : (
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <ImageIcon className="w-5 h-5 text-gray-400" />
-                          </div>
-                        )}
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{experience.name}</div>
-                          <div className="text-sm text-gray-500">{experience.category || 'helitour'}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <MapPin className="w-4 h-4 mr-1 text-gray-400" />
-                        {experience.location}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <Clock className="w-4 h-4 mr-1 text-gray-400" />
-                        {experience.duration_hours}h
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">${experience.base_price}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => handleToggleActive(experience.id, experience.is_active)}
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          experience.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {experience.is_active ? 'Active' : 'Inactive'}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => {
-                            setSelectedExperienceId(experience.id)
-                            setShowImageUpload(true)
-                          }}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          <ImageIcon className="w-4 h-4" />
-                        </button>
-                        <Link
-                          href={`/admin/experiences/${experience.id}/edit`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteExperience(experience.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <tbody className="bg-white divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                      Loading experiences...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
+                ) : experiences.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                      No experiences found
+                    </td>
+                  </tr>
+                ) : (
+                  <SortableContext
+                    items={experiences.map((exp: any) => exp.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {experiences.map((experience: any) => (
+                      <SortableExperienceRow
+                        key={experience.id}
+                        experience={experience}
+                        onDelete={handleDeleteExperience}
+                        onToggleActive={handleToggleActive}
+                        onImageUpload={(id: string) => {
+                          setSelectedExperienceId(id)
+                          setShowImageUpload(true)
+                        }}
+                      />
+                    ))}
+                  </SortableContext>
+                )}
+              </tbody>
+            </DndContext>
             </table>
           </div>
         </div>
