@@ -31,6 +31,20 @@ interface Experience {
   category_name_en: string | null
   category_name_es: string | null
   type: 'experience' | 'destination'
+  experience_images?: Array<{
+    id: string
+    image_url: string
+    caption: string | null
+    is_primary: boolean
+    order_index: number | null
+  }>
+  destination_images?: Array<{
+    id: string
+    image_url: string
+    caption: string | null
+    is_primary: boolean
+    order_index: number | null
+  }>
 }
 
 export default function BookExperiencesPage() {
@@ -67,14 +81,32 @@ export default function BookExperiencesPage() {
       const [experiencesResponse, destinationsResponse] = await Promise.all([
         supabase
           .from('experiences')
-          .select('*')
+          .select(`
+            *,
+            experience_images (
+              id,
+              image_url,
+              caption,
+              is_primary,
+              order_index
+            )
+          `)
           .eq('is_active', true)
-          .order('base_price'),
+          .order('order_index', { ascending: true, nullsFirst: false }),
         supabase
           .from('destinations')
-          .select('*')
+          .select(`
+            *,
+            destination_images (
+              id,
+              image_url,
+              caption,
+              is_primary,
+              order_index
+            )
+          `)
           .eq('is_active', true)
-          .order('name')
+          .order('order_index', { ascending: true, nullsFirst: false })
       ])
 
       console.log('📊 Query results:', { 
@@ -120,7 +152,8 @@ export default function BookExperiencesPage() {
           image_url: null,
           category_name_en: 'Destinations',
           category_name_es: 'Destinos',
-          type: 'destination' as const
+          type: 'destination' as const,
+          destination_images: dest.destination_images || []
         }))
         allItems.push(...destinationItems)
         console.log('✅ Added', destinationItems.length, 'destinations')
@@ -255,17 +288,25 @@ export default function BookExperiencesPage() {
                 {filteredExperiences.map((experience) => (
                 <div key={experience.id} className="card-luxury hover:scale-105 transition-transform">
                   <div className="aspect-video bg-gray-200 rounded-lg mb-4 relative overflow-hidden">
-                    {experience.image_url ? (
-                      <img
-                        src={experience.image_url}
-                        alt={getDisplayName(experience)}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary-100 to-primary-200">
-                        <Sparkles className="h-12 w-12 text-primary-600" />
-                      </div>
-                    )}
+                    {(() => {
+                      // Get primary image from experience_images or destination_images
+                      const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images
+                      const primaryImage = images?.find(img => img.is_primary)?.image_url
+                      const firstImage = images?.[0]?.image_url
+                      const displayImage = primaryImage || firstImage || experience.image_url
+                      
+                      return displayImage ? (
+                        <img
+                          src={displayImage}
+                          alt={getDisplayName(experience)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary-100 to-primary-200">
+                          <Sparkles className="h-12 w-12 text-primary-600" />
+                        </div>
+                      )
+                    })()}
                     <div className="absolute top-2 right-2">
                       <span className="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
                         {getCategoryName(experience)}
