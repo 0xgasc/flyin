@@ -87,16 +87,25 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
           formData.append('originalName', file.name)
           formData.append('originalSize', file.size.toString())
           
+          console.log(`📤 Uploading chunk ${i + 1}/${totalChunks} (${chunk.size} bytes)`)
+          
           const response = await fetch('/api/upload/irys-chunk', {
             method: 'POST',
             body: formData
           })
           
           if (!response.ok) {
-            throw new Error(`Chunk ${i + 1} upload failed`)
+            const errorData = await response.json().catch(() => ({}))
+            const errorMsg = errorData.details || errorData.error || `HTTP ${response.status}`
+            throw new Error(`Chunk ${i + 1} upload failed: ${errorMsg}`)
           }
           
           const result = await response.json()
+          if (!result.success || !result.chunkId) {
+            throw new Error(`Chunk ${i + 1} upload returned invalid response`)
+          }
+          
+          console.log(`✅ Chunk ${i + 1} uploaded successfully: ${result.chunkId}`)
           chunks.push(result.chunkId)
           
           // Update progress
@@ -104,7 +113,9 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
         }
         
         // Assemble chunks on server
+        console.log(`🔧 Assembling ${chunks.length} chunks...`)
         setUploadProgress(85)
+        
         const assembleResponse = await fetch('/api/upload/irys-assemble', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -112,12 +123,14 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
             uploadId,
             chunks,
             originalName: file.name,
-            originalSize: file.size
+            originalSize: file.size.toString()
           })
         })
         
         if (!assembleResponse.ok) {
-          throw new Error('Failed to assemble file chunks')
+          const errorData = await assembleResponse.json().catch(() => ({}))
+          const errorMsg = errorData.details || errorData.error || `HTTP ${assembleResponse.status}`
+          throw new Error(`Assembly failed: ${errorMsg}`)
         }
         
         const result = await assembleResponse.json()

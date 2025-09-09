@@ -28,7 +28,17 @@ export async function POST(request: NextRequest) {
     // Save chunk to temp file
     const chunkPath = join(tempDir, `chunk-${chunkIndex}`)
     const chunkBuffer = Buffer.from(await chunk.arrayBuffer())
-    await writeFile(chunkPath, chunkBuffer)
+    
+    console.log(`💾 Saving chunk ${parseInt(chunkIndex) + 1}/${totalChunks} to ${chunkPath}`)
+    console.log(`📊 Chunk size: ${chunkBuffer.length} bytes`)
+    
+    try {
+      await writeFile(chunkPath, chunkBuffer)
+      console.log(`✅ Chunk ${parseInt(chunkIndex) + 1} saved successfully`)
+    } catch (error) {
+      console.error(`❌ Failed to save chunk ${parseInt(chunkIndex) + 1}:`, error)
+      throw new Error(`Failed to save chunk: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
     
     console.log(`✅ Saved chunk ${parseInt(chunkIndex) + 1}/${totalChunks} for upload ${uploadId}`)
     

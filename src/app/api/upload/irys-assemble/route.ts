@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFile, rmdir } from 'fs/promises'
+import { readFile, rm, stat } from 'fs/promises'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { Uploader } from '@irys/upload'
@@ -27,10 +27,27 @@ export async function POST(request: NextRequest) {
     tempDir = join(tmpdir(), 'irys-uploads', uploadId)
     const chunkBuffers: Buffer[] = []
     
+    // Check if temp directory exists
+    try {
+      const dirStats = await stat(tempDir)
+      console.log(`📁 Temp directory exists: ${tempDir}`)
+    } catch (error) {
+      console.error(`❌ Temp directory not found: ${tempDir}`)
+      throw new Error(`Upload chunks not found. Upload may have timed out.`)
+    }
+    
     for (let i = 0; i < chunks.length; i++) {
       const chunkPath = join(tempDir, `chunk-${i}`)
-      const chunkBuffer = await readFile(chunkPath)
-      chunkBuffers.push(chunkBuffer)
+      console.log(`📖 Reading chunk ${i + 1}/${chunks.length}: ${chunkPath}`)
+      
+      try {
+        const chunkBuffer = await readFile(chunkPath)
+        chunkBuffers.push(chunkBuffer)
+        console.log(`✅ Chunk ${i + 1} read: ${chunkBuffer.length} bytes`)
+      } catch (error) {
+        console.error(`❌ Failed to read chunk ${i + 1}:`, error)
+        throw new Error(`Failed to read chunk ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      }
     }
     
     // Combine all chunks into final buffer
@@ -94,7 +111,7 @@ export async function POST(request: NextRequest) {
     
     // Clean up temp files
     try {
-      await rmdir(tempDir, { recursive: true })
+      await rm(tempDir, { recursive: true, force: true })
       console.log(`🧹 Cleaned up temp directory: ${tempDir}`)
     } catch (cleanupError) {
       console.warn(`⚠️ Failed to clean up temp directory: ${cleanupError}`)
@@ -116,7 +133,7 @@ export async function POST(request: NextRequest) {
     // Clean up on error
     if (tempDir) {
       try {
-        await rmdir(tempDir, { recursive: true })
+        await rm(tempDir, { recursive: true, force: true })
       } catch (cleanupError) {
         console.warn(`⚠️ Failed to clean up temp directory on error: ${cleanupError}`)
       }
