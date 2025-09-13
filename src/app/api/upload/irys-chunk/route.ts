@@ -4,7 +4,7 @@ import { join } from 'path'
 import { tmpdir } from 'os'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 120 // Increased timeout for large chunks
 
 export async function POST(request: NextRequest) {
   try {

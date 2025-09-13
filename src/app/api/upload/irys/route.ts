@@ -4,7 +4,7 @@ import { Ethereum } from '@irys/upload-ethereum'
 
 // Configure API route to accept larger files
 export const runtime = 'nodejs'
-export const maxDuration = 60 // 60 seconds timeout
+export const maxDuration = 300 // 5 minutes timeout for large files
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +14,14 @@ export async function POST(request: NextRequest) {
     const contentLength = request.headers.get('content-length')
     console.log(`📏 Content-Length header: ${contentLength} bytes`)
     
-    // This endpoint handles files up to 4MB - larger files use chunked upload
-    const directUploadLimit = 4 * 1024 * 1024 // 4MB for direct upload
+    // This endpoint handles files up to 6GB (Irys supports up to 6GB files)
+    const directUploadLimit = 6 * 1024 * 1024 * 1024 // 6GB for direct upload
     if (contentLength && parseInt(contentLength) > directUploadLimit) {
-      console.warn(`⚠️ File size ${contentLength} exceeds direct upload limit - should use chunked upload`)
+      console.warn(`⚠️ File size ${contentLength} exceeds 6GB limit`)
       return NextResponse.json(
         { 
-          error: `File too large for direct upload. Use chunked upload for files over 4MB.`,
-          tip: 'The client should automatically handle this via chunked upload.'
+          error: `File too large for upload. Maximum size is 6GB.`,
+          tip: 'Please compress your file or use a smaller version.'
         },
         { status: 413 }
       )
@@ -41,12 +41,12 @@ export async function POST(request: NextRequest) {
     console.log(`📁 Received file: ${file.name} (${file.size} bytes)`)
     
     // Double-check file size after receiving
-    const maxSize = 4 * 1024 * 1024 // 4MB for direct upload
+    const maxSize = 6 * 1024 * 1024 * 1024 // 6GB for direct upload
     if (file.size > maxSize) {
       return NextResponse.json(
         { 
-          error: `File too large for direct upload. Maximum size is 4MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`,
-          tip: 'Large files should use chunked upload automatically.'
+          error: `File too large for upload. Maximum size is 6GB. Your file is ${(file.size / 1024 / 1024 / 1024).toFixed(2)}GB.`,
+          tip: 'Please compress your file or use a smaller version.'
         },
         { status: 413 }
       )

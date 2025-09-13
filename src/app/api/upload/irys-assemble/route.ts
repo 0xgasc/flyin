@@ -27,13 +27,51 @@ export async function POST(request: NextRequest) {
     tempDir = join(tmpdir(), 'irys-uploads', uploadId)
     const chunkBuffers: Buffer[] = []
     
-    // Check if temp directory exists
+    // Check if temp directory exists with detailed debugging
     try {
       const dirStats = await stat(tempDir)
       console.log(`📁 Temp directory exists: ${tempDir}`)
+      console.log(`📊 Directory stats:`, { 
+        isDirectory: dirStats.isDirectory(),
+        size: dirStats.size,
+        created: dirStats.birthtime,
+        modified: dirStats.mtime
+      })
+      
+      // List directory contents
+      const { readdir } = await import('fs/promises')
+      const files = await readdir(tempDir)
+      console.log(`📋 Directory contents: [${files.join(', ')}]`)
+      
+      // Check each expected chunk file
+      for (let i = 0; i < chunks.length; i++) {
+        const chunkPath = join(tempDir, `chunk-${i}`)
+        try {
+          const chunkStats = await stat(chunkPath)
+          console.log(`✅ Chunk ${i} exists: ${chunkStats.size} bytes`)
+        } catch (chunkError) {
+          console.error(`❌ Chunk ${i} missing: ${chunkPath}`)
+          throw new Error(`Chunk ${i} not found at ${chunkPath}`)
+        }
+      }
+      
     } catch (error) {
       console.error(`❌ Temp directory not found: ${tempDir}`)
-      throw new Error(`Upload chunks not found. Upload may have timed out.`)
+      console.error(`❌ Error details:`, error)
+      
+      // Try to check parent directory
+      const parentDir = join(tmpdir(), 'irys-uploads')
+      try {
+        await stat(parentDir)
+        console.log(`📁 Parent directory exists: ${parentDir}`)
+        const { readdir } = await import('fs/promises')
+        const parentFiles = await readdir(parentDir)
+        console.log(`📋 Parent directory contents: [${parentFiles.join(', ')}]`)
+      } catch (parentError) {
+        console.error(`❌ Parent directory also missing: ${parentDir}`, parentError)
+      }
+      
+      throw new Error(`Upload chunks not found. Upload may have timed out. Directory: ${tempDir}`)
     }
     
     for (let i = 0; i < chunks.length; i++) {

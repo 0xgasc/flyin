@@ -22,7 +22,7 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
       // IRYS supports up to 6GB files - much more generous limit
       const maxSize = 6 * 1024 * 1024 * 1024 // 6GB IRYS limit
       if (selectedFile.size > maxSize) {
-        alert(`File too large. Maximum size is 6GB. Your file is ${(selectedFile.size / 1024 / 1024 / 1024).toFixed(1)}GB.`)
+        alert(`File too large. Maximum size is 6GB. Your file is ${(selectedFile.size / 1024 / 1024 / 1024).toFixed(2)}GB.`)
         e.target.value = '' // Clear the input
         return
       }
@@ -43,158 +43,42 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
     setUploadProgress(0)
     
     try {
-      console.log('📤 Uploading to Irys with chunked approach...')
+      console.log(`📤 Uploading ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB) directly to Irys...`)
       
-      // For files larger than 2MB, use chunked upload approach (reduced for better reliability)
-      const chunkSize = 2 * 1024 * 1024 // 2MB chunks for better reliability
-      const totalChunks = Math.ceil(file.size / chunkSize)
+      // Show progress as upload proceeds
+      setUploadProgress(10)
       
-      if (file.size <= chunkSize) {
-        // Small file - use direct API route
-        const formData = new FormData()
-        formData.append('file', file)
-        
-        const response = await fetch('/api/upload/irys', {
-          method: 'POST',
-          body: formData
-        })
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      setUploadProgress(20)
+      
+      const response = await fetch('/api/upload/irys', {
+        method: 'POST',
+        body: formData
+      })
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.details || errorData.error || 'Upload failed')
-        }
+      setUploadProgress(80)
 
-        const result = await response.json()
-        setUploadedUrl(result.url)
-        if (onUpload) onUpload(result.url)
-        if (onUploadComplete) onUploadComplete(result.url)
-      } else {
-        // Large file - use chunked upload via new endpoint
-        const uploadId = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        const chunks: string[] = []
-        
-        // Upload chunks with retry logic
-        for (let i = 0; i < totalChunks; i++) {
-          let chunkUploaded = false
-          let retryCount = 0
-          const maxRetries = 3
-          
-          while (!chunkUploaded && retryCount < maxRetries) {
-            try {
-              const start = i * chunkSize
-              const end = Math.min(start + chunkSize, file.size)
-              const chunk = file.slice(start, end)
-              
-              const formData = new FormData()
-              formData.append('chunk', chunk)
-              formData.append('uploadId', uploadId)
-              formData.append('chunkIndex', i.toString())
-              formData.append('totalChunks', totalChunks.toString())
-              formData.append('originalName', file.name)
-              formData.append('originalSize', file.size.toString())
-              
-              console.log(`📤 Uploading chunk ${i + 1}/${totalChunks} (${chunk.size} bytes) - Attempt ${retryCount + 1}`)
-              
-              const response = await fetch('/api/upload/irys-chunk', {
-                method: 'POST',
-                body: formData,
-                // Add timeout to prevent hanging
-                signal: AbortSignal.timeout(30000) // 30 second timeout per chunk
-              })
-              
-              if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                const errorMsg = errorData.details || errorData.error || `HTTP ${response.status}`
-                throw new Error(`Chunk ${i + 1} upload failed: ${errorMsg}`)
-              }
-              
-              const result = await response.json()
-              if (!result.success || !result.chunkId) {
-                throw new Error(`Chunk ${i + 1} upload returned invalid response`)
-              }
-              
-              console.log(`✅ Chunk ${i + 1} uploaded successfully: ${result.chunkId}`)
-              chunks.push(result.chunkId)
-              chunkUploaded = true
-              
-              // Update progress
-              setUploadProgress(Math.round(((i + 1) / totalChunks) * 80)) // 80% for upload, 20% for assembly
-              
-            } catch (error) {
-              retryCount++
-              console.warn(`⚠️ Chunk ${i + 1} failed (attempt ${retryCount}):`, error)
-              
-              if (retryCount >= maxRetries) {
-                throw new Error(`Chunk ${i + 1} failed after ${maxRetries} attempts: ${error}`)
-              }
-              
-              // Wait before retry (exponential backoff)
-              await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)))
-            }
-          }
-        }
-        
-        // Assemble chunks on server with retry
-        console.log(`🔧 Assembling ${chunks.length} chunks...`)
-        setUploadProgress(85)
-        
-        let assemblySuccess = false
-        let assemblyRetries = 0
-        const maxAssemblyRetries = 2
-        let result
-        
-        while (!assemblySuccess && assemblyRetries < maxAssemblyRetries) {
-          try {
-            console.log(`🔧 Assembly attempt ${assemblyRetries + 1}/${maxAssemblyRetries}`)
-            
-            const assembleResponse = await fetch('/api/upload/irys-assemble', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                uploadId,
-                chunks,
-                originalName: file.name,
-                originalSize: file.size.toString()
-              }),
-              // Longer timeout for assembly
-              signal: AbortSignal.timeout(60000) // 60 second timeout for assembly
-            })
-            
-            if (!assembleResponse.ok) {
-              const errorData = await assembleResponse.json().catch(() => ({}))
-              const errorMsg = errorData.details || errorData.error || `HTTP ${assembleResponse.status}`
-              throw new Error(`Assembly failed: ${errorMsg}`)
-            }
-            
-            result = await assembleResponse.json()
-            assemblySuccess = true
-            setUploadProgress(100)
-            
-          } catch (error) {
-            assemblyRetries++
-            console.warn(`⚠️ Assembly failed (attempt ${assemblyRetries}):`, error)
-            
-            if (assemblyRetries >= maxAssemblyRetries) {
-              throw new Error(`Assembly failed after ${maxAssemblyRetries} attempts: ${error}`)
-            }
-            
-            // Wait before retry
-            await new Promise(resolve => setTimeout(resolve, 2000))
-            setUploadProgress(85) // Reset progress for retry
-          }
-        }
-        
-        setUploadedUrl(result.url)
-        if (onUpload) onUpload(result.url)
-        if (onUploadComplete) onUploadComplete(result.url)
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.details || errorData.error || 'Upload failed')
       }
+
+      const result = await response.json()
+      setUploadProgress(100)
       
-      console.log('✅ Upload successful')
+      setUploadedUrl(result.url)
+      if (onUpload) onUpload(result.url)
+      if (onUploadComplete) onUploadComplete(result.url)
+      
+      console.log('✅ Upload successful:', result.url)
       
       // Auto close after successful upload
       setTimeout(() => {
         if (onClose) onClose()
       }, 2000)
+      
     } catch (error) {
       console.error('Error uploading to Irys:', error)
       
@@ -203,11 +87,11 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
       console.error('Full upload error details:', error)
       
       if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
-        alert(`Upload timed out. This usually happens with large files or slow connections.\n\nTips:\n• Try a smaller file (under 10MB works best)\n• Check your internet connection\n• Use URL mode instead for external images`)
-      } else if (errorMessage.includes('chunk')) {
-        alert(`Chunk upload failed. This can happen with unstable connections.\n\nTips:\n• Try again (chunks will retry automatically)\n• Use URL mode for external images\n• Compress your image before uploading`)
-      } else if (errorMessage.includes('Assembly failed')) {
-        alert(`File assembly failed. The chunks uploaded but couldn't be combined.\n\nTips:\n• Try uploading again\n• Use a smaller file\n• Use URL mode instead`)
+        alert(`Upload timed out. This usually happens with very large files or slow connections.\n\nTips:\n• Check your internet connection\n• Try compressing the file\n• Use URL mode instead for external images`)
+      } else if (errorMessage.includes('too large')) {
+        alert(`File too large. Maximum size is 6GB.\n\nTips:\n• Compress your file\n• Use a smaller resolution\n• Use URL mode instead`)
+      } else if (errorMessage.includes('Insufficient balance') || errorMessage.includes('Failed to mint tokens')) {
+        alert(`Upload failed due to insufficient Irys balance.\n\nPlease contact support or try again later.`)
       } else {
         alert(`Upload failed: ${errorMessage}\n\nYou can use URL mode instead to paste an image URL.`)
       }
