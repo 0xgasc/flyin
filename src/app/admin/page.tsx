@@ -1169,6 +1169,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         }));
         setExperiences(optimisticOrder);
         
+        // Show saving indicator
+        const savingToast = document.createElement('div');
+        savingToast.innerHTML = '💾 Saving order...';
+        savingToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        document.body.appendChild(savingToast);
+        
         // Update database in background with batch operation
         try {
           const updates = newOrder.map((exp: any, index: number) => ({
@@ -1176,8 +1182,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             order_index: index
           }));
 
-          // Use Promise.all for concurrent updates instead of sequential
-          await Promise.all(
+          // Check each update result individually for better error detection
+          const results = await Promise.allSettled(
             updates.map(update =>
               supabase
                 .from('experiences')
@@ -1186,12 +1192,34 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             )
           );
 
+          // Check if any updates failed
+          const failures = results.filter(result => result.status === 'rejected');
+          const dbErrors = results
+            .filter(result => result.status === 'fulfilled')
+            .map(result => (result as any).value.error)
+            .filter(error => error !== null);
+
+          if (failures.length > 0 || dbErrors.length > 0) {
+            throw new Error(`Failed to update ${failures.length + dbErrors.length} experiences`);
+          }
+
+          // Success - show confirmation
+          savingToast.innerHTML = '✅ Order saved!';
+          savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+          setTimeout(() => document.body.removeChild(savingToast), 2000);
+          
           console.log('✅ Experience order updated successfully');
         } catch (error) {
           console.error('❌ Error updating experience order:', error);
+          
+          // Show error and rollback
+          savingToast.innerHTML = '❌ Save failed - reverting';
+          savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+          setTimeout(() => document.body.removeChild(savingToast), 3000);
+          
           // Rollback on failure - refetch to restore correct order
           await fetchExperiences();
-          alert('Failed to update experience order - reverted changes');
+          alert('Failed to update experience order - reverted changes. Please try again.');
         }
       }
     };
@@ -1500,6 +1528,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         }));
         setDestinations(optimisticOrder);
         
+        // Show saving indicator
+        const savingToast = document.createElement('div');
+        savingToast.innerHTML = '💾 Saving order...';
+        savingToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        document.body.appendChild(savingToast);
+        
         // Update database in background with batch operation
         try {
           const updates = newOrder.map((dest: any, index: number) => ({
@@ -1507,8 +1541,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             order_index: index
           }));
 
-          // Use Promise.all for concurrent updates instead of sequential
-          await Promise.all(
+          // Check each update result individually for better error detection
+          const results = await Promise.allSettled(
             updates.map(update =>
               supabase
                 .from('destinations')
@@ -1517,12 +1551,34 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             )
           );
 
+          // Check if any updates failed
+          const failures = results.filter(result => result.status === 'rejected');
+          const dbErrors = results
+            .filter(result => result.status === 'fulfilled')
+            .map(result => (result as any).value.error)
+            .filter(error => error !== null);
+
+          if (failures.length > 0 || dbErrors.length > 0) {
+            throw new Error(`Failed to update ${failures.length + dbErrors.length} destinations`);
+          }
+
+          // Success - show confirmation
+          savingToast.innerHTML = '✅ Order saved!';
+          savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+          setTimeout(() => document.body.removeChild(savingToast), 2000);
+          
           console.log('✅ Destination order updated successfully');
         } catch (error) {
           console.error('❌ Error updating destination order:', error);
+          
+          // Show error and rollback
+          savingToast.innerHTML = '❌ Save failed - reverting';
+          savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+          setTimeout(() => document.body.removeChild(savingToast), 3000);
+          
           // Rollback on failure - refetch to restore correct order
           await fetchDestinations();
-          alert('Failed to update destination order - reverted changes');
+          alert('Failed to update destination order - reverted changes. Please try again.');
         }
       }
     };
