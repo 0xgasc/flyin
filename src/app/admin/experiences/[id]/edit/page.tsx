@@ -8,6 +8,13 @@ import IrysUpload from '@/components/IrysUpload'
 import { ArrowLeft, Plus, Trash2, ImageIcon, X } from 'lucide-react'
 import Link from 'next/link'
 
+interface PricingTier {
+  id: string
+  min_passengers: number
+  max_passengers: number
+  price: number
+}
+
 interface Experience {
   id: string
   name: string
@@ -24,6 +31,7 @@ interface Experience {
   highlights: string[]
   requirements: string[]
   meeting_point: string
+  pricing_tiers?: PricingTier[]
   metadata: any
 }
 
@@ -34,6 +42,44 @@ interface ExperienceImage {
   is_primary: boolean
   order_index: number
 }
+
+// Preset options
+const INCLUDES_PRESETS = [
+  'Round-trip helicopter transport',
+  'Professional pilot and guide',
+  'Safety equipment and briefing',
+  'Bottled water and snacks',
+  'Photography opportunities',
+  'Aerial photography',
+  'Hotel pickup and drop-off',
+  'Champagne toast',
+  'Gourmet lunch',
+  'All taxes and fees'
+]
+
+const HIGHLIGHTS_PRESETS = [
+  'Breathtaking aerial views',
+  'Exclusive access to remote locations',
+  'Expert commentary throughout',
+  'Small group experience',
+  'Weather-dependent flight paths',
+  'Sunset/sunrise timing available',
+  'VIP treatment',
+  'Once-in-a-lifetime experience',
+  'Perfect for special occasions',
+  'Instagram-worthy moments'
+]
+
+const MEETING_POINT_PRESETS = [
+  'La Aurora International Airport - Main Terminal',
+  'La Aurora International Airport - Private Aviation Terminal',
+  'Hotel pickup available',
+  'Marina Puerto Quetzal',
+  'Antigua Central Park',
+  'Guatemala City Heliport',
+  'Hotel lobby (specified at booking)',
+  'Custom location (to be arranged)'
+]
 
 export default function EditExperiencePage() {
   const router = useRouter()
@@ -58,12 +104,16 @@ export default function EditExperiencePage() {
     includes: [] as string[],
     highlights: [] as string[],
     requirements: [] as string[],
-    meeting_point: ''
+    meeting_point: '',
+    pricing_tiers: [] as PricingTier[]
   })
 
   const [newInclude, setNewInclude] = useState('')
   const [newHighlight, setNewHighlight] = useState('')
   const [newRequirement, setNewRequirement] = useState('')
+  const [showIncludesDropdown, setShowIncludesDropdown] = useState(false)
+  const [showHighlightsDropdown, setShowHighlightsDropdown] = useState(false)
+  const [showMeetingPointDropdown, setShowMeetingPointDropdown] = useState(false)
 
   const fetchExperience = useCallback(async () => {
     try {
@@ -93,7 +143,8 @@ export default function EditExperiencePage() {
           includes: result.data.includes || [],
           highlights: result.data.highlights || [],
           requirements: result.data.requirements || [],
-          meeting_point: result.data.meeting_point || ''
+          meeting_point: result.data.meeting_point || '',
+          pricing_tiers: result.data.pricing_tiers || []
         })
       }
     } catch (error) {
@@ -170,6 +221,9 @@ export default function EditExperiencePage() {
       }
       if (formData.meeting_point) {
         updateData.meeting_point = formData.meeting_point
+      }
+      if (formData.pricing_tiers && formData.pricing_tiers.length > 0) {
+        updateData.pricing_tiers = formData.pricing_tiers
       }
 
       console.log('🔄 Updating experience with data:', updateData)
@@ -308,6 +362,36 @@ export default function EditExperiencePage() {
     }))
   }
 
+  // Pricing tier management
+  const addPricingTier = () => {
+    const newTier: PricingTier = {
+      id: `tier-${Date.now()}`,
+      min_passengers: 1,
+      max_passengers: 2,
+      price: formData.base_price
+    }
+    setFormData(prev => ({
+      ...prev,
+      pricing_tiers: [...prev.pricing_tiers, newTier]
+    }))
+  }
+
+  const updatePricingTier = (id: string, field: keyof PricingTier, value: number) => {
+    setFormData(prev => ({
+      ...prev,
+      pricing_tiers: prev.pricing_tiers.map(tier =>
+        tier.id === id ? { ...tier, [field]: value } : tier
+      )
+    }))
+  }
+
+  const removePricingTier = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      pricing_tiers: prev.pricing_tiers.filter(tier => tier.id !== id)
+    }))
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -334,24 +418,27 @@ export default function EditExperiencePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 py-8">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8">
           <Link
             href="/admin"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="inline-flex items-center text-navy-700 hover:text-navy-900 mb-4 font-medium transition-colors"
+            style={{ color: '#1e3a8a' }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Admin Panel
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Experience</h1>
-          <p className="text-gray-600 mt-2">Update experience details and manage images</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent" style={{ color: '#0f172a' }}>
+            Edit Experience
+          </h1>
+          <p className="text-slate-600 mt-2 text-lg">Manage experience details, pricing, and media</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-6">Experience Details</h2>
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
+            <h2 className="text-2xl font-bold mb-6 text-navy-900" style={{ color: '#1e3a8a' }}>Experience Details</h2>
             
             <form onSubmit={handleSave} className="space-y-6">
               <div>
@@ -422,123 +509,252 @@ export default function EditExperiencePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Base Price ($)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.base_price}
-                    onChange={(e) => setFormData(prev => ({ ...prev, base_price: parseFloat(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+              {/* Pricing Matrix */}
+              <div className="border-2 border-navy-200 rounded-lg p-6" style={{ borderColor: '#bfdbfe' }}>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-navy-900" style={{ color: '#1e3a8a' }}>
+                    Pricing Tiers
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={addPricingTier}
+                    className="flex items-center space-x-2 px-4 py-2 bg-navy-600 text-white rounded-lg hover:bg-navy-700 transition-colors shadow-sm"
+                    style={{ backgroundColor: '#1e40af' }}
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Price Bracket</span>
+                  </button>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Min Passengers
+                {/* Base Price (always visible) */}
+                <div className="mb-4 p-4 bg-navy-50 rounded-lg" style={{ backgroundColor: '#eff6ff' }}>
+                  <label className="block text-sm font-semibold text-navy-900 mb-2" style={{ color: '#1e3a8a' }}>
+                    Base Price (Default)
                   </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.min_passengers || 1}
-                    onChange={(e) => setFormData(prev => ({ ...prev, min_passengers: parseInt(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Min Passengers</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={formData.min_passengers || 1}
+                        onChange={(e) => setFormData(prev => ({ ...prev, min_passengers: parseInt(e.target.value) }))}
+                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        style={{ borderColor: '#93c5fd' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Max Passengers</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={formData.max_passengers}
+                        onChange={(e) => setFormData(prev => ({ ...prev, max_passengers: parseInt(e.target.value) }))}
+                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        style={{ borderColor: '#93c5fd' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Price ($)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={formData.base_price}
+                        onChange={(e) => setFormData(prev => ({ ...prev, base_price: parseFloat(e.target.value) }))}
+                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 font-semibold"
+                        style={{ borderColor: '#93c5fd' }}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Passengers
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.max_passengers}
-                    onChange={(e) => setFormData(prev => ({ ...prev, max_passengers: parseInt(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                {/* Additional Pricing Tiers */}
+                {formData.pricing_tiers.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium text-gray-600">Additional Price Brackets:</p>
+                    {formData.pricing_tiers.map((tier) => (
+                      <div key={tier.id} className="p-4 bg-white border-2 border-slate-200 rounded-lg">
+                        <div className="grid grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Min Pass.</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={tier.min_passengers}
+                              onChange={(e) => updatePricingTier(tier.id, 'min_passengers', parseInt(e.target.value))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Max Pass.</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={tier.max_passengers}
+                              onChange={(e) => updatePricingTier(tier.id, 'max_passengers', parseInt(e.target.value))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                            />
+                          </div>
+                          <div className="flex items-end space-x-2">
+                            <div className="flex-1">
+                              <label className="block text-xs text-gray-600 mb-1">Price ($)</label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={tier.price}
+                                onChange={(e) => updatePricingTier(tier.id, 'price', parseFloat(e.target.value))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removePricingTier(tier.id)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Includes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Includes
+                <label className="block text-sm font-semibold text-navy-900 mb-3" style={{ color: '#1e3a8a' }}>
+                  What's Included
                 </label>
                 <div className="space-y-2">
                   {formData.includes.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{item}</span>
+                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded-lg border border-blue-200">{item}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('includes', index)}
-                        className="text-red-600 hover:text-red-800"
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newInclude}
-                      onChange={(e) => setNewInclude(e.target.value)}
-                      placeholder="Add what's included..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addToArray('includes', newInclude)
-                        setNewInclude('')
-                      }}
-                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                  <div className="relative">
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={newInclude}
+                        onChange={(e) => setNewInclude(e.target.value)}
+                        onFocus={() => setShowIncludesDropdown(true)}
+                        placeholder="Type or select from presets..."
+                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        style={{ borderColor: '#93c5fd' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newInclude.trim()) {
+                            addToArray('includes', newInclude)
+                            setNewInclude('')
+                            setShowIncludesDropdown(false)
+                          }
+                        }}
+                        className="px-5 py-3 bg-navy-600 text-white rounded-lg hover:bg-navy-700 transition-colors shadow-sm"
+                        style={{ backgroundColor: '#1e40af' }}
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                    {showIncludesDropdown && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {INCLUDES_PRESETS.filter(preset =>
+                          !formData.includes.includes(preset) &&
+                          preset.toLowerCase().includes(newInclude.toLowerCase())
+                        ).map((preset, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              addToArray('includes', preset)
+                              setNewInclude('')
+                              setShowIncludesDropdown(false)
+                            }}
+                            className="w-full text-left px-4 py-3 hover:bg-navy-50 transition-colors border-b border-slate-100"
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Highlights */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Highlights
+                <label className="block text-sm font-semibold text-navy-900 mb-3" style={{ color: '#1e3a8a' }}>
+                  Experience Highlights
                 </label>
                 <div className="space-y-2">
                   {formData.highlights.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{item}</span>
+                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded-lg border border-blue-200">{item}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('highlights', index)}
-                        className="text-red-600 hover:text-red-800"
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newHighlight}
-                      onChange={(e) => setNewHighlight(e.target.value)}
-                      placeholder="Add highlight..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addToArray('highlights', newHighlight)
-                        setNewHighlight('')
-                      }}
-                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                  <div className="relative">
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={newHighlight}
+                        onChange={(e) => setNewHighlight(e.target.value)}
+                        onFocus={() => setShowHighlightsDropdown(true)}
+                        placeholder="Type or select from presets..."
+                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        style={{ borderColor: '#93c5fd' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newHighlight.trim()) {
+                            addToArray('highlights', newHighlight)
+                            setNewHighlight('')
+                            setShowHighlightsDropdown(false)
+                          }
+                        }}
+                        className="px-5 py-3 bg-navy-600 text-white rounded-lg hover:bg-navy-700 transition-colors shadow-sm"
+                        style={{ backgroundColor: '#1e40af' }}
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                    {showHighlightsDropdown && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {HIGHLIGHTS_PRESETS.filter(preset =>
+                          !formData.highlights.includes(preset) &&
+                          preset.toLowerCase().includes(newHighlight.toLowerCase())
+                        ).map((preset, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              addToArray('highlights', preset)
+                              setNewHighlight('')
+                              setShowHighlightsDropdown(false)
+                            }}
+                            className="w-full text-left px-4 py-3 hover:bg-navy-50 transition-colors border-b border-slate-100"
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -585,54 +801,79 @@ export default function EditExperiencePage() {
 
               {/* Meeting Point */}
               <div>
-                <label htmlFor="meeting_point" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="meeting_point" className="block text-sm font-semibold text-navy-900 mb-3" style={{ color: '#1e3a8a' }}>
                   Meeting Point
                 </label>
-                <input
-                  type="text"
-                  id="meeting_point"
-                  value={formData.meeting_point}
-                  onChange={(e) => setFormData(prev => ({ ...prev, meeting_point: e.target.value }))}
-                  placeholder="e.g., La Aurora International Airport, Main Terminal"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="meeting_point"
+                    value={formData.meeting_point}
+                    onChange={(e) => setFormData(prev => ({ ...prev, meeting_point: e.target.value }))}
+                    onFocus={() => setShowMeetingPointDropdown(true)}
+                    placeholder="Type or select from presets..."
+                    className="w-full px-4 py-3 border-2 border-navy-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500"
+                    style={{ borderColor: '#93c5fd' }}
+                  />
+                  {showMeetingPointDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {MEETING_POINT_PRESETS.filter(preset =>
+                        preset.toLowerCase().includes(formData.meeting_point.toLowerCase())
+                      ).map((preset, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, meeting_point: preset }))
+                            setShowMeetingPointDropdown(false)
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-navy-50 transition-colors border-b border-slate-100"
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded-lg">
                 <input
                   type="checkbox"
                   id="is_active"
                   checked={formData.is_active}
                   onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-                  className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="w-5 h-5 text-navy-600 focus:ring-navy-500 border-gray-300 rounded"
                 />
-                <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                <label htmlFor="is_active" className="text-sm font-semibold text-navy-900" style={{ color: '#1e3a8a' }}>
                   Active (visible to users)
                 </label>
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 pt-4 border-t-2 border-slate-200">
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="flex-1 bg-navy-600 text-white py-4 px-6 rounded-lg hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-500 disabled:opacity-50 font-semibold text-lg shadow-lg transition-all"
+                  style={{ backgroundColor: '#1e40af' }}
                 >
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {saving ? 'Saving Changes...' : '💾 Save Experience'}
                 </button>
               </div>
             </form>
           </div>
 
           {/* Images Section */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Experience Images</h2>
+              <h2 className="text-2xl font-bold text-navy-900" style={{ color: '#1e3a8a' }}>Experience Gallery</h2>
               <button
                 onClick={() => setShowImageUpload(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center space-x-2"
+                className="bg-navy-600 text-white px-5 py-3 rounded-lg hover:bg-navy-700 flex items-center space-x-2 shadow-sm transition-colors"
+                style={{ backgroundColor: '#1e40af' }}
               >
-                <Plus className="w-4 h-4" />
-                <span>Add Image</span>
+                <Plus className="w-5 h-5" />
+                <span className="font-semibold">Add Image</span>
               </button>
             </div>
 
