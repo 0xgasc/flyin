@@ -15,68 +15,100 @@ function LoginContent() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        console.log('✅ Already logged in, redirecting...')
+        window.location.href = redirect
+      }
+    }
+    checkSession()
+  }, [redirect])
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
     try {
+      console.log('🔐 Starting login...')
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Login error:', error)
+        throw error
+      }
 
-      if (data.user) {
-        // Try to get the user's profile
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single()
+      if (!data.session || !data.user) {
+        throw new Error('No session returned from login')
+      }
 
-        if (profileError) {
-          console.error('Profile error:', profileError)
-          // If profile doesn't exist, create a basic one
-          if (profileError.code === 'PGRST116') {
-            const { error: createError } = await supabase
-              .from('profiles')
-              .insert({
-                id: data.user.id,
-                email: data.user.email || '',
-                role: 'client',
-                account_balance: 0,
-                kyc_verified: false
-              })
+      console.log('✅ Login successful, session created')
 
-            if (createError) {
-              console.error('Create profile error:', createError)
-              throw createError
-            }
+      // Wait a moment for localStorage to be written
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-            router.push(redirect)
-          } else {
-            throw profileError
+      // Try to get the user's profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single()
+
+      if (profileError) {
+        console.error('Profile error:', profileError)
+        // If profile doesn't exist, create a basic one
+        if (profileError.code === 'PGRST116') {
+          console.log('Creating new profile...')
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              email: data.user.email || '',
+              role: 'client',
+              account_balance: 0,
+              kyc_verified: false
+            })
+
+          if (createError) {
+            console.error('Create profile error:', createError)
+            throw createError
           }
+
+          console.log('✅ Profile created, redirecting to:', redirect)
+          // Use window.location for hard navigation to ensure auth state loads
+          window.location.href = redirect
+          return
         } else {
-          // Profile exists, redirect based on role
-          if (profile?.role === 'admin') {
-            // Admins go to dashboard by default, but can access admin panel if explicitly requested
-            router.push(redirect.includes('/admin') ? redirect : '/dashboard')
-          } else if (profile?.role === 'pilot') {
-            router.push('/pilot')
-          } else {
-            router.push(redirect)
-          }
+          throw profileError
         }
+      } else {
+        // Profile exists, redirect based on role
+        console.log('✅ Profile found, role:', profile?.role)
+        let targetUrl = redirect
+
+        if (profile?.role === 'admin') {
+          targetUrl = redirect.includes('/admin') ? redirect : '/admin'
+        } else if (profile?.role === 'pilot') {
+          targetUrl = '/pilot'
+        }
+
+        console.log('🚀 Redirecting to:', targetUrl)
+        // Use window.location for hard navigation to ensure auth state loads
+        window.location.href = targetUrl
       }
     } catch (error: any) {
-      console.error('Login error:', error)
+      console.error('❌ Login error:', error)
       setError(error.message || 'Failed to login')
-    } finally {
       setLoading(false)
     }
+    // Don't set loading false on success - we're redirecting
   }
 
   return (
@@ -113,6 +145,7 @@ function LoginContent() {
                   className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="you@example.com"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -131,6 +164,7 @@ function LoginContent() {
                   className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="••••••••"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>

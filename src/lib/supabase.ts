@@ -12,10 +12,11 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_A
 export const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
-    storageKey: 'sb-auth',
+    storageKey: 'sb-boruptqklkvrmexxgwmc-auth-token',
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   }
 })
 
