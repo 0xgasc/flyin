@@ -62,7 +62,7 @@ export default function EditDestinationPage() {
   const fetchDestination = useCallback(async () => {
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('destinations')
           .select('*')
           .eq('id', params.id)
@@ -98,7 +98,7 @@ export default function EditDestinationPage() {
   const fetchImages = useCallback(async () => {
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('destination_images')
           .select('*')
           .eq('destination_id', params.id)
@@ -164,7 +164,7 @@ export default function EditDestinationPage() {
 
       // Use authenticatedRequest wrapper to handle session validation
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('destinations')
           .update(updateData)
           .eq('id', params.id)
@@ -189,7 +189,7 @@ export default function EditDestinationPage() {
   const handleImageUpload = async (url: string) => {
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('destination_images')
           .insert({
             destination_id: params.id,
@@ -217,7 +217,7 @@ export default function EditDestinationPage() {
 
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('destination_images')
           .delete()
           .eq('id', imageId)
@@ -235,7 +235,7 @@ export default function EditDestinationPage() {
     try {
       // First, set all images to not primary
       await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('destination_images')
           .update({ is_primary: false })
           .eq('destination_id', params.id)
@@ -243,7 +243,7 @@ export default function EditDestinationPage() {
 
       // Then set the selected image as primary
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('destination_images')
           .update({ is_primary: true })
           .eq('id', imageId)
@@ -267,7 +267,7 @@ export default function EditDestinationPage() {
     const timerId = setTimeout(async () => {
       try {
         await authenticatedRequest(
-          () => supabase
+          async () => supabase
             .from('destination_images')
             .update({ caption })
             .eq('id', imageId)

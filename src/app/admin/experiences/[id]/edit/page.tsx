@@ -68,7 +68,7 @@ export default function EditExperiencePage() {
   const fetchExperience = useCallback(async () => {
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('experiences')
           .select('*')
           .eq('id', params.id)
@@ -107,7 +107,7 @@ export default function EditExperiencePage() {
   const fetchImages = useCallback(async () => {
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('experience_images')
           .select('*')
           .eq('experience_id', params.id)
@@ -176,7 +176,7 @@ export default function EditExperiencePage() {
 
       // Use authenticatedRequest wrapper to handle session validation
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('experiences')
           .update(updateData)
           .eq('id', params.id)
@@ -201,7 +201,7 @@ export default function EditExperiencePage() {
   const handleImageUpload = async (url: string) => {
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('experience_images')
           .insert({
             experience_id: params.id,
@@ -229,7 +229,7 @@ export default function EditExperiencePage() {
 
     try {
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('experience_images')
           .delete()
           .eq('id', imageId)
@@ -247,7 +247,7 @@ export default function EditExperiencePage() {
     try {
       // First, set all images to not primary
       await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('experience_images')
           .update({ is_primary: false })
           .eq('experience_id', params.id)
@@ -255,7 +255,7 @@ export default function EditExperiencePage() {
 
       // Then set the selected image as primary
       const result = await authenticatedRequest(
-        () => supabase
+        async () => supabase
           .from('experience_images')
           .update({ is_primary: true })
           .eq('id', imageId)
@@ -279,7 +279,7 @@ export default function EditExperiencePage() {
     const timerId = setTimeout(async () => {
       try {
         await authenticatedRequest(
-          () => supabase
+          async () => supabase
             .from('experience_images')
             .update({ caption })
             .eq('id', imageId)
