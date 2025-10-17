@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase, authenticatedRequest } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import IrysUpload from '@/components/IrysUpload'
 import { ArrowLeft, Plus, Trash2, ImageIcon, X } from 'lucide-react'
@@ -59,6 +59,59 @@ export default function EditDestinationPage() {
   const [newHighlight, setNewHighlight] = useState('')
   const [newRequirement, setNewRequirement] = useState('')
 
+  const fetchDestination = useCallback(async () => {
+    try {
+      const result = await authenticatedRequest(
+        () => supabase
+          .from('destinations')
+          .select('*')
+          .eq('id', params.id)
+          .single()
+      )
+
+      if (result.error) throw result.error
+
+      if (result.data) {
+        setDestination(result.data)
+        setFormData({
+          name: result.data.name || '',
+          description: result.data.description || '',
+          location: result.data.location || '',
+          coordinates: result.data.coordinates || { lat: 14.5891, lng: -90.5515 },
+          features: result.data.features || [],
+          highlights: result.data.highlights || [],
+          requirements: result.data.requirements || [],
+          meeting_point: result.data.meeting_point || '',
+          best_time: result.data.best_time || '',
+          difficulty_level: result.data.difficulty_level || '',
+          is_active: result.data.is_active || true
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching destination:', error)
+      alert('Failed to load destination. Please refresh the page.')
+    } finally {
+      setLoading(false)
+    }
+  }, [params.id])
+
+  const fetchImages = useCallback(async () => {
+    try {
+      const result = await authenticatedRequest(
+        () => supabase
+          .from('destination_images')
+          .select('*')
+          .eq('destination_id', params.id)
+          .order('order_index')
+      )
+
+      if (result.error) throw result.error
+      if (result.data) setImages(result.data)
+    } catch (error) {
+      console.error('Error fetching images:', error)
+    }
+  }, [params.id])
+
   useEffect(() => {
     if (!profile || profile.role !== 'admin') {
       router.push('/admin')
@@ -69,58 +122,13 @@ export default function EditDestinationPage() {
       fetchDestination()
       fetchImages()
     }
-  }, [profile, params.id])
-
-  const fetchDestination = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('destinations')
-        .select('*')
-        .eq('id', params.id)
-        .single()
-
-      if (error) throw error
-
-      if (data) {
-        setDestination(data)
-        setFormData({
-          name: data.name || '',
-          description: data.description || '',
-          location: data.location || '',
-          coordinates: data.coordinates || { lat: 14.5891, lng: -90.5515 },
-          features: data.features || [],
-          highlights: data.highlights || [],
-          requirements: data.requirements || [],
-          meeting_point: data.meeting_point || '',
-          best_time: data.best_time || '',
-          difficulty_level: data.difficulty_level || '',
-          is_active: data.is_active || true
-        })
-      }
-    } catch (error) {
-      console.error('Error fetching destination:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchImages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('destination_images')
-        .select('*')
-        .eq('destination_id', params.id)
-        .order('order_index')
-
-      if (error) throw error
-      if (data) setImages(data)
-    } catch (error) {
-      console.error('Error fetching images:', error)
-    }
-  }
+  }, [profile, params.id, router, fetchDestination, fetchImages])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Prevent multiple simultaneous saves
+    if (saving) return
     setSaving(true)
 
     try {
@@ -154,14 +162,17 @@ export default function EditDestinationPage() {
 
       console.log('🔄 Updating destination with data:', updateData)
 
-      const { error } = await supabase
-        .from('destinations')
-        .update(updateData)
-        .eq('id', params.id)
+      // Use authenticatedRequest wrapper to handle session validation
+      const result = await authenticatedRequest(
+        () => supabase
+          .from('destinations')
+          .update(updateData)
+          .eq('id', params.id)
+      )
 
-      if (error) {
-        console.error('❌ Database error:', error)
-        throw error
+      if (result.error) {
+        console.error('❌ Database error:', result.error)
+        throw result.error
       }
 
       console.log('✅ Destination updated successfully')
@@ -177,20 +188,22 @@ export default function EditDestinationPage() {
 
   const handleImageUpload = async (url: string) => {
     try {
-      const { data, error } = await supabase
-        .from('destination_images')
-        .insert({
-          destination_id: params.id,
-          image_url: url,
-          caption: '',
-          is_primary: images.length === 0, // First image is primary
-          order_index: images.length
-        })
-        .select()
+      const result = await authenticatedRequest(
+        () => supabase
+          .from('destination_images')
+          .insert({
+            destination_id: params.id,
+            image_url: url,
+            caption: '',
+            is_primary: images.length === 0, // First image is primary
+            order_index: images.length
+          })
+          .select()
+      )
 
-      if (error) throw error
-      if (data && data[0]) {
-        setImages(prev => [...prev, data[0]])
+      if (result.error) throw result.error
+      if (result.data && result.data[0]) {
+        setImages(prev => [...prev, result.data[0]])
         setShowImageUpload(false)
       }
     } catch (error) {
@@ -203,12 +216,14 @@ export default function EditDestinationPage() {
     if (!confirm('Are you sure you want to delete this image?')) return
 
     try {
-      const { error } = await supabase
-        .from('destination_images')
-        .delete()
-        .eq('id', imageId)
+      const result = await authenticatedRequest(
+        () => supabase
+          .from('destination_images')
+          .delete()
+          .eq('id', imageId)
+      )
 
-      if (error) throw error
+      if (result.error) throw result.error
       setImages(prev => prev.filter(img => img.id !== imageId))
     } catch (error) {
       console.error('Error deleting image:', error)
@@ -219,19 +234,23 @@ export default function EditDestinationPage() {
   const handleSetPrimary = async (imageId: string) => {
     try {
       // First, set all images to not primary
-      await supabase
-        .from('destination_images')
-        .update({ is_primary: false })
-        .eq('destination_id', params.id)
+      await authenticatedRequest(
+        () => supabase
+          .from('destination_images')
+          .update({ is_primary: false })
+          .eq('destination_id', params.id)
+      )
 
       // Then set the selected image as primary
-      const { error } = await supabase
-        .from('destination_images')
-        .update({ is_primary: true })
-        .eq('id', imageId)
+      const result = await authenticatedRequest(
+        () => supabase
+          .from('destination_images')
+          .update({ is_primary: true })
+          .eq('id', imageId)
+      )
 
-      if (error) throw error
-      
+      if (result.error) throw result.error
+
       // Update local state
       setImages(prev => prev.map(img => ({
         ...img,
@@ -242,6 +261,24 @@ export default function EditDestinationPage() {
       alert('Failed to set primary image')
     }
   }
+
+  // Debounced caption update to avoid too many DB calls
+  const updateCaptionDebounced = useCallback((imageId: string, caption: string) => {
+    const timerId = setTimeout(async () => {
+      try {
+        await authenticatedRequest(
+          () => supabase
+            .from('destination_images')
+            .update({ caption })
+            .eq('id', imageId)
+        )
+      } catch (error) {
+        console.error('Error updating caption:', error)
+      }
+    }, 1000) // Wait 1 second after user stops typing
+
+    return () => clearTimeout(timerId)
+  }, [])
 
   const addToArray = (field: 'features' | 'highlights' | 'requirements', value: string) => {
     if (value.trim()) {
@@ -610,20 +647,14 @@ export default function EditDestinationPage() {
                         <input
                           type="text"
                           value={image.caption || ''}
-                          onChange={async (e) => {
+                          onChange={(e) => {
                             const newCaption = e.target.value
-                            try {
-                              await supabase
-                                .from('destination_images')
-                                .update({ caption: newCaption })
-                                .eq('id', image.id)
-                              
-                              setImages(prev => prev.map(img => 
-                                img.id === image.id ? { ...img, caption: newCaption } : img
-                              ))
-                            } catch (error) {
-                              console.error('Error updating caption:', error)
-                            }
+                            // Update local state immediately for responsive UI
+                            setImages(prev => prev.map(img =>
+                              img.id === image.id ? { ...img, caption: newCaption } : img
+                            ))
+                            // Debounce the database update
+                            updateCaptionDebounced(image.id, newCaption)
                           }}
                           placeholder="Image caption..."
                           className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"

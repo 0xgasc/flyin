@@ -13,23 +13,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const checkUser = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        
+
         if (sessionError) {
           console.error('Session error:', sessionError)
           reset()
           return
         }
-        
+
         if (session?.user) {
           setUser(session.user)
-          
+
           try {
             const { data: profile, error: profileError } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .single()
-            
+
             if (profileError) {
               console.error('Profile error:', profileError)
               // If profile doesn't exist, create it
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   })
                   .select()
                   .single()
-                
+
                 if (createError) {
                   console.error('Create profile error:', createError)
                 } else {
@@ -69,19 +69,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     checkUser()
 
+    // Set up periodic session validation (every 5 minutes)
+    const sessionCheckInterval = setInterval(async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session) {
+          // Check if token is about to expire (within 5 minutes)
+          const expiresAt = session.expires_at
+          const now = Math.floor(Date.now() / 1000)
+          const timeUntilExpiry = expiresAt ? expiresAt - now : 0
+
+          if (timeUntilExpiry < 300) { // Less than 5 minutes
+            console.log('Session expiring soon, refreshing in background...')
+            const { error } = await supabase.auth.refreshSession()
+            if (error) {
+              console.warn('Background session refresh failed:', error)
+            } else {
+              console.log('Session refreshed successfully')
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Session check error:', error)
+      }
+    }, 5 * 60 * 1000) // Check every 5 minutes
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth event:', event, session?.user?.email)
-      
+
       if (session?.user) {
         setUser(session.user)
-        
+
         try {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single()
-          
+
           if (profile) {
             setProfile(profile)
           } else if (profileError?.code === 'PGRST116') {
@@ -95,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               })
               .select()
               .single()
-            
+
             if (!createError && newProfile) {
               setProfile(newProfile)
             }
@@ -103,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
           console.error('Auth state change profile error:', error)
         }
-        
+
         setLoading(false)
       } else {
         reset()
@@ -112,6 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       subscription.unsubscribe()
+      clearInterval(sessionCheckInterval)
     }
   }, [setUser, setProfile, setLoading, reset])
 
