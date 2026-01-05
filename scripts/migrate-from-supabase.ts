@@ -86,17 +86,59 @@ const transactionSchema = new mongoose.Schema({
   supabaseId: { type: String },
 }, { timestamps: true })
 
+const destinationSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  location: { type: String, required: true },
+  coordinates: {
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true }
+  },
+  features: { type: [String], default: [] },
+  highlights: { type: [String], default: [] },
+  requirements: { type: [String], default: [] },
+  meetingPoint: { type: String, default: null },
+  bestTime: { type: String, default: null },
+  difficultyLevel: { type: String, default: null },
+  metadata: { type: mongoose.Schema.Types.Mixed, default: null },
+  orderIndex: { type: Number, default: null },
+  isActive: { type: Boolean, default: true },
+  supabaseId: { type: String },
+}, { timestamps: true })
+
+const experienceImageSchema = new mongoose.Schema({
+  experienceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Experience', required: true },
+  imageUrl: { type: String, required: true },
+  caption: { type: String, default: null },
+  isPrimary: { type: Boolean, default: false },
+  orderIndex: { type: Number, default: 0 },
+  supabaseId: { type: String },
+}, { timestamps: true })
+
+const destinationImageSchema = new mongoose.Schema({
+  destinationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Destination', required: true },
+  imageUrl: { type: String, required: true },
+  caption: { type: String, default: null },
+  isPrimary: { type: Boolean, default: false },
+  orderIndex: { type: Number, default: 0 },
+  supabaseId: { type: String },
+}, { timestamps: true })
+
 // Create models
 const User = mongoose.models.User || mongoose.model('User', userSchema)
 const Airport = mongoose.models.Airport || mongoose.model('Airport', airportSchema)
 const Experience = mongoose.models.Experience || mongoose.model('Experience', experienceSchema)
 const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema)
 const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema)
+const Destination = mongoose.models.Destination || mongoose.model('Destination', destinationSchema)
+const ExperienceImage = mongoose.models.ExperienceImage || mongoose.model('ExperienceImage', experienceImageSchema)
+const DestinationImage = mongoose.models.DestinationImage || mongoose.model('DestinationImage', destinationImageSchema)
 
 // ID mappings (Supabase UUID -> MongoDB ObjectId)
 const userIdMap: Map<string, mongoose.Types.ObjectId> = new Map()
 const experienceIdMap: Map<string, mongoose.Types.ObjectId> = new Map()
 const bookingIdMap: Map<string, mongoose.Types.ObjectId> = new Map()
+const destinationIdMap: Map<string, mongoose.Types.ObjectId> = new Map()
 
 // Default password hash for migrated users (they'll need to reset)
 // This is bcrypt hash of "MigratedUser123!"
@@ -391,6 +433,165 @@ async function migrateTransactions() {
   console.log(`  📊 Total transactions migrated: ${count}`)
 }
 
+async function migrateDestinations() {
+  console.log('\n📦 Migrating destinations...')
+
+  const { data: destinations, error } = await supabase
+    .from('destinations')
+    .select('*')
+    .order('order_index', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching destinations:', error)
+    return
+  }
+
+  if (!destinations || destinations.length === 0) {
+    console.log('  No destinations found')
+    return
+  }
+
+  for (const dest of destinations) {
+    try {
+      const existing = await Destination.findOne({ supabaseId: dest.id })
+      if (existing) {
+        destinationIdMap.set(dest.id, existing._id)
+        console.log(`  ⏭️  Skipped (exists): ${dest.name}`)
+        continue
+      }
+
+      const destination = new Destination({
+        name: dest.name,
+        description: dest.description,
+        location: dest.location,
+        coordinates: dest.coordinates || { lat: 14.5891, lng: -90.5515 },
+        features: dest.features || [],
+        highlights: dest.highlights || [],
+        requirements: dest.requirements || [],
+        meetingPoint: dest.meeting_point,
+        bestTime: dest.best_time,
+        difficultyLevel: dest.difficulty_level,
+        metadata: dest.metadata,
+        orderIndex: dest.order_index,
+        isActive: dest.is_active !== false,
+        supabaseId: dest.id,
+      })
+
+      await destination.save()
+      destinationIdMap.set(dest.id, destination._id)
+      console.log(`  ✅ Migrated: ${dest.name}`)
+    } catch (err: any) {
+      console.error(`  ❌ Failed: ${dest.name} - ${err.message}`)
+    }
+  }
+
+  console.log(`  📊 Total destinations migrated: ${destinationIdMap.size}`)
+}
+
+async function migrateExperienceImages() {
+  console.log('\n📦 Migrating experience images...')
+
+  const { data: images, error } = await supabase
+    .from('experience_images')
+    .select('*')
+    .order('order_index', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching experience images:', error)
+    return
+  }
+
+  if (!images || images.length === 0) {
+    console.log('  No experience images found')
+    return
+  }
+
+  let count = 0
+  for (const img of images) {
+    try {
+      const existing = await ExperienceImage.findOne({ supabaseId: img.id })
+      if (existing) {
+        console.log(`  ⏭️  Skipped (exists): ${img.id}`)
+        continue
+      }
+
+      // Get MongoDB experience ID
+      const experienceMongoId = experienceIdMap.get(img.experience_id)
+      if (!experienceMongoId) {
+        console.log(`  ⚠️  Skipped (no experience): ${img.id}`)
+        continue
+      }
+
+      await ExperienceImage.create({
+        experienceId: experienceMongoId,
+        imageUrl: img.image_url,
+        caption: img.caption,
+        isPrimary: img.is_primary || false,
+        orderIndex: img.order_index || 0,
+        supabaseId: img.id,
+      })
+      count++
+      console.log(`  ✅ Migrated: Image for experience`)
+    } catch (err: any) {
+      console.error(`  ❌ Failed: ${img.id} - ${err.message}`)
+    }
+  }
+
+  console.log(`  📊 Total experience images migrated: ${count}`)
+}
+
+async function migrateDestinationImages() {
+  console.log('\n📦 Migrating destination images...')
+
+  const { data: images, error } = await supabase
+    .from('destination_images')
+    .select('*')
+    .order('order_index', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching destination images:', error)
+    return
+  }
+
+  if (!images || images.length === 0) {
+    console.log('  No destination images found')
+    return
+  }
+
+  let count = 0
+  for (const img of images) {
+    try {
+      const existing = await DestinationImage.findOne({ supabaseId: img.id })
+      if (existing) {
+        console.log(`  ⏭️  Skipped (exists): ${img.id}`)
+        continue
+      }
+
+      // Get MongoDB destination ID
+      const destinationMongoId = destinationIdMap.get(img.destination_id)
+      if (!destinationMongoId) {
+        console.log(`  ⚠️  Skipped (no destination): ${img.id}`)
+        continue
+      }
+
+      await DestinationImage.create({
+        destinationId: destinationMongoId,
+        imageUrl: img.image_url,
+        caption: img.caption,
+        isPrimary: img.is_primary || false,
+        orderIndex: img.order_index || 0,
+        supabaseId: img.id,
+      })
+      count++
+      console.log(`  ✅ Migrated: Image for destination`)
+    } catch (err: any) {
+      console.error(`  ❌ Failed: ${img.id} - ${err.message}`)
+    }
+  }
+
+  console.log(`  📊 Total destination images migrated: ${count}`)
+}
+
 async function migrate() {
   console.log('🚀 Starting Supabase to MongoDB Migration')
   console.log('=========================================')
@@ -405,6 +606,9 @@ async function migrate() {
     await migrateUsers()
     await migrateAirports()
     await migrateExperiences()
+    await migrateDestinations()
+    await migrateExperienceImages()
+    await migrateDestinationImages()
     await migrateBookings()
     await migrateTransactions()
 
@@ -416,6 +620,7 @@ async function migrate() {
     console.log('\n📊 Summary:')
     console.log(`   Users: ${userIdMap.size}`)
     console.log(`   Experiences: ${experienceIdMap.size}`)
+    console.log(`   Destinations: ${destinationIdMap.size}`)
     console.log(`   Bookings: ${bookingIdMap.size}`)
 
   } catch (error) {
