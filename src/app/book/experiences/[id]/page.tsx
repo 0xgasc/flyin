@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { 
-  ArrowLeft, Clock, Users, MapPin, CheckCircle, 
+import {
+  ArrowLeft, Clock, Users, MapPin, CheckCircle,
   Calendar, DollarSign, Plane, Star, Camera,
   ChevronLeft, ChevronRight, AlertTriangle
 } from 'lucide-react'
@@ -79,15 +78,42 @@ export default function ExperienceDetailPage() {
 
   const fetchExperience = async () => {
     try {
-      const { data, error } = await supabase
-        .from('experiences')
-        .select('*')
-        .eq('id', params.id)
-        .eq('is_active', true)
-        .single()
+      const response = await fetch(`/api/experiences/${params.id}`)
+      const data = await response.json()
 
-      if (error) throw error
-      if (data) setExperience(data)
+      if (data.success && data.experience) {
+        setExperience({
+          id: data.experience.id,
+          name: data.experience.name,
+          name_es: data.experience.name_es,
+          description: data.experience.description,
+          description_es: data.experience.description_es,
+          duration_hours: data.experience.duration_hours,
+          duration_minutes: data.experience.duration_minutes,
+          base_price: data.experience.base_price,
+          max_passengers: data.experience.max_passengers,
+          min_passengers: data.experience.min_passengers || 1,
+          includes: data.experience.includes || [],
+          includes_es: data.experience.includes_es,
+          highlights: data.experience.highlights,
+          requirements: data.experience.requirements,
+          meeting_point: data.experience.meeting_point,
+          location: data.experience.location,
+          aircraft_options: data.experience.aircraft_options,
+          route_waypoints: data.experience.route_waypoints || [],
+          category: data.experience.category,
+          image_url: data.experience.image_url,
+          category_name_en: data.experience.category_name_en,
+          category_name_es: data.experience.category_name_es,
+          is_active: data.experience.is_active,
+          created_at: data.experience.created_at,
+          updated_at: data.experience.updated_at
+        })
+        // Also set images if returned
+        if (data.experience_images) {
+          setImages(data.experience_images)
+        }
+      }
     } catch (error) {
       console.error('Error fetching experience:', error)
     } finally {
@@ -96,44 +122,49 @@ export default function ExperienceDetailPage() {
   }
 
   const fetchImages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('experience_images')
-        .select('*')
-        .eq('experience_id', params.id)
-        .order('order_index')
-
-      if (error) throw error
-      if (data) setImages(data)
-    } catch (error) {
-      console.error('Error fetching images:', error)
-    }
+    // Images are now fetched together with experience
+    // This function is kept for compatibility but may not be needed
   }
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!profile) {
       alert('Please login to book an experience')
       router.push('/login?redirect=' + encodeURIComponent(`/book/experiences/${params.id}`))
       return
     }
 
+    // Validate date is not in the past
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const selectedDate = new Date(formData.date)
+    if (selectedDate < today) {
+      alert(locale === 'es' ? 'La fecha no puede ser en el pasado' : 'Date cannot be in the past')
+      return
+    }
+
     try {
-      const { error } = await supabase.from('bookings').insert({
-        client_id: profile.id,
-        booking_type: 'experience',
-        experience_id: params.id,
-        scheduled_date: formData.date,
-        scheduled_time: formData.time,
-        passenger_count: formData.passengers,
-        total_price: experience?.base_price || 0,
-        notes: formData.notes,
-        status: 'pending',
-        payment_status: 'pending'
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          booking_type: 'experience',
+          experience_id: params.id,
+          scheduled_date: formData.date,
+          scheduled_time: formData.time,
+          passenger_count: formData.passengers,
+          total_price: experience?.base_price || 0,
+          notes: formData.notes
+        })
       })
 
-      if (error) throw error
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create booking')
+      }
 
       alert(locale === 'es' ? '¡Reserva exitosa! Redirigiendo a su panel...' : 'Booking successful! Redirecting to your dashboard...')
       router.push('/dashboard')
@@ -398,6 +429,7 @@ export default function ExperienceDetailPage() {
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
+                  min={format(new Date(), 'yyyy-MM-dd')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />

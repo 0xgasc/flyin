@@ -6,8 +6,9 @@ import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useAuthStore } from '@/lib/auth-store'
-import { supabase } from '@/lib/supabase'
+import { logout } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
+import { PhotoGallery } from '@/components/PhotoGallery'
 
 export default function HomePage() {
   const { t } = useTranslation()
@@ -15,7 +16,7 @@ export default function HomePage() {
   const router = useRouter()
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
+    await logout()
     router.push('/')
   }
   
@@ -34,7 +35,7 @@ export default function HomePage() {
               // Authenticated user actions
               <>
                 <span className="text-sm text-gray-300">
-                  {profile.full_name || profile.email}
+                  {profile.fullName || profile.email}
                 </span>
                 {profile.role === 'admin' && (
                   <Link href="/admin" className="hover:text-luxury-gold transition-colors text-sm">
@@ -110,32 +111,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="mt-16 text-center">
-          <h3 className="text-2xl font-semibold mb-8">{t('how_it_works.title')}</h3>
-          <div className="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            <div className="text-center">
-              <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-primary-700">1</span>
-              </div>
-              <h4 className="font-semibold mb-2">{t('how_it_works.step1.title')}</h4>
-              <p className="text-gray-600 text-sm">{t('how_it_works.step1.description')}</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-primary-700">2</span>
-              </div>
-              <h4 className="font-semibold mb-2">{t('how_it_works.step2.title')}</h4>
-              <p className="text-gray-600 text-sm">{t('how_it_works.step2.description')}</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-primary-700">3</span>
-              </div>
-              <h4 className="font-semibold mb-2">{t('how_it_works.step3.title')}</h4>
-              <p className="text-gray-600 text-sm">{t('how_it_works.step3.description')}</p>
-            </div>
-          </div>
-        </div>
+        {/* Photo Gallery */}
+        <PhotoGallery />
       </main>
     </div>
   )

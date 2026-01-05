@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { 
-  ArrowLeft, MapPin, CheckCircle, 
+import {
+  ArrowLeft, MapPin, CheckCircle,
   Calendar, DollarSign, Plane, Star, Camera,
   ChevronLeft, ChevronRight, Navigation, AlertTriangle, Clock
 } from 'lucide-react'
@@ -71,15 +70,32 @@ export default function DestinationDetailPage() {
 
   const fetchDestination = async () => {
     try {
-      const { data, error } = await supabase
-        .from('destinations')
-        .select('*')
-        .eq('id', params.id)
-        .eq('is_active', true)
-        .single()
+      const response = await fetch(`/api/destinations/${params.id}`)
+      const data = await response.json()
 
-      if (error) throw error
-      if (data) setDestination(data)
+      if (data.success && data.destination) {
+        setDestination({
+          id: data.destination.id,
+          name: data.destination.name,
+          description: data.destination.description,
+          location: data.destination.location,
+          coordinates: data.destination.coordinates,
+          features: data.destination.features || [],
+          highlights: data.destination.highlights,
+          requirements: data.destination.requirements,
+          meeting_point: data.destination.meeting_point,
+          best_time: data.destination.best_time,
+          difficulty_level: data.destination.difficulty_level,
+          is_active: data.destination.is_active,
+          metadata: data.destination.metadata,
+          created_at: data.destination.created_at,
+          updated_at: data.destination.updated_at
+        })
+        // Also set images if returned
+        if (data.destination_images) {
+          setImages(data.destination_images)
+        }
+      }
     } catch (error) {
       console.error('Error fetching destination:', error)
     } finally {
@@ -88,23 +104,13 @@ export default function DestinationDetailPage() {
   }
 
   const fetchImages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('destination_images')
-        .select('*')
-        .eq('destination_id', params.id)
-        .order('order_index')
-
-      if (error) throw error
-      if (data) setImages(data)
-    } catch (error) {
-      console.error('Error fetching images:', error)
-    }
+    // Images are now fetched together with destination
+    // This function is kept for compatibility but may not be needed
   }
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!profile) {
       alert('Please login to book transport to this destination')
       router.push('/login?redirect=' + encodeURIComponent(`/book/destinations/${params.id}`))
@@ -112,25 +118,31 @@ export default function DestinationDetailPage() {
     }
 
     try {
-      const { error } = await supabase.from('bookings').insert({
-        client_id: profile.id,
-        booking_type: 'transport',
-        destination_id: params.id,
-        from_location: formData.fromLocation,
-        to_location: destination?.location || '',
-        scheduled_date: formData.date,
-        scheduled_time: formData.time,
-        return_date: formData.isRoundTrip ? formData.returnDate : null,
-        return_time: formData.isRoundTrip ? formData.returnTime : null,
-        is_round_trip: formData.isRoundTrip,
-        passenger_count: formData.passengers,
-        total_price: 0, // Will be calculated by admin
-        notes: formData.notes,
-        status: 'pending',
-        payment_status: 'pending'
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          booking_type: 'transport',
+          destination_id: params.id,
+          from_location: formData.fromLocation,
+          to_location: destination?.location || '',
+          scheduled_date: formData.date,
+          scheduled_time: formData.time,
+          return_date: formData.isRoundTrip ? formData.returnDate : null,
+          return_time: formData.isRoundTrip ? formData.returnTime : null,
+          is_round_trip: formData.isRoundTrip,
+          passenger_count: formData.passengers,
+          total_price: 0, // Will be calculated by admin
+          notes: formData.notes
+        })
       })
 
-      if (error) throw error
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create booking')
+      }
 
       alert(locale === 'es' ? '¡Solicitud enviada! Te contactaremos con una cotización...' : 'Request submitted! We will contact you with a quote...')
       router.push('/dashboard')

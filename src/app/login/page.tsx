@@ -3,13 +3,23 @@
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { login, getCurrentUser } from '@/lib/auth-client'
 import { Plane, Mail, Lock } from 'lucide-react'
+
+// Validate redirect URL to prevent open redirect attacks
+const getSafeRedirect = (redirect: string | null): string => {
+  if (!redirect) return '/dashboard'
+  // Only allow paths starting with / that don't have protocol or //
+  if (redirect.startsWith('/') && !redirect.includes('://') && !redirect.startsWith('//')) {
+    return redirect
+  }
+  return '/dashboard'
+}
 
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/dashboard'
+  const redirect = getSafeRedirect(searchParams.get('redirect'))
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -18,9 +28,9 @@ function LoginContent() {
   // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        console.log('✅ Already logged in, redirecting...')
+      const user = await getCurrentUser()
+      if (user) {
+        console.log('Already logged in, redirecting...')
         window.location.href = redirect
       }
     }
@@ -33,82 +43,29 @@ function LoginContent() {
     setLoading(true)
 
     try {
-      console.log('🔐 Starting login...')
+      const result = await login(email, password)
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        console.error('❌ Login error:', error)
-        throw error
+      if (!result.success || !result.user) {
+        throw new Error(result.error || 'Login failed')
       }
 
-      if (!data.session || !data.user) {
-        throw new Error('No session returned from login')
+      console.log('Login successful')
+
+      // Redirect based on role
+      let targetUrl = redirect
+
+      if (result.user.role === 'admin') {
+        targetUrl = redirect.includes('/admin') ? redirect : '/admin'
+      } else if (result.user.role === 'pilot') {
+        targetUrl = '/pilot'
       }
 
-      console.log('✅ Login successful, session created')
-
-      // Wait a moment for localStorage to be written
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Try to get the user's profile
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single()
-
-      if (profileError) {
-        console.error('Profile error:', profileError)
-        // If profile doesn't exist, create a basic one
-        if (profileError.code === 'PGRST116') {
-          console.log('Creating new profile...')
-          const { error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              email: data.user.email || '',
-              role: 'client',
-              account_balance: 0,
-              kyc_verified: false
-            })
-
-          if (createError) {
-            console.error('Create profile error:', createError)
-            throw createError
-          }
-
-          console.log('✅ Profile created, redirecting to:', redirect)
-          // Use window.location for hard navigation to ensure auth state loads
-          window.location.href = redirect
-          return
-        } else {
-          throw profileError
-        }
-      } else {
-        // Profile exists, redirect based on role
-        console.log('✅ Profile found, role:', profile?.role)
-        let targetUrl = redirect
-
-        if (profile?.role === 'admin') {
-          targetUrl = redirect.includes('/admin') ? redirect : '/admin'
-        } else if (profile?.role === 'pilot') {
-          targetUrl = '/pilot'
-        }
-
-        console.log('🚀 Redirecting to:', targetUrl)
-        // Use window.location for hard navigation to ensure auth state loads
-        window.location.href = targetUrl
-      }
+      window.location.href = targetUrl
     } catch (error: any) {
-      console.error('❌ Login error:', error)
+      console.error('Login error:', error)
       setError(error.message || 'Failed to login')
       setLoading(false)
     }
-    // Don't set loading false on success - we're redirecting
   }
 
   return (

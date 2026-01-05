@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
-import { 
-  Plus, Edit, Trash2, MapPin, Eye, Search, Upload, 
+import {
+  Plus, Edit, Trash2, MapPin, Eye, Search, Upload,
   Image as ImageIcon, DollarSign, Clock, Users, X
 } from 'lucide-react'
 import IrysUpload from '@/components/IrysUpload'
@@ -56,13 +55,12 @@ export default function ExperiencesPage() {
 
   const fetchExperiences = async () => {
     try {
-      const { data, error } = await supabase
-        .from('experiences')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/experiences?include_inactive=true', { credentials: 'include' })
+      const data = await response.json()
 
-      if (error) throw error
-      setExperiences(data || [])
+      if (data.success && data.experiences) {
+        setExperiences(data.experiences)
+      }
     } catch (error) {
       console.error('Error fetching experiences:', error)
     } finally {
@@ -74,27 +72,37 @@ export default function ExperiencesPage() {
     if (!confirm('Are you sure you want to delete this experience?')) return
 
     try {
-      const { error } = await supabase
-        .from('experiences')
-        .delete()
-        .eq('id', id)
+      const response = await fetch(`/api/experiences/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error)
+      }
+
       await fetchExperiences()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting experience:', error)
-      alert('Failed to delete experience')
+      alert('Failed to delete experience: ' + error.message)
     }
   }
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
-        .from('experiences')
-        .update({ is_active: !currentStatus })
-        .eq('id', id)
+      const response = await fetch(`/api/experiences/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ is_active: !currentStatus })
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error)
+      }
+
       await fetchExperiences()
     } catch (error) {
       console.error('Error updating experience status:', error)
@@ -352,20 +360,25 @@ export default function ExperiencesPage() {
           onUploadComplete={async (url) => {
             try {
               // Update the experience with the new image
-              await supabase
-                .from('experiences')
-                .update({ image_url: url })
-                .eq('id', selectedExperienceId)
+              await fetch(`/api/experiences/${selectedExperienceId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ image_url: url })
+              })
 
               // Also add to experience_images table
-              await supabase
-                .from('experience_images')
-                .insert({
+              await fetch('/api/experience-images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
                   experience_id: selectedExperienceId,
                   image_url: url,
                   is_primary: true,
                   order_index: 0
                 })
+              })
 
               await fetchExperiences()
               setShowImageUpload(false)

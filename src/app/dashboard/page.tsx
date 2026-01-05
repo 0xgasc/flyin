@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { 
+import { logout, getAuthHeaders } from '@/lib/auth-client'
+import {
   Plane, Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
   User, Mail, Phone, Upload, Save, Wallet, FileText, CheckCircle, Eye, EyeOff
 } from 'lucide-react'
@@ -15,16 +15,16 @@ import { format } from 'date-fns'
 
 interface Booking {
   id: string
-  created_at: string
-  booking_type: 'transport' | 'experience'
+  createdAt: string
+  bookingType: 'transport' | 'experience'
   status: string
-  from_location: string | null
-  to_location: string | null
-  scheduled_date: string
-  scheduled_time: string
-  total_price: number
-  payment_status: string
-  experiences: {
+  fromLocation: string | null
+  toLocation: string | null
+  scheduledDate: string
+  scheduledTime: string
+  totalPrice: number
+  paymentStatus: string
+  experience: {
     name: string
     location: string
   } | null
@@ -32,16 +32,13 @@ interface Booking {
 
 interface PaymentProof {
   id: string
-  created_at: string
-  user_id: string
+  createdAt: string
+  userId: string
   type: string
   amount: number
-  payment_method: string
-  reference: string
-  proof_url: string | null
-  status: 'pending' | 'approved' | 'rejected'
-  admin_notes: string | null
-  processed_at: string | null
+  paymentMethod: string
+  reference: string | null
+  status: 'pending' | 'approved' | 'rejected' | 'completed' | 'failed'
 }
 
 export default function DashboardPage() {
@@ -61,7 +58,7 @@ export default function DashboardPage() {
   
   // Profile state
   const [profileData, setProfileData] = useState({
-    full_name: profile?.full_name || '',
+    fullName: profile?.fullName || '',
     email: profile?.email || '',
     phone: profile?.phone || '',
   })
@@ -102,7 +99,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (profile) {
       setProfileData({
-        full_name: profile.full_name || '',
+        fullName: profile.fullName || '',
         email: profile.email || '',
         phone: profile.phone || '',
       })
@@ -135,20 +132,14 @@ export default function DashboardPage() {
   const fetchBookings = async () => {
     setBookingsLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          experiences (
-            name,
-            location
-          )
-        `)
-        .eq('client_id', profile.id)
-        .order('created_at', { ascending: false })
-
-      if (data) setBookings(data)
-      if (error) console.error('Error fetching bookings:', error)
+      const res = await fetch('/api/bookings', {
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      })
+      const json = await res.json()
+      if (json.success && json.bookings) {
+        setBookings(json.bookings)
+      }
     } catch (error) {
       console.error('Error fetching bookings:', error)
     } finally {
@@ -158,15 +149,14 @@ export default function DashboardPage() {
 
   const fetchPaymentProofs = async () => {
     try {
-      const { data, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', profile.id)
-        .in('type', ['deposit', 'payment'])
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setPaymentProofs(data || [])
+      const res = await fetch('/api/transactions', {
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      })
+      const json = await res.json()
+      if (json.success && json.transactions) {
+        setPaymentProofs(json.transactions)
+      }
     } catch (error) {
       console.error('Error fetching payment proofs:', error)
     }
@@ -179,21 +169,27 @@ export default function DashboardPage() {
     setProfileSuccess('')
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: profileData.full_name,
+      const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          fullName: profileData.fullName,
           phone: profileData.phone,
         })
-        .eq('id', profile.id)
+      })
 
-      if (error) throw error
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to update profile')
 
       // Update local profile state
-      setProfile({ 
-        ...profile, 
-        full_name: profileData.full_name, 
-        phone: profileData.phone 
+      setProfile({
+        ...profile,
+        fullName: profileData.fullName,
+        phone: profileData.phone
       })
 
       setProfileSuccess(locale === 'es' ? 'Perfil actualizado correctamente' : 'Profile updated successfully')
@@ -210,48 +206,30 @@ export default function DashboardPage() {
     setProfileError('')
 
     try {
-      let proofImageUrl = ''
-      
-      // Upload proof image if provided
-      if (topUpData.proof_image) {
-        const fileExt = topUpData.proof_image.name.split('.').pop()
-        const fileName = `${profile.id}/${Date.now()}.${fileExt}`
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('payment-proofs')
-          .upload(fileName, topUpData.proof_image)
-
-        if (uploadError) {
-          throw new Error('Failed to upload payment proof. Please try again.')
-        }
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('payment-proofs')
-          .getPublicUrl(fileName)
-        
-        proofImageUrl = publicUrl
-      }
-
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: profile.id,
+      // Create transaction record via API
+      const res = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        credentials: 'include',
+        body: JSON.stringify({
           type: 'deposit',
           amount: parseFloat(topUpData.amount),
-          payment_method: topUpData.payment_method,
+          paymentMethod: topUpData.payment_method,
           reference: topUpData.reference,
-          proof_url: proofImageUrl,
-          status: 'pending'
         })
-      
-      if (transactionError) throw transactionError
+      })
 
-      alert(locale === 'es' 
-        ? '¡Solicitud de recarga enviada! Te contactaremos pronto con la confirmación.' 
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to submit top-up request')
+
+      alert(locale === 'es'
+        ? '¡Solicitud de recarga enviada! Te contactaremos pronto con la confirmación.'
         : 'Top-up request submitted! We will contact you soon with confirmation.'
       )
-      
+
       // Reset form
       setTopUpData({
         amount: '',
@@ -261,7 +239,7 @@ export default function DashboardPage() {
       })
       setShowTopUpModal(false)
       fetchPaymentProofs()
-      
+
     } catch (error: any) {
       setProfileError(error.message || 'Failed to submit top-up request')
     } finally {
@@ -277,60 +255,50 @@ export default function DashboardPage() {
 
   const handlePayBooking = async (bookingId: string, amount: number) => {
     const confirmPayment = confirm(`Confirm payment of $${amount} for this flight?\n\nThis will:\n• Process payment from your account balance\n• Confirm your booking\n• Final booking confirmation will be sent`)
-    
+
     if (!confirmPayment) return
-    
+
     // Check if user has sufficient balance
-    if (!profile?.account_balance || profile.account_balance < amount) {
-      const topUpConfirm = confirm(`Insufficient balance. Current balance: $${profile?.account_balance?.toFixed(2) || '0.00'}\n\nWould you like to top up your account first?`)
+    if (!profile?.accountBalance || profile.accountBalance < amount) {
+      const topUpConfirm = confirm(`Insufficient balance. Current balance: $${profile?.accountBalance?.toFixed(2) || '0.00'}\n\nWould you like to top up your account first?`)
       if (topUpConfirm) {
         setActiveTab('payments')
         setShowTopUpModal(true)
       }
       return
     }
-    
+
     setPaymentLoading(true)
     try {
-      // Update booking payment status
-      const { error: bookingError } = await supabase
-        .from('bookings')
-        .update({ payment_status: 'paid' })
-        .eq('id', bookingId)
-      
-      if (bookingError) throw bookingError
-      
-      // Deduct from user balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ 
-          account_balance: (profile.account_balance || 0) - amount 
+      // Pay booking via API
+      const res = await fetch(`/api/bookings/${bookingId}/pay`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          paymentMethod: 'account_balance'
         })
-        .eq('id', profile.id)
-      
-      if (balanceError) throw balanceError
-      
-      // Create payment transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: profile.id,
-          type: 'payment',
-          amount: -amount,
-          payment_method: 'account_balance',
-          status: 'completed',
-          reference: `Flight payment - Booking ${bookingId}`
-        })
-      
-      if (transactionError) console.warn('Transaction record failed:', transactionError)
-      
+      })
+
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Payment failed')
+
+      // Update local profile balance
+      setProfile({
+        ...profile,
+        accountBalance: (profile.accountBalance || 0) - amount
+      })
+
       alert(`Payment successful! $${amount} deducted from your account.\n\nYour flight is now confirmed and you'll receive final details soon.`)
-      
+
       // Refresh data
       fetchBookings()
       fetchPaymentProofs()
       setShowPaymentModal(false)
-      
+
     } catch (error: any) {
       console.error('Payment error:', error)
       alert('Payment failed: ' + error.message)
@@ -342,55 +310,29 @@ export default function DashboardPage() {
   const handleBankDepositPayment = async (bookingId: string, amount: number, proofFile: File | null) => {
     setPaymentLoading(true)
     try {
-      let proofUrl = ''
-      
-      if (proofFile) {
-        const fileExt = proofFile.name.split('.').pop()
-        const fileName = `booking-payments/${bookingId}/${Date.now()}.${fileExt}`
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('payment-proofs')
-          .upload(fileName, proofFile)
-        
-        if (uploadError) {
-          throw new Error('Failed to upload payment proof. Please try again.')
-        }
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('payment-proofs')
-          .getPublicUrl(fileName)
-        
-        proofUrl = publicUrl
-      }
-
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: profile.id,
-          type: 'deposit',
-          amount: amount,
-          payment_method: 'bank_deposit',
-          status: 'pending',
-          reference: `Booking payment - ${bookingId}`,
-          proof_url: proofUrl,
-          metadata: { booking_id: bookingId }
+      // Create transaction and update booking via API
+      const res = await fetch(`/api/bookings/${bookingId}/pay`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          paymentMethod: 'bank_transfer',
+          reference: `Booking payment - ${bookingId}`
         })
-      
-      if (transactionError) throw transactionError
+      })
 
-      const { error: bookingError } = await supabase
-        .from('bookings')
-        .update({ payment_status: 'processing' })
-        .eq('id', bookingId)
-      
-      if (bookingError) console.warn('Booking update failed:', bookingError)
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Bank deposit failed')
 
       alert(`Bank deposit initiated!\n\nYour payment is being processed. You'll receive confirmation within 24 hours.`)
-      
+
       fetchBookings()
       fetchPaymentProofs()
       setShowPaymentModal(false)
-      
+
     } catch (error: any) {
       console.error('Bank deposit error:', error)
       alert('Bank deposit failed: ' + error.message)
@@ -429,7 +371,7 @@ export default function DashboardPage() {
           </Link>
           <div className="flex items-center space-x-6">
             <div className="text-sm">
-              Balance: <span className="font-bold text-luxury-gold">${profile?.account_balance?.toFixed(2) || '0.00'}</span>
+              Balance: <span className="font-bold text-luxury-gold">${profile?.accountBalance?.toFixed(2) || '0.00'}</span>
             </div>
             <LanguageSwitcher />
             {profile?.role === 'admin' && (
@@ -438,11 +380,11 @@ export default function DashboardPage() {
               </Link>
             )}
             <Link href="/dashboard" className="text-sm hover:text-luxury-gold transition-colors">
-              {profile?.full_name || profile?.email}
+              {profile?.fullName || profile?.email}
             </Link>
             <button
               onClick={async () => {
-                await supabase.auth.signOut()
+                await logout()
                 window.location.href = '/'
               }}
               className="text-sm hover:text-luxury-gold"
@@ -523,9 +465,9 @@ export default function DashboardPage() {
                       <div className="flex-1">
                         <div className="flex items-center space-x-4 mb-4">
                           <h3 className="text-xl font-semibold">
-                            {booking.booking_type === 'transport' 
-                              ? `${booking.from_location} → ${booking.to_location}`
-                              : booking.experiences?.name
+                            {booking.bookingType === 'transport'
+                              ? `${booking.fromLocation} → ${booking.toLocation}`
+                              : booking.experience?.name
                             }
                           </h3>
                           <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
@@ -536,22 +478,22 @@ export default function DashboardPage() {
                         <div className="grid md:grid-cols-4 gap-4 text-sm text-gray-600">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2 text-primary-600" />
-                            {format(new Date(booking.scheduled_date), 'MMM dd, yyyy')}
+                            {format(new Date(booking.scheduledDate), 'MMM dd, yyyy')}
                           </div>
                           <div className="flex items-center">
                             <Clock className="h-4 w-4 mr-2 text-primary-600" />
-                            {booking.scheduled_time}
+                            {booking.scheduledTime}
                           </div>
                           <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-2 text-primary-600" />
-                            {booking.booking_type === 'transport' 
+                            {booking.bookingType === 'transport'
                               ? 'Direct Transport'
-                              : booking.experiences?.location
+                              : booking.experience?.location
                             }
                           </div>
                           <div className="flex items-center">
                             <DollarSign className="h-4 w-4 mr-2 text-primary-600" />
-                            ${booking.total_price}
+                            ${booking.totalPrice}
                           </div>
                         </div>
                       </div>
@@ -562,10 +504,10 @@ export default function DashboardPage() {
                             ✗ Cancel
                           </button>
                         )}
-                        
-                        {(booking.status === 'approved' || booking.status === 'assigned') && booking.payment_status !== 'paid' && (
+
+                        {(booking.status === 'approved' || booking.status === 'assigned') && booking.paymentStatus !== 'paid' && (
                           <>
-                            <button 
+                            <button
                               onClick={() => openPaymentModal(booking)}
                               className="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700 flex items-center"
                             >
@@ -577,8 +519,8 @@ export default function DashboardPage() {
                             </p>
                           </>
                         )}
-                        
-                        {booking.status === 'assigned' && booking.payment_status === 'paid' && (
+
+                        {booking.status === 'assigned' && booking.paymentStatus === 'paid' && (
                           <div className="bg-green-50 border border-green-200 rounded p-2">
                             <p className="text-xs text-green-800 font-medium text-center">
                               ✈️ Ready to Fly!
@@ -588,7 +530,7 @@ export default function DashboardPage() {
                             </p>
                           </div>
                         )}
-                        
+
                         {booking.status === 'completed' && (
                           <div className="bg-green-50 border border-green-200 rounded p-2">
                             <p className="text-xs text-green-800 font-medium text-center">
@@ -646,8 +588,8 @@ export default function DashboardPage() {
                 </label>
                 <input
                   type="text"
-                  value={profileData.full_name}
-                  onChange={(e) => setProfileData({...profileData, full_name: e.target.value})}
+                  value={profileData.fullName}
+                  onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter your full name"
                 />
@@ -697,7 +639,7 @@ export default function DashboardPage() {
                 <Wallet className="h-12 w-12 text-primary-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Account Balance</h3>
                 <p className="text-3xl font-bold text-primary-900">
-                  ${profile?.account_balance?.toFixed(2) || '0.00'}
+                  ${profile?.accountBalance?.toFixed(2) || '0.00'}
                 </p>
               </div>
             </div>
@@ -715,13 +657,13 @@ export default function DashboardPage() {
                           {proof.type === 'deposit' ? 'Top-up' : 'Payment'} - ${Math.abs(proof.amount)}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {format(new Date(proof.created_at), 'MMM dd, yyyy HH:mm')}
+                          {format(new Date(proof.createdAt), 'MMM dd, yyyy HH:mm')}
                         </p>
-                        <p className="text-sm text-gray-600">{proof.reference}</p>
+                        <p className="text-sm text-gray-600">{proof.reference || ''}</p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        proof.status === 'approved' ? 'bg-green-100 text-green-800' :
-                        proof.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        proof.status === 'approved' || proof.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        proof.status === 'rejected' || proof.status === 'failed' ? 'bg-red-100 text-red-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
                         {proof.status.charAt(0).toUpperCase() + proof.status.slice(1)}
@@ -740,8 +682,8 @@ export default function DashboardPage() {
         <PaymentModal 
           booking={selectedBooking}
           onClose={() => setShowPaymentModal(false)}
-          onPayAccountBalance={() => handlePayBooking(selectedBooking.id, selectedBooking.total_price)}
-          onPayBankDeposit={(proofFile) => handleBankDepositPayment(selectedBooking.id, selectedBooking.total_price, proofFile)}
+          onPayAccountBalance={() => handlePayBooking(selectedBooking.id, selectedBooking.totalPrice)}
+          onPayBankDeposit={(proofFile) => handleBankDepositPayment(selectedBooking.id, selectedBooking.totalPrice, proofFile)}
           onPayCreditCard={handleCreditCardPayment}
           onPayCrypto={handleCryptoPayment}
           loading={paymentLoading}
@@ -884,16 +826,16 @@ function PaymentModal({
 
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <h3 className="font-semibold text-gray-900">
-            {booking.booking_type === 'transport' 
-              ? `${booking.from_location} → ${booking.to_location}`
-              : booking.experiences?.name
+            {booking.bookingType === 'transport'
+              ? `${booking.fromLocation} → ${booking.toLocation}`
+              : booking.experience?.name
             }
           </h3>
           <p className="text-sm text-gray-600">
-            {new Date(booking.scheduled_date).toLocaleDateString()} at {booking.scheduled_time}
+            {new Date(booking.scheduledDate).toLocaleDateString()} at {booking.scheduledTime}
           </p>
           <p className="text-xl font-bold text-primary-900 mt-2">
-            ${booking.total_price}
+            ${booking.totalPrice}
           </p>
         </div>
 
@@ -912,8 +854,8 @@ function PaymentModal({
               <div className="text-left">
                 <div className="font-semibold">Account Balance</div>
                 <div className="text-sm text-gray-600">
-                  Current: ${profile?.account_balance?.toFixed(2) || '0.00'}
-                  {(!profile?.account_balance || profile.account_balance < booking.total_price) && (
+                  Current: ${profile?.accountBalance?.toFixed(2) || '0.00'}
+                  {(!profile?.accountBalance || profile.accountBalance < booking.totalPrice) && (
                     <span className="text-red-600 ml-1">(Insufficient)</span>
                   )}
                 </div>
@@ -984,7 +926,7 @@ function PaymentModal({
               <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
               <p><strong>Account Number:</strong> 1234567890</p>
               <p><strong>Bank:</strong> Banco Industrial</p>
-              <p><strong>Amount:</strong> ${booking.total_price}</p>
+              <p><strong>Amount:</strong> ${booking.totalPrice}</p>
               <p><strong>Reference:</strong> Booking {booking.id.slice(0, 8)}</p>
             </div>
             
@@ -1032,7 +974,7 @@ function PaymentModal({
                   break
               }
             }}
-            disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.account_balance || profile.account_balance < booking.total_price))}
+            disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.accountBalance || profile.accountBalance < booking.totalPrice))}
             className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Processing...' : 

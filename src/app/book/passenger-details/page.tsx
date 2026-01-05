@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import { Users, Plus, Trash2, ShoppingCart, Plane, DollarSign } from 'lucide-react'
 
@@ -34,55 +33,96 @@ interface SelectedAddon {
 function PassengerDetailsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { profile } = useAuthStore()
-  
-  // Get booking data from URL params
-  const bookingData = {
-    booking_id: searchParams.get('booking_id'),
-    passenger_count: parseInt(searchParams.get('passengers') || '1'),
-    total_price: parseFloat(searchParams.get('total_price') || '0'),
-    from_location: searchParams.get('from'),
-    to_location: searchParams.get('to'),
-    date: searchParams.get('date'),
-    time: searchParams.get('time'),
-  }
+  const { profile, user } = useAuthStore()
+
+  // Get booking ID from URL params
+  const bookingId = searchParams.get('booking_id')
+
+  // State for actual booking data from database
+  const [bookingData, setBookingData] = useState<{
+    booking_id: string | null
+    passenger_count: number
+    base_price: number // Actual price from database - NOT from URL
+    from_location: string
+    to_location: string
+    date: string
+    time: string
+  } | null>(null)
 
   const [passengers, setPassengers] = useState<PassengerDetails[]>([])
   const [availableAddons, setAvailableAddons] = useState<Addon[]>([])
   const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true) // Start loading
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  // Fetch booking from database to get actual price (prevents price manipulation)
   useEffect(() => {
-    // Initialize passenger forms
-    const initialPassengers = Array.from({ length: bookingData.passenger_count }, (_, i) => ({
-      name: i === 0 ? profile?.full_name || '' : '',
-      age: 25,
-      passport: '',
-      emergency_contact: '',
-      dietary_restrictions: '',
-      special_requests: ''
-    }))
-    setPassengers(initialPassengers)
-    
+    const fetchBooking = async () => {
+      if (!bookingId) {
+        setError('Missing booking ID. Please restart the booking process.')
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/bookings/${bookingId}`, {
+          credentials: 'include'
+        })
+        const data = await response.json()
+
+        if (!response.ok || !data.success) {
+          throw new Error('Booking not found')
+        }
+
+        const booking = data.booking
+
+        // Verify the booking belongs to the current user
+        if (user && booking.client_id !== user.id) {
+          throw new Error('You do not have permission to modify this booking')
+        }
+
+        setBookingData({
+          booking_id: booking.id,
+          passenger_count: booking.passenger_count || 1,
+          base_price: booking.total_price, // Use price from database, NOT URL
+          from_location: booking.from_location || '',
+          to_location: booking.to_location || '',
+          date: booking.scheduled_date || '',
+          time: booking.scheduled_time || ''
+        })
+
+        // Initialize passenger forms
+        const initialPassengers = Array.from({ length: booking.passenger_count || 1 }, (_, i) => ({
+          name: i === 0 ? profile?.fullName || '' : '',
+          age: 25,
+          passport: '',
+          emergency_contact: '',
+          dietary_restrictions: '',
+          special_requests: ''
+        }))
+        setPassengers(initialPassengers)
+      } catch (err: any) {
+        setError(err.message || 'Failed to load booking')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBooking()
     fetchAddons()
-  }, [bookingData.passenger_count, profile])
+  }, [bookingId, user, profile])
 
   const fetchAddons = async () => {
     try {
-      const { data, error } = await supabase
-        .from('addons')
-        .select('*')
-        .eq('is_active', true)
-        .order('category', { ascending: true })
+      const response = await fetch('/api/addons')
+      const data = await response.json()
 
-      if (data) {
-        const addonsWithQuantity = data.map(addon => ({ ...addon, quantity: 0 }))
+      if (data.success && data.addons) {
+        const addonsWithQuantity = data.addons.map((addon: any) => ({ ...addon, quantity: 0 }))
         setAvailableAddons(addonsWithQuantity)
-      }
-      if (error) {
-        console.warn('Could not fetch addons:', error)
-        // Use placeholder addons if database not ready
+      } else {
+        // Use placeholder addons if API not ready
         setAvailableAddons([
           { id: 'priority-boarding', name: 'Priority Boarding', description: 'Skip the queue with priority boarding access', price: 25, category: 'service', quantity: 0 },
           { id: 'luxury-seating', name: 'Luxury Seating', description: 'Upgrade to premium leather seating', price: 50, category: 'comfort', quantity: 0 },
@@ -93,6 +133,14 @@ function PassengerDetailsContent() {
       }
     } catch (err) {
       console.warn('Addons fetch error:', err)
+      // Use placeholder addons if API fails
+      setAvailableAddons([
+        { id: 'priority-boarding', name: 'Priority Boarding', description: 'Skip the queue with priority boarding access', price: 25, category: 'service', quantity: 0 },
+        { id: 'luxury-seating', name: 'Luxury Seating', description: 'Upgrade to premium leather seating', price: 50, category: 'comfort', quantity: 0 },
+        { id: 'gourmet-meal', name: 'Gourmet Meal Service', description: 'Chef-prepared meal with local specialties', price: 35, category: 'catering', quantity: 0 },
+        { id: 'photography-package', name: 'Aerial Photography', description: 'Professional photos of your journey', price: 75, category: 'service', quantity: 0 },
+        { id: 'ground-transport', name: 'Ground Transportation', description: 'Luxury car service to/from helipad', price: 60, category: 'service', quantity: 0 },
+      ])
     }
   }
 
@@ -131,42 +179,66 @@ function PassengerDetailsContent() {
   }
 
   const calculateGrandTotal = () => {
-    return bookingData.total_price + calculateAddonTotal()
+    // Use base price from database (not URL params) to prevent manipulation
+    return (bookingData?.base_price || 0) + calculateAddonTotal()
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!bookingData.booking_id) {
+
+    if (!bookingData?.booking_id) {
       setError('Missing booking information. Please restart the booking process.')
       return
     }
 
-    setLoading(true)
+    // Validate passenger names
+    for (let i = 0; i < passengers.length; i++) {
+      if (!passengers[i].name.trim()) {
+        setError(`Please enter name for passenger ${i + 1}`)
+        return
+      }
+      if (passengers[i].age < 1 || passengers[i].age > 120) {
+        setError(`Please enter a valid age for passenger ${i + 1}`)
+        return
+      }
+    }
+
+    setSubmitting(true)
     setError('')
 
     try {
+      // Recalculate total from database base price + addons
+      // This prevents any price manipulation from URL parameters
+      const addonTotal = calculateAddonTotal()
+      const grandTotal = bookingData.base_price + addonTotal
+
       // Update booking with passenger details and addons
-      const { error: updateError } = await supabase
-        .from('bookings')
-        .update({
+      const response = await fetch(`/api/bookings/${bookingData.booking_id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
           passenger_details: passengers,
           selected_addons: selectedAddons,
-          addon_total_price: calculateAddonTotal(),
-          total_price: calculateGrandTotal() // Update total to include addons
+          addon_total_price: addonTotal,
+          total_price: grandTotal // Calculated from database base_price, not URL
         })
-        .eq('id', bookingData.booking_id)
+      })
 
-      if (updateError) throw updateError
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to save passenger details')
+      }
 
       // Redirect to payment confirmation
       alert('Passenger details saved! Proceeding to payment...')
       router.push(`/dashboard?highlight=${bookingData.booking_id}`)
-      
+
     } catch (error: any) {
       setError(error.message || 'Failed to save passenger details')
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
@@ -186,6 +258,33 @@ function PassengerDetailsContent() {
     groups[category].push(addon)
     return groups
   }, {} as Record<string, Addon[]>)
+
+  // Show loading state while fetching booking
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-12 w-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading booking details...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error if booking couldn't be loaded
+  if (!bookingData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
+          <p className="text-red-800 font-medium mb-2">Unable to load booking</p>
+          <p className="text-red-700 text-sm mb-4">{error || 'Booking not found'}</p>
+          <Link href="/book/transport" className="btn-primary inline-block">
+            Start New Booking
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -378,7 +477,7 @@ function PassengerDetailsContent() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Base Flight Price:</span>
-                <span>${bookingData.total_price.toFixed(2)}</span>
+                <span>${bookingData.base_price.toFixed(2)}</span>
               </div>
               
               {selectedAddons.length > 0 && (
@@ -413,16 +512,17 @@ function PassengerDetailsContent() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              disabled={submitting}
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
             >
               Back
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={submitting}
               className="flex-1 btn-luxury disabled:opacity-50"
             >
-              {loading ? 'Saving...' : 'Continue to Payment'}
+              {submitting ? 'Saving...' : 'Continue to Payment'}
             </button>
           </div>
         </form>

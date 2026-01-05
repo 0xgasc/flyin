@@ -19,7 +19,7 @@ export default function PendingVerificationPage() {
           </h1>
           
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            Welcome {profile?.full_name}! To start accepting flight assignments, you need to complete 
+            Welcome {profile?.fullName}! To start accepting flight assignments, you need to complete 
             our in-person verification process.
           </p>
 

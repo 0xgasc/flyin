@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid } from 'lucide-react'
 import { MobileNav } from '@/components/mobile-nav'
@@ -57,15 +56,13 @@ export default function BookTransportPage() {
 
   const fetchAirports = async () => {
     try {
-      const { data, error } = await supabase
-        .from('airports')
-        .select('*')
-        .order('name')
+      const response = await fetch('/api/airports')
+      const data = await response.json()
 
-      if (data) setAirports(data)
-      if (error) {
-        console.error('Error fetching airports:', error)
-        // Use demo airports if database is not connected
+      if (data.success && data.airports) {
+        setAirports(data.airports)
+      } else {
+        // Use demo airports if API fails
         setAirports([
           { id: '1', code: 'GUA', name: 'La Aurora International Airport', city: 'Guatemala City' },
           { id: '2', code: 'FRS', name: 'Mundo Maya International Airport', city: 'Flores' },
@@ -74,7 +71,8 @@ export default function BookTransportPage() {
         ])
       }
     } catch (err) {
-      // Use demo airports if database is not connected
+      console.error('Error fetching airports:', err)
+      // Use demo airports if API fails
       setAirports([
         { id: '1', code: 'GUA', name: 'La Aurora International Airport', city: 'Guatemala City' },
         { id: '2', code: 'FRS', name: 'Mundo Maya International Airport', city: 'Flores' },
@@ -186,7 +184,7 @@ export default function BookTransportPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Check if user is logged in
     if (!profile?.id) {
       setError('Please log in to book a flight')
@@ -196,18 +194,37 @@ export default function BookTransportPage() {
       }, 2000)
       return
     }
-    
+
+    // Validate date is not in the past
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const selectedDate = new Date(formData.date)
+    if (selectedDate < today) {
+      setError('Departure date cannot be in the past')
+      return
+    }
+
+    // Validate return date if round trip
+    if (formData.isRoundTrip && formData.returnDate) {
+      const returnDate = new Date(formData.returnDate)
+      if (returnDate < selectedDate) {
+        setError('Return date must be on or after departure date')
+        return
+      }
+    }
+
     setLoading(true)
     setError('')
 
     try {
       const fromLoc = formData.fromLocation === 'custom' ? formData.fromCustom : formData.fromLocation
       const toLoc = formData.toLocation === 'custom' ? formData.toCustom : formData.toLocation
-      
-      const { data, error } = await supabase
-        .from('bookings')
-        .insert({
-          client_id: profile.id,
+
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
           booking_type: 'transport',
           from_location: fromLoc,
           to_location: toLoc,
@@ -218,16 +235,20 @@ export default function BookTransportPage() {
           is_round_trip: formData.isRoundTrip,
           passenger_count: formData.passengers,
           notes: formData.notes,
-          total_price: price,
+          total_price: price
         })
-        .select()
+      })
 
-      if (error) throw error
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create booking')
+      }
 
       // Redirect to passenger details page with booking info
-      const booking = data[0]
+      const booking = data.booking
       const passengerDetailsUrl = `/book/passenger-details?booking_id=${booking.id}&passengers=${formData.passengers}&total_price=${price}&from=${encodeURIComponent(fromLoc)}&to=${encodeURIComponent(toLoc)}&date=${formData.date}&time=${formData.time}`
-      
+
       setError('')
       router.push(passengerDetailsUrl)
     } catch (error: any) {
@@ -246,7 +267,7 @@ export default function BookTransportPage() {
           <div className="hidden md:flex items-center space-x-4">
             {profile ? (
               <div className="text-xs sm:text-sm text-gray-300">
-                {t('common.welcome')}, {profile?.full_name || profile?.email}
+                {t('common.welcome')}, {profile?.fullName || profile?.email}
               </div>
             ) : (
               <div className="flex items-center space-x-4">

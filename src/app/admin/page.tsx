@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
-import { supabase } from '@/lib/supabase'
-import { 
-  Plane, Calendar, MapPin, Clock, Users, CheckCircle, 
+import { logout } from '@/lib/auth-client'
+import {
+  Plane, Calendar, MapPin, Clock, Users, CheckCircle,
   AlertCircle, XCircle, DollarSign, BarChart3, UserCheck,
   Plus, Edit, Trash2, Upload, Image as ImageIcon, Eye, GripVertical
 } from 'lucide-react'
@@ -237,120 +237,58 @@ export default function AdminDashboard() {
 
   const fetchBookings = async () => {
     try {
-      let query = supabase
-        .from('bookings')
-        .select(`
-          *,
-          client:profiles!bookings_client_id_fkey (
-            id,
-            full_name,
-            email,
-            phone
-          ),
-          pilot:profiles!bookings_pilot_id_fkey (
-            id,
-            full_name,
-            email
-          ),
-          experiences (
-            name,
-            location
-          )
-        `)
-        .order('created_at', { ascending: false })
-
+      let url = '/api/bookings?'
       if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter)
+        url += `status=${statusFilter}`
       }
 
-      const { data, error } = await query
+      const response = await fetch(url, { credentials: 'include' })
+      const data = await response.json()
 
-      if (data) setBookings(data)
-      if (error) {
-        console.error('Error fetching bookings:', error)
-        // Demo data
-        setBookings([
-          {
-            id: '1',
-            created_at: new Date().toISOString(),
-            booking_type: 'transport',
-            status: 'pending',
-            from_location: 'GUA',
-            to_location: 'FRS',
-            scheduled_date: '2024-01-20',
-            scheduled_time: '09:00',
-            passenger_count: 3,
-            total_price: 450,
-            notes: 'VIP client',
-            admin_notes: null,
-            payment_status: 'pending',
-            pilot_id: null,
-            client: {
-              id: '1',
-              full_name: 'Carlos Rodriguez',
-              email: 'carlos@example.com',
-              phone: '+502 5555 1111'
-            },
-            pilot: null,
-            experiences: null
+      if (data.success && data.bookings) {
+        // Transform the API response to match expected format
+        const transformedBookings = data.bookings.map((b: any) => ({
+          id: b.id,
+          created_at: b.created_at,
+          booking_type: b.booking_type,
+          status: b.status,
+          from_location: b.from_location,
+          to_location: b.to_location,
+          scheduled_date: b.scheduled_date,
+          scheduled_time: b.scheduled_time,
+          passenger_count: b.passenger_count,
+          total_price: b.total_price,
+          notes: b.notes,
+          admin_notes: b.admin_notes,
+          payment_status: b.payment_status,
+          pilot_id: b.pilot_id,
+          client: b.client || b.profiles || {
+            id: b.client_id,
+            full_name: b.profiles?.full_name || null,
+            email: b.profiles?.email || '',
+            phone: b.profiles?.phone || null
           },
-          {
-            id: '2',
-            created_at: new Date().toISOString(),
-            booking_type: 'experience',
-            status: 'approved',
-            from_location: null,
-            to_location: null,
-            scheduled_date: '2024-01-21',
-            scheduled_time: '15:00',
-            passenger_count: 2,
-            total_price: 900,
-            notes: 'Honeymoon couple',
-            admin_notes: 'Premium service requested',
-            payment_status: 'paid',
-            pilot_id: null,
-            client: {
-              id: '2',
-              full_name: 'Ana Martinez',
-              email: 'ana@example.com',
-              phone: '+502 5555 2222'
-            },
-            pilot: null,
-            experiences: {
-              name: 'Antigua Colonial Tour',
-              location: 'Antigua'
-            }
-          }
-        ])
+          pilot: b.pilot,
+          experiences: b.experiences || b.experience,
+          passenger_details: b.passenger_details,
+          selected_addons: b.selected_addons,
+          addon_total_price: b.addon_total_price,
+          helicopter_id: b.helicopter_id,
+          return_date: b.return_date,
+          return_time: b.return_time,
+          is_round_trip: b.is_round_trip,
+          revision_requested: b.revision_requested,
+          revision_notes: b.revision_notes,
+          revision_data: b.revision_data
+        }))
+        setBookings(transformedBookings)
+      } else {
+        console.error('Error fetching bookings:', data.error)
+        setBookings([])
       }
     } catch (err) {
-      // Demo data
-      setBookings([
-        {
-          id: '1',
-          created_at: new Date().toISOString(),
-          booking_type: 'transport',
-          status: 'pending',
-          from_location: 'GUA',
-          to_location: 'FRS',
-          scheduled_date: '2024-01-20',
-          scheduled_time: '09:00',
-          passenger_count: 3,
-          total_price: 450,
-          notes: 'VIP client',
-          admin_notes: null,
-          payment_status: 'pending',
-          pilot_id: null,
-          client: {
-            id: '1',
-            full_name: 'Carlos Rodriguez',
-            email: 'carlos@example.com',
-            phone: '+502 5555 1111'
-          },
-          pilot: null,
-          experiences: null
-        }
-      ])
+      console.error('Error fetching bookings:', err)
+      setBookings([])
     } finally {
       setLoading(false)
     }
@@ -358,36 +296,26 @@ export default function AdminDashboard() {
 
   const fetchPilots = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'pilot')
-        .order('full_name')
+      const response = await fetch('/api/pilots', { credentials: 'include' })
+      const data = await response.json()
 
-      if (data) {
-        setPilots(data)
-        setAvailablePilots(data.filter(p => p.kyc_verified))
-      }
-      if (error) {
-        console.error('Error fetching pilots:', error)
-        // Demo data
-        const demoPilots = [
-          { id: '1', full_name: 'Miguel Santos', email: 'miguel@example.com', kyc_verified: true },
-          { id: '2', full_name: 'Roberto Diaz', email: 'roberto@example.com', kyc_verified: true },
-          { id: '3', full_name: 'Luis Morales', email: 'luis@example.com', kyc_verified: false }
-        ]
-        setPilots(demoPilots)
-        setAvailablePilots(demoPilots.filter(p => p.kyc_verified))
+      if (data.success && data.pilots) {
+        const transformedPilots = data.pilots.map((p: any) => ({
+          id: p.id,
+          full_name: p.full_name,
+          email: p.email,
+          kyc_verified: p.kyc_verified
+        }))
+        setPilots(transformedPilots)
+        setAvailablePilots(transformedPilots.filter((p: any) => p.kyc_verified))
+      } else {
+        setPilots([])
+        setAvailablePilots([])
       }
     } catch (err) {
-      // Demo data
-      const demoPilots = [
-        { id: '1', full_name: 'Miguel Santos', email: 'miguel@example.com', kyc_verified: true },
-        { id: '2', full_name: 'Roberto Diaz', email: 'roberto@example.com', kyc_verified: true },
-        { id: '3', full_name: 'Luis Morales', email: 'luis@example.com', kyc_verified: false }
-      ]
-      setPilots(demoPilots)
-      setAvailablePilots(demoPilots.filter(p => p.kyc_verified))
+      console.error('Error fetching pilots:', err)
+      setPilots([])
+      setAvailablePilots([])
     } finally {
       setLoading(false)
     }
@@ -397,29 +325,16 @@ export default function AdminDashboard() {
     setLoading(true)
     try {
       console.log('Fetching all users...')
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/users', { credentials: 'include' })
+      const data = await response.json()
 
-      console.log('Users fetch result:', { data, error, count: data?.length })
-      console.log('Actual users data:', data)
+      console.log('Users fetch result:', { data, count: data.users?.length })
 
-      if (error) {
-        console.error('Error fetching users:', error)
-      }
-      
-      // Always set the data we got, even if there was an error
-      setUsers(data || [])
-      
-      // If no data and no users found, add demo data
-      if (!data || data.length === 0) {
-        console.log('No users found, adding demo data')
-        setUsers([
-          { id: '1', email: 'client1@example.com', full_name: 'John Doe', role: 'client', kyc_verified: true, account_balance: 150.00, created_at: new Date().toISOString() },
-          { id: '2', email: 'pilot1@example.com', full_name: 'Miguel Santos', role: 'pilot', kyc_verified: true, account_balance: 0, created_at: new Date().toISOString() },
-          { id: '3', email: 'client2@example.com', full_name: 'Ana Rodriguez', role: 'client', kyc_verified: false, account_balance: 0, created_at: new Date().toISOString() }
-        ])
+      if (data.success && data.users) {
+        setUsers(data.users)
+      } else {
+        console.error('Error fetching users:', data.error)
+        setUsers([])
       }
     } catch (err) {
       console.error('Error fetching users:', err)
@@ -431,22 +346,13 @@ export default function AdminDashboard() {
 
   const fetchTransactions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(`
-          *,
-          user:profiles!transactions_user_id_fkey (
-            full_name,
-            email
-          )
-        `)
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/transactions', { credentials: 'include' })
+      const data = await response.json()
 
-      if (data) {
-        setTransactions(data)
-      }
-      if (error) {
-        console.error('Error fetching transactions:', error)
+      if (data.success && data.transactions) {
+        setTransactions(data.transactions)
+      } else {
+        console.error('Error fetching transactions:', data.error)
         // Demo data with payment proof URLs
         setTransactions([
           {
@@ -500,64 +406,43 @@ export default function AdminDashboard() {
   const fetchFinancialData = async () => {
     try {
       setLoading(true)
-      
-      // Fetch financial summary view
-      const { data: summary, error: summaryError } = await supabase
-        .from('financial_summary')
-        .select('*')
-        .single()
-      
-      if (summary) {
-        setFinancialSummary(summary)
+
+      // Compute financial summary from bookings
+      const response = await fetch('/api/bookings', { credentials: 'include' })
+      const data = await response.json()
+
+      if (data.success && data.bookings) {
+        // Calculate financial summary from bookings
+        const completedBookings = data.bookings.filter((b: any) => b.status === 'completed')
+        const totalRevenue = completedBookings.reduce((sum: number, b: any) => sum + (b.total_price || 0), 0)
+        const bookingCount = completedBookings.length
+
+        setFinancialSummary({
+          total_revenue: totalRevenue,
+          total_bookings: bookingCount,
+          average_booking_value: bookingCount > 0 ? totalRevenue / bookingCount : 0,
+          pending_payments: data.bookings.filter((b: any) => b.payment_status === 'pending').length
+        })
+
+        // Generate revenue entries from completed bookings
+        const revenueEntries = completedBookings.slice(0, 50).map((b: any) => ({
+          id: b.id,
+          amount: b.total_price,
+          created_at: b.created_at,
+          booking: {
+            id: b.id,
+            from_location: b.from_location,
+            to_location: b.to_location,
+            scheduled_date: b.scheduled_date,
+            total_price: b.total_price
+          }
+        }))
+        setBusinessRevenue(revenueEntries)
       }
-      
-      // Fetch operational costs
-      const { data: costs, error: costsError } = await supabase
-        .from('operational_costs')
-        .select(`
-          *,
-          pilot:profiles!operational_costs_pilot_id_fkey (
-            full_name,
-            email
-          ),
-          booking:bookings (
-            id,
-            from_location,
-            to_location,
-            scheduled_date
-          )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(50)
-      
-      if (costs) {
-        setOperationalCosts(costs)
-      }
-      
-      // Fetch business revenue
-      const { data: revenue, error: revenueError } = await supabase
-        .from('business_revenue')
-        .select(`
-          *,
-          booking:bookings (
-            id,
-            from_location,
-            to_location,
-            scheduled_date,
-            total_price
-          )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(50)
-      
-      if (revenue) {
-        setBusinessRevenue(revenue)
-      }
-      
-      if (summaryError) console.error('Error fetching financial summary:', summaryError)
-      if (costsError) console.error('Error fetching operational costs:', costsError)
-      if (revenueError) console.error('Error fetching business revenue:', revenueError)
-      
+
+      // Operational costs would need a separate model - set empty for now
+      setOperationalCosts([])
+
     } catch (error) {
       console.error('Error fetching financial data:', error)
     } finally {
@@ -567,19 +452,16 @@ export default function AdminDashboard() {
 
   const fetchHelicopters = async () => {
     try {
-      const { data, error } = await supabase
-        .from('helicopters')
-        .select('*')
-        .order('name')
+      const response = await fetch('/api/helicopters', { credentials: 'include' })
+      const data = await response.json()
 
-      console.log('Fetching helicopters - data:', data, 'error:', error)
-      
-      if (data) {
-        setHelicopters(data)
-      }
-      if (error) {
-        console.error('Error fetching helicopters:', error)
-        // Demo data if table doesn't exist yet
+      console.log('Fetching helicopters - data:', data)
+
+      if (data.success && data.helicopters) {
+        setHelicopters(data.helicopters)
+      } else {
+        console.error('Error fetching helicopters:', data.error)
+        // Demo data if no helicopters exist yet
         setHelicopters([
           {
             id: 'robinson-r44',
@@ -611,22 +493,13 @@ export default function AdminDashboard() {
 
   const fetchMaintenanceRecords = async () => {
     try {
-      const { data, error } = await supabase
-        .from('maintenance_records')
-        .select(`
-          *,
-          helicopter:helicopters!maintenance_records_helicopter_id_fkey (
-            name,
-            registration_number
-          )
-        `)
-        .order('start_date', { ascending: false })
+      const response = await fetch('/api/maintenance', { credentials: 'include' })
+      const data = await response.json()
 
-      if (data) {
-        setMaintenanceRecords(data)
-      }
-      if (error) {
-        console.warn('Error fetching maintenance records:', error)
+      if (data.success && data.records) {
+        setMaintenanceRecords(data.records)
+      } else {
+        console.warn('Error fetching maintenance records:', data.error)
         setMaintenanceRecords([])
       }
     } catch (err) {
@@ -637,25 +510,13 @@ export default function AdminDashboard() {
 
   const fetchExperiences = async () => {
     try {
-      const { data, error } = await supabase
-        .from('experiences')
-        .select(`
-          *,
-          experience_images (
-            id,
-            image_url,
-            caption,
-            is_primary,
-            order_index
-          )
-        `)
-        .order('order_index', { ascending: true, nullsFirst: false })
+      const response = await fetch('/api/experiences?include_inactive=true', { credentials: 'include' })
+      const data = await response.json()
 
-      if (data) {
-        setExperiences(data)
-      }
-      if (error) {
-        console.warn('Error fetching experiences (table may not exist yet):', error.message)
+      if (data.success && data.experiences) {
+        setExperiences(data.experiences)
+      } else {
+        console.warn('Error fetching experiences:', data.error)
         setExperiences([])
       }
     } catch (err) {
@@ -668,25 +529,13 @@ export default function AdminDashboard() {
 
   const fetchDestinations = async () => {
     try {
-      const { data, error } = await supabase
-        .from('destinations')
-        .select(`
-          *,
-          destination_images (
-            id,
-            image_url,
-            caption,
-            is_primary,
-            order_index
-          )
-        `)
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/destinations?include_inactive=true&include_images=true', { credentials: 'include' })
+      const data = await response.json()
 
-      if (data) {
-        setDestinations(data)
-      }
-      if (error) {
-        console.warn('Error fetching destinations (table may not exist yet):', error.message)
+      if (data.success && data.destinations) {
+        setDestinations(data.destinations)
+      } else {
+        console.warn('Error fetching destinations:', data.error)
         setDestinations([])
       }
     } catch (err) {
@@ -701,38 +550,39 @@ export default function AdminDashboard() {
     setRefreshing(true)
     try {
       console.log('Updating booking:', { bookingId, status, pilotId })
-      
+
       const updates: any = { status }
       if (pilotId) updates.pilot_id = pilotId
       if (helicopterId) updates.helicopter_id = helicopterId
       if (status === 'assigned' && pilotId) updates.status = 'assigned'
 
-      const { data, error } = await supabase
-        .from('bookings')
-        .update(updates)
-        .eq('id', bookingId)
-        .select()
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updates)
+      })
 
-      console.log('Update result:', { data, error })
-      console.log('Updated booking data:', data)
+      const data = await response.json()
+      console.log('Update result:', data)
 
-      if (error) {
-        console.error('Database error:', error)
-        alert('Error updating booking: ' + error.message)
+      if (!response.ok || !data.success) {
+        console.error('Update error:', data.error)
+        alert('Error updating booking: ' + (data.error || 'Unknown error'))
         setRefreshing(false)
         return
       }
 
       // Success - update local state immediately
-      setBookings(prev => prev.map(booking => 
-        booking.id === bookingId 
+      setBookings(prev => prev.map(booking =>
+        booking.id === bookingId
           ? { ...booking, status, pilot_id: pilotId || null, helicopter_id: helicopterId || null }
           : booking
       ))
-      
+
       setSelectedBooking(null)
       alert(`Booking ${status} successfully!`)
-      
+
       // Also refresh from server
       setTimeout(() => {
         fetchBookings()
@@ -747,7 +597,7 @@ export default function AdminDashboard() {
 
   const updateTransactionStatus = async (transactionId: string, status: 'approved' | 'rejected', notes?: string) => {
     console.log('Updating transaction:', { transactionId, status, notes })
-    
+
     try {
       const transaction = transactions.find(t => t.id === transactionId)
       if (!transaction) {
@@ -755,64 +605,34 @@ export default function AdminDashboard() {
         return
       }
 
-      const updates: any = { 
-        status,
-        processed_at: new Date().toISOString(),
-        admin_notes: notes || null
-      }
+      // Update transaction status via API (also handles balance update if approving deposit)
+      const response = await fetch(`/api/transactions/${transactionId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          status,
+          admin_notes: notes || null
+        })
+      })
 
-      // Update transaction status first
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .update(updates)
-        .eq('id', transactionId)
+      const data = await response.json()
 
-      if (transactionError) {
-        console.error('Transaction update error:', transactionError)
-        alert('Error updating transaction: ' + transactionError.message)
+      if (!response.ok) {
+        console.error('Transaction update error:', data.error)
+        alert('Error updating transaction: ' + data.error)
         return
       }
 
-      // If approving, also update user balance
-      if (status === 'approved' && transaction.type === 'deposit') {
-        console.log('Updating user balance for user:', transaction.user_id, 'amount:', transaction.amount)
-        
-        // Get current balance
-        const { data: userProfile, error: fetchError } = await supabase
-          .from('profiles')
-          .select('account_balance')
-          .eq('id', transaction.user_id)
-          .single()
-
-        if (fetchError) {
-          console.error('Error fetching user profile:', fetchError)
-          alert('Transaction approved but balance update failed: ' + fetchError.message)
-          fetchTransactions()
-          return
-        }
-
-        const currentBalance = userProfile?.account_balance || 0
-        const newBalance = currentBalance + transaction.amount
-
-        // Update user balance
-        const { error: balanceError } = await supabase
-          .from('profiles')
-          .update({ account_balance: newBalance })
-          .eq('id', transaction.user_id)
-
-        if (balanceError) {
-          console.error('Balance update error:', balanceError)
-          alert('Transaction approved but balance update failed: ' + balanceError.message)
-        } else {
-          console.log('Balance updated successfully from', currentBalance, 'to', newBalance)
-          alert(`Transaction ${status} successfully! User balance updated.`)
-        }
+      if (data.balance_updated) {
+        console.log('Balance updated to', data.new_balance)
+        alert(`Transaction ${status} successfully! User balance updated.`)
       } else {
         alert(`Transaction ${status} successfully!`)
       }
 
       fetchTransactions()
-      
+
     } catch (err) {
       console.error('Error updating transaction:', err)
       alert('Error updating transaction: ' + err)
@@ -821,14 +641,20 @@ export default function AdminDashboard() {
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', userId)
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ role: newRole })
+      })
 
-      if (!error) {
+      const data = await response.json()
+
+      if (response.ok) {
         fetchUsers()
         alert(`User role updated to ${newRole}!`)
+      } else {
+        alert('Error updating user role: ' + data.error)
       }
     } catch (err) {
       console.error('Error updating user role:', err)
@@ -852,12 +678,14 @@ export default function AdminDashboard() {
 
   const updateUserProfile = async () => {
     if (!selectedUser) return
-    
+
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
+      const response = await fetch(`/api/users/${selectedUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
           full_name: editUserData.full_name,
           phone: editUserData.phone,
           role: editUserData.role,
@@ -865,11 +693,13 @@ export default function AdminDashboard() {
           account_balance: editUserData.account_balance,
           admin_notes: editUserData.notes
         })
-        .eq('id', selectedUser.id)
+      })
 
-      if (error) {
-        console.error('Error updating user:', error)
-        alert('Error updating user: ' + error.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error('Error updating user:', data.error)
+        alert('Error updating user: ' + data.error)
       } else {
         alert('User profile updated successfully!')
         setShowEditUserModal(false)
@@ -904,7 +734,7 @@ export default function AdminDashboard() {
 
   const approveBookingWithChanges = async () => {
     if (!selectedBookingForEdit) return
-    
+
     setLoading(true)
     try {
       // Create revision data
@@ -920,19 +750,23 @@ export default function AdminDashboard() {
         notes: editBookingData.notes
       }
 
-      const { error } = await supabase
-        .from('bookings')
-        .update({
+      const response = await fetch(`/api/bookings/${selectedBookingForEdit.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
           status: 'needs_revision',
           revision_requested: true,
           revision_notes: editBookingData.revision_notes,
           revision_data: revisionData
         })
-        .eq('id', selectedBookingForEdit.id)
+      })
 
-      if (error) {
-        console.error('Error creating revision:', error)
-        alert('Error creating revision: ' + error.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error('Error creating revision:', data.error)
+        alert('Error creating revision: ' + data.error)
       } else {
         alert('Revision request created! Client will be notified to review and confirm changes.')
         setShowEditBookingModal(false)
@@ -950,14 +784,18 @@ export default function AdminDashboard() {
   const approveBookingAsIs = async (bookingId: string) => {
     setRefreshing(true)
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'approved' })
-        .eq('id', bookingId)
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'approved' })
+      })
 
-      if (error) {
-        console.error('Error approving booking:', error)
-        alert('Error approving booking: ' + error.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error('Error approving booking:', data.error)
+        alert('Error approving booking: ' + data.error)
       } else {
         alert('Booking approved without changes!')
         fetchBookings()
@@ -973,52 +811,36 @@ export default function AdminDashboard() {
   const createNewUser = async () => {
     setLoading(true)
     try {
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: newUserData.email,
-        password: newUserData.password,
-        options: {
-          data: {
-            full_name: newUserData.full_name,
-            role: newUserData.role
-          }
-        }
+      // Create user via API
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: newUserData.email,
+          password: newUserData.password,
+          full_name: newUserData.full_name,
+          role: newUserData.role,
+          phone: newUserData.phone
+        })
       })
 
-      if (authError) {
-        throw authError
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error)
       }
 
-      if (authData.user) {
-        // Create profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: newUserData.email,
-            full_name: newUserData.full_name,
-            role: newUserData.role,
-            phone: newUserData.phone,
-            kyc_verified: newUserData.role === 'admin', // Auto-verify admins
-            account_balance: 0
-          })
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
-          // Continue anyway - might be created by trigger
-        }
-
-        alert(`${newUserData.role} user created successfully!`)
-        setShowCreateUserModal(false)
-        setNewUserData({
-          email: '',
-          password: '',
-          full_name: '',
-          role: 'client',
-          phone: ''
-        })
-        fetchUsers()
-      }
+      alert(`${newUserData.role} user created successfully!`)
+      setShowCreateUserModal(false)
+      setNewUserData({
+        email: '',
+        password: '',
+        full_name: '',
+        role: 'client',
+        phone: ''
+      })
+      fetchUsers()
     } catch (error: any) {
       console.error('User creation error:', error)
       alert('Error creating user: ' + error.message)
@@ -1029,18 +851,20 @@ export default function AdminDashboard() {
 
   const verifyPilot = async (pilotId: string) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ kyc_verified: true })
-        .eq('id', pilotId)
+      const response = await fetch(`/api/users/${pilotId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ kyc_verified: true })
+      })
 
-      if (!error) {
+      if (response.ok) {
         fetchPilots()
       }
     } catch (err) {
       console.error('Error verifying pilot:', err)
       // Update local state for demo
-      setPilots(prev => prev.map(p => 
+      setPilots(prev => prev.map(p =>
         p.id === pilotId ? { ...p, kyc_verified: true } : p
       ))
     }
@@ -1182,41 +1006,42 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             order_index: index
           }));
 
-          // Check each update result individually for better error detection
+          // Update each experience order via API
           const results = await Promise.allSettled(
             updates.map(update =>
-              supabase
-                .from('experiences')
-                .update({ order_index: update.order_index })
-                .eq('id', update.id)
+              fetch(`/api/experiences/${update.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ order_index: update.order_index })
+              })
             )
           );
 
           // Check if any updates failed
           const failures = results.filter(result => result.status === 'rejected');
-          const dbErrors = results
+          const httpErrors = results
             .filter(result => result.status === 'fulfilled')
-            .map(result => (result as any).value.error)
-            .filter(error => error !== null);
+            .filter(result => !(result as any).value.ok);
 
-          if (failures.length > 0 || dbErrors.length > 0) {
-            throw new Error(`Failed to update ${failures.length + dbErrors.length} experiences`);
+          if (failures.length > 0 || httpErrors.length > 0) {
+            throw new Error(`Failed to update ${failures.length + httpErrors.length} experiences`);
           }
 
           // Success - show confirmation
           savingToast.innerHTML = '✅ Order saved!';
           savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 2000);
-          
+
           console.log('✅ Experience order updated successfully');
         } catch (error) {
           console.error('❌ Error updating experience order:', error);
-          
+
           // Show error and rollback
           savingToast.innerHTML = '❌ Save failed - reverting';
           savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 3000);
-          
+
           // Rollback on failure - refetch to restore correct order
           await fetchExperiences();
           alert('Failed to update experience order - reverted changes. Please try again.');
@@ -1226,39 +1051,20 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
     const handleDeleteExperience = async (id: string) => {
       if (!confirm('Are you sure you want to delete this experience?')) return
-      
+
       try {
-        // First check if there are any bookings referencing this experience
-        const { data: bookings, error: bookingsError } = await supabase
-          .from('bookings')
-          .select('id, client:profiles(full_name)')
-          .eq('experience_id', id)
-        
-        if (bookingsError) throw bookingsError
-        
-        if (bookings && bookings.length > 0) {
-          const clientNames = bookings.map(b => (b.client as any)?.full_name || 'Unknown').join(', ')
-          const confirmDelete = confirm(
-            `This experience has ${bookings.length} booking(s) from: ${clientNames}.\n\nDeleting this experience will also delete all associated bookings. Are you sure you want to continue?`
-          )
-          if (!confirmDelete) return
-          
-          // Delete bookings first
-          const { error: deleteBookingsError } = await supabase
-            .from('bookings')
-            .delete()
-            .eq('experience_id', id)
-          
-          if (deleteBookingsError) throw deleteBookingsError
+        // Delete the experience via API (will handle related data)
+        const response = await fetch(`/api/experiences/${id}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error)
         }
-        
-        // Now delete the experience (experience_images will cascade delete automatically)
-        const { error } = await supabase
-          .from('experiences')
-          .delete()
-          .eq('id', id)
-        
-        if (error) throw error
+
         await fetchExperiences()
       } catch (error: any) {
         console.error('Error deleting experience:', error)
@@ -1268,12 +1074,18 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
     const handleToggleActive = async (id: string, currentStatus: boolean) => {
       try {
-        const { error } = await supabase
-          .from('experiences')
-          .update({ is_active: !currentStatus })
-          .eq('id', id)
-        
-        if (error) throw error
+        const response = await fetch(`/api/experiences/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ is_active: !currentStatus })
+        })
+
+        if (!response.ok) {
+          const data = await response.json()
+          throw new Error(data.error)
+        }
+
         await fetchExperiences()
       } catch (error) {
         console.error('Error updating experience status:', error)
@@ -1375,19 +1187,26 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           <IrysUpload
             onUploadComplete={async (url) => {
               try {
-                await supabase
-                  .from('experiences')
-                  .update({ image_url: url })
-                  .eq('id', selectedExperienceId)
+                // Update experience image_url
+                await fetch(`/api/experiences/${selectedExperienceId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({ image_url: url })
+                })
 
-                await supabase
-                  .from('experience_images')
-                  .insert({
+                // Add to experience_images
+                await fetch('/api/experience-images', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({
                     experience_id: selectedExperienceId,
                     image_url: url,
                     is_primary: true,
                     order_index: 0
                   })
+                })
 
                 await fetchExperiences()
                 setShowImageUpload(false)
@@ -1541,41 +1360,42 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             order_index: index
           }));
 
-          // Check each update result individually for better error detection
+          // Update each destination order via API
           const results = await Promise.allSettled(
             updates.map(update =>
-              supabase
-                .from('destinations')
-                .update({ order_index: update.order_index })
-                .eq('id', update.id)
+              fetch(`/api/destinations/${update.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ order_index: update.order_index })
+              })
             )
           );
 
           // Check if any updates failed
           const failures = results.filter(result => result.status === 'rejected');
-          const dbErrors = results
+          const httpErrors = results
             .filter(result => result.status === 'fulfilled')
-            .map(result => (result as any).value.error)
-            .filter(error => error !== null);
+            .filter(result => !(result as any).value.ok);
 
-          if (failures.length > 0 || dbErrors.length > 0) {
-            throw new Error(`Failed to update ${failures.length + dbErrors.length} destinations`);
+          if (failures.length > 0 || httpErrors.length > 0) {
+            throw new Error(`Failed to update ${failures.length + httpErrors.length} destinations`);
           }
 
           // Success - show confirmation
           savingToast.innerHTML = '✅ Order saved!';
           savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 2000);
-          
+
           console.log('✅ Destination order updated successfully');
         } catch (error) {
           console.error('❌ Error updating destination order:', error);
-          
+
           // Show error and rollback
           savingToast.innerHTML = '❌ Save failed - reverting';
           savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 3000);
-          
+
           // Rollback on failure - refetch to restore correct order
           await fetchDestinations();
           alert('Failed to update destination order - reverted changes. Please try again.');
@@ -1585,29 +1405,39 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
     const handleDeleteDestination = async (id: string) => {
       if (!confirm('Are you sure you want to delete this destination?')) return
-      
+
       try {
-        const { error } = await supabase
-          .from('destinations')
-          .delete()
-          .eq('id', id)
-        
-        if (error) throw error
+        const response = await fetch(`/api/destinations/${id}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        })
+
+        if (!response.ok) {
+          const data = await response.json()
+          throw new Error(data.error)
+        }
+
         await fetchDestinations()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting destination:', error)
-        alert('Failed to delete destination')
+        alert('Failed to delete destination: ' + error.message)
       }
     }
 
     const handleToggleActive = async (id: string, currentStatus: boolean) => {
       try {
-        const { error } = await supabase
-          .from('destinations')
-          .update({ is_active: !currentStatus })
-          .eq('id', id)
-        
-        if (error) throw error
+        const response = await fetch(`/api/destinations/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ is_active: !currentStatus })
+        })
+
+        if (!response.ok) {
+          const data = await response.json()
+          throw new Error(data.error)
+        }
+
         await fetchDestinations()
       } catch (error) {
         console.error('Error updating destination status:', error)
@@ -1699,14 +1529,17 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           <IrysUpload
             onUploadComplete={async (url) => {
               try {
-                await supabase
-                  .from('destination_images')
-                  .insert({
+                await fetch('/api/destination-images', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({
                     destination_id: selectedDestinationId,
                     image_url: url,
                     is_primary: true,
                     order_index: 0
                   })
+                })
 
                 await fetchDestinations()
                 setShowImageUpload(false)
@@ -1735,11 +1568,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           </Link>
           <div className="flex items-center space-x-6">
             <Link href="/dashboard" className="text-sm hover:text-luxury-gold transition-colors">
-              {profile?.full_name || profile?.email}
+              {profile?.fullName || profile?.email}
             </Link>
             <button
               onClick={async () => {
-                await supabase.auth.signOut()
+                await logout()
                 router.push('/')
               }}
               className="text-sm hover:text-luxury-gold"
@@ -3740,15 +3573,16 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             <form onSubmit={async (e) => {
               e.preventDefault()
               try {
-                const { error } = await supabase
-                  .from('helicopters')
-                  .insert({
-                    id: newHelicopterData.name.toLowerCase().replace(/\s+/g, '-'),
-                    ...newHelicopterData
-                  })
+                const response = await fetch('/api/helicopters', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify(newHelicopterData)
+                })
 
-                if (error) throw error
-                
+                const data = await response.json()
+                if (!response.ok) throw new Error(data.error)
+
                 setShowAddHelicopterModal(false)
                 setNewHelicopterData({
                   name: '',
@@ -3901,9 +3735,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             <form onSubmit={async (e) => {
               e.preventDefault()
               try {
-                const { error } = await supabase
-                  .from('helicopters')
-                  .update({
+                const response = await fetch(`/api/helicopters/${selectedHelicopterForEdit.id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({
                     name: selectedHelicopterForEdit.name,
                     model: selectedHelicopterForEdit.model,
                     manufacturer: selectedHelicopterForEdit.manufacturer,
@@ -3920,14 +3756,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     notes: selectedHelicopterForEdit.notes,
                     total_flight_hours: selectedHelicopterForEdit.total_flight_hours,
                     last_maintenance_date: selectedHelicopterForEdit.last_maintenance_date,
-                    next_maintenance_due: selectedHelicopterForEdit.next_maintenance_due,
-                    insurance_expiry: selectedHelicopterForEdit.insurance_expiry,
-                    certification_expiry: selectedHelicopterForEdit.certification_expiry
+                    next_maintenance_due: selectedHelicopterForEdit.next_maintenance_due
                   })
-                  .eq('id', selectedHelicopterForEdit.id)
+                })
 
-                if (error) throw error
-                
+                const data = await response.json()
+                if (!response.ok) throw new Error(data.error)
+
                 setShowEditHelicopterModal(false)
                 fetchHelicopters()
                 alert('Helicopter updated successfully!')
@@ -4057,31 +3892,38 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             <form onSubmit={async (e) => {
               e.preventDefault()
               const formData = new FormData(e.currentTarget)
-              
+
               try {
-                const { error } = await supabase
-                  .from('maintenance_records')
-                  .insert({
+                const maintenanceType = formData.get('maintenance_type') as string
+                const response = await fetch('/api/maintenance', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({
                     helicopter_id: selectedHelicopterForEdit.id,
-                    maintenance_type: formData.get('maintenance_type'),
+                    type: maintenanceType,
                     description: formData.get('description'),
                     start_date: formData.get('start_date'),
-                    status: 'scheduled',
-                    performed_by: formData.get('performed_by'),
-                    cost: formData.get('cost') ? parseFloat(formData.get('cost') as string) : null,
+                    status: maintenanceType !== 'inspection' ? 'in_progress' : 'scheduled',
+                    technician: formData.get('performed_by'),
+                    cost: formData.get('cost') ? parseFloat(formData.get('cost') as string) : 0,
                     notes: formData.get('notes')
                   })
+                })
 
-                if (error) throw error
-                
+                const data = await response.json()
+                if (!response.ok) throw new Error(data.error)
+
                 // Update helicopter status if going into maintenance
-                if (formData.get('maintenance_type') !== 'inspection') {
-                  await supabase
-                    .from('helicopters')
-                    .update({ status: 'maintenance' })
-                    .eq('id', selectedHelicopterForEdit.id)
+                if (maintenanceType !== 'inspection') {
+                  await fetch(`/api/helicopters/${selectedHelicopterForEdit.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ status: 'maintenance' })
+                  })
                 }
-                
+
                 setShowMaintenanceModal(false)
                 fetchHelicopters()
                 fetchMaintenanceRecords()

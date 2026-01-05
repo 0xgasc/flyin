@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -75,70 +74,59 @@ export default function BookExperiencesPage() {
   const fetchExperiences = async () => {
     console.log('🔄 fetchExperiences started')
     setLoading(true)
-    
+
     try {
-      // Fetch both experiences and destinations
+      // Fetch both experiences and destinations from MongoDB API
       console.log('📡 Querying experiences and destinations...')
       const [experiencesResponse, destinationsResponse] = await Promise.all([
-        supabase
-          .from('experiences')
-          .select(`
-            *,
-            experience_images (
-              id,
-              image_url,
-              caption,
-              is_primary,
-              order_index
-            )
-          `)
-          .eq('is_active', true)
-          .order('order_index', { ascending: true, nullsFirst: false }),
-        supabase
-          .from('destinations')
-          .select(`
-            *,
-            destination_images (
-              id,
-              image_url,
-              caption,
-              is_primary,
-              order_index
-            )
-          `)
-          .eq('is_active', true)
-          .order('order_index', { ascending: true, nullsFirst: false })
+        fetch('/api/experiences'),
+        fetch('/api/destinations?include_images=true')
       ])
 
-      console.log('📊 Query results:', { 
-        experiencesCount: experiencesResponse.data?.length || 0, 
-        destinationsCount: destinationsResponse.data?.length || 0,
-        experiencesError: experiencesResponse.error?.message,
-        destinationsError: destinationsResponse.error?.message,
-        firstExperience: experiencesResponse.data?.[0],
-        firstDestination: destinationsResponse.data?.[0]
+      const experiencesData = await experiencesResponse.json()
+      const destinationsData = await destinationsResponse.json()
+
+      console.log('📊 Query results:', {
+        experiencesCount: experiencesData.experiences?.length || 0,
+        destinationsCount: destinationsData.destinations?.length || 0
       })
 
       const allItems = []
       const allCategories = new Set(['experiences', 'destinations'])
 
       // Process experiences
-      if (experiencesResponse.data && experiencesResponse.data.length > 0) {
-        const experienceItems = experiencesResponse.data.map(exp => ({
-          ...exp,
-          type: 'experience' as const,
+      if (experiencesData.success && experiencesData.experiences?.length > 0) {
+        const experienceItems = experiencesData.experiences.map((exp: any) => ({
+          id: exp.id,
+          name: exp.name,
+          name_es: exp.name_es,
+          description: exp.description,
+          description_es: exp.description_es,
+          duration_hours: exp.duration_hours,
+          duration_minutes: exp.duration_minutes,
+          base_price: exp.base_price,
+          max_passengers: exp.max_passengers,
+          min_passengers: exp.min_passengers || 1,
+          includes: exp.includes || [],
+          includes_es: exp.includes_es,
+          location: exp.location,
+          aircraft_options: exp.aircraft_options,
+          route_waypoints: exp.route_waypoints || [],
           category: 'experiences',
+          image_url: exp.image_url,
+          category_name_en: exp.category_name_en,
+          category_name_es: exp.category_name_es,
+          type: 'experience' as const,
+          order_index: exp.order_index,
           experience_images: exp.experience_images || []
         }))
         allItems.push(...experienceItems)
         console.log('✅ Added', experienceItems.length, 'experiences')
-        console.log('First experience with images:', experienceItems[0])
       }
 
-      // Process destinations  
-      if (destinationsResponse.data && destinationsResponse.data.length > 0) {
-        const destinationItems = destinationsResponse.data.map(dest => ({
-          ...dest,
+      // Process destinations
+      if (destinationsData.success && destinationsData.destinations?.length > 0) {
+        const destinationItems = destinationsData.destinations.map((dest: any) => ({
           id: dest.id,
           name: dest.name,
           name_es: null,
@@ -172,11 +160,11 @@ export default function BookExperiencesPage() {
         const bOrder = b.order_index ?? 999
         return aOrder - bOrder
       })
-      
+
       setExperiences(sortedItems)
       setCategories(Array.from(allCategories))
-      console.log('✅ Total items loaded:', sortedItems.length, 'Order:', sortedItems.map(i => ({ name: i.name, order: i.order_index })))
-      
+      console.log('✅ Total items loaded:', sortedItems.length)
+
     } catch (error) {
       console.error('❌ Error fetching data:', error)
       setError('Failed to load experiences and destinations')

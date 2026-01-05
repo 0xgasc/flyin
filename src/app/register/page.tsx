@@ -3,8 +3,23 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { Plane, Mail, Lock, User, Phone } from 'lucide-react'
+import { register } from '@/lib/auth-client'
+import { Plane, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react'
+
+// Email validation regex
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+// Password validation
+const validatePassword = (password: string) => {
+  const checks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  }
+  const isValid = checks.length && checks.uppercase && checks.lowercase && checks.number
+  return { checks, isValid }
+}
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -17,56 +32,58 @@ export default function RegisterPage() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false)
+
+  const passwordValidation = validatePassword(formData.password)
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Trim inputs
+    const trimmedEmail = formData.email.trim().toLowerCase()
+    const trimmedName = formData.fullName.trim()
+    const trimmedPhone = formData.phone.trim()
+
+    // Validate full name
+    if (trimmedName.length < 2) {
+      setError('Full name must be at least 2 characters')
+      return
+    }
+
+    // Validate email format
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
+      setError('Please enter a valid email address')
+      return
+    }
+
+    // Validate password strength
+    if (!passwordValidation.isValid) {
+      setError('Password does not meet requirements')
+      return
+    }
+
     setLoading(true)
 
     try {
-      // Sign up the user (no email confirmation required)
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
+      const result = await register({
+        email: trimmedEmail,
         password: formData.password,
-        options: {
-          emailRedirectTo: undefined, // Disable email confirmation
-          data: {
-            full_name: formData.fullName,
-            phone: formData.phone,
-            role: formData.role,
-          }
-        }
+        fullName: trimmedName,
+        phone: trimmedPhone || undefined,
+        role: formData.role,
       })
 
-      if (authError) throw authError
+      if (!result.success) {
+        throw new Error(result.error || 'Registration failed')
+      }
 
-      if (authData.user) {
-        // Create the user profile immediately
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: authData.user.id,
-            email: formData.email,
-            full_name: formData.fullName,
-            phone: formData.phone,
-            role: formData.role,
-            account_balance: 0,
-            kyc_verified: false
-          })
+      console.log('User registered successfully:', result.user?.email)
 
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
-          throw profileError
-        }
-
-        // Success! User is registered and logged in
-        console.log('User registered successfully:', authData.user.email)
-        
-        if (formData.role === 'pilot') {
-          router.push('/pilot/pending-verification')
-        } else {
-          router.push('/dashboard')
-        }
+      if (formData.role === 'pilot') {
+        router.push('/pilot/pending-verification')
+      } else {
+        router.push('/dashboard')
       }
     } catch (error: any) {
       console.error('Registration error:', error)
@@ -192,17 +209,49 @@ export default function RegisterPage() {
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  onFocus={() => setShowPasswordRequirements(true)}
+                  onBlur={() => setShowPasswordRequirements(false)}
+                  className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    formData.password && !passwordValidation.isValid
+                      ? 'border-amber-400'
+                      : formData.password && passwordValidation.isValid
+                      ? 'border-green-400'
+                      : 'border-gray-300'
+                  }`}
                   placeholder="••••••••"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
+              {/* Password requirements */}
+              {(showPasswordRequirements || formData.password) && (
+                <div className="mt-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <p className="font-medium text-gray-700 mb-2">Password must have:</p>
+                  <ul className="space-y-1">
+                    <li className={`flex items-center ${passwordValidation.checks.length ? 'text-green-600' : 'text-gray-500'}`}>
+                      {passwordValidation.checks.length ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      At least 8 characters
+                    </li>
+                    <li className={`flex items-center ${passwordValidation.checks.uppercase ? 'text-green-600' : 'text-gray-500'}`}>
+                      {passwordValidation.checks.uppercase ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      One uppercase letter
+                    </li>
+                    <li className={`flex items-center ${passwordValidation.checks.lowercase ? 'text-green-600' : 'text-gray-500'}`}>
+                      {passwordValidation.checks.lowercase ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      One lowercase letter
+                    </li>
+                    <li className={`flex items-center ${passwordValidation.checks.number ? 'text-green-600' : 'text-gray-500'}`}>
+                      {passwordValidation.checks.number ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      One number
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !passwordValidation.isValid || !formData.email || !formData.fullName}
               className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating account...' : 'Create Account'}

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Plane, Menu, X, Home, User, Calendar, Settings, LogOut, Globe } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
-import { supabase } from '@/lib/supabase'
+import { logout } from '@/lib/auth-client'
 import { useI18n } from '@/lib/i18n'
 
 interface NavItem {
@@ -30,27 +30,23 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
 
   const handleSignOut = async (e?: React.MouseEvent) => {
     console.log('handleSignOut called')
-    
+
     if (e) {
       e.preventDefault()
       e.stopPropagation()
     }
-    
+
     // Close menu immediately for better UX
     setIsOpen(false)
-    
+
     try {
-      console.log('Calling supabase.auth.signOut()')
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        console.error('Supabase signOut error:', error)
-      } else {
-        console.log('Successfully signed out')
-      }
+      console.log('Calling logout()')
+      await logout()
+      console.log('Successfully signed out')
     } catch (error) {
       console.error('Sign out error:', error)
     }
-    
+
     // Always redirect regardless of success/failure
     console.log('Redirecting to home page')
     window.location.href = '/'
@@ -224,7 +220,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                 ) : (
                   <>
                     <div className="p-3 text-sm text-gray-400">
-                      {profile.full_name || profile.email}
+                      {profile.fullName || profile.email}
                     </div>
                     <div 
                       onTouchStart={(e) => {

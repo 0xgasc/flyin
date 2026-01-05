@@ -1,8 +1,8 @@
 import { create } from 'zustand'
-import { User } from '@supabase/supabase-js'
-import { Database } from '@/types/database.types'
+import { User } from '@/lib/auth-client'
 
-type Profile = Database['public']['Tables']['profiles']['Row']
+// Profile type now mirrors User (MongoDB doesn't separate auth user and profile)
+type Profile = User
 
 interface AuthState {
   user: User | null

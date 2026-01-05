@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
-import { supabase } from '@/lib/supabase'
+import { logout } from '@/lib/auth-client'
 import { Plane, Calendar, MapPin, Clock, Users, CheckCircle, AlertCircle, DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -47,127 +47,54 @@ export default function PilotDashboard() {
 
   const fetchBookings = async () => {
     try {
-      let query = supabase
-        .from('bookings')
-        .select(`
-          *,
-          profiles:client_id (
-            full_name,
-            email,
-            phone
-          ),
-          experiences (
-            name,
-            location,
-            duration_hours
-          )
-        `)
-        .eq('pilot_id', profile?.id)
-        .order('scheduled_date', { ascending: true })
-
+      // Build query params based on filter
+      let statusQuery = ''
       if (filter === 'active') {
-        query = query.in('status', ['assigned', 'accepted'])
-      } else if (filter !== 'all') {
-        query = query.eq('status', filter)
+        statusQuery = '&status=assigned&status=accepted'
+      } else if (filter === 'completed') {
+        statusQuery = '&status=completed'
       }
 
-      const { data, error } = await query
+      const response = await fetch(`/api/bookings?${statusQuery}`, {
+        credentials: 'include'
+      })
 
-      if (data) setBookings(data)
-      if (error) {
-        console.error('Error fetching bookings:', error)
-        // Demo data for pilot view
-        setBookings([
-          {
-            id: '1',
-            created_at: new Date().toISOString(),
-            booking_type: 'transport',
-            status: 'assigned',
-            from_location: 'GUA',
-            to_location: 'FRS',
-            scheduled_date: '2024-01-15',
-            scheduled_time: '10:00',
-            passenger_count: 2,
-            total_price: 350,
-            notes: 'Business travelers, punctuality important',
-            profiles: {
-              full_name: 'John Smith',
-              email: 'john@example.com',
-              phone: '+502 5555 1234'
-            },
-            experiences: null
+      if (!response.ok) {
+        throw new Error('Failed to fetch bookings')
+      }
+
+      const data = await response.json()
+
+      if (data.success && data.bookings) {
+        // Transform API response to match expected format
+        const transformedBookings = data.bookings.map((b: any) => ({
+          id: b.id,
+          created_at: b.created_at,
+          booking_type: b.booking_type,
+          status: b.status,
+          from_location: b.from_location,
+          to_location: b.to_location,
+          scheduled_date: b.scheduled_date,
+          scheduled_time: b.scheduled_time,
+          passenger_count: b.passenger_count,
+          total_price: b.total_price,
+          notes: b.notes,
+          profiles: b.profiles || {
+            full_name: b.client?.full_name,
+            email: b.client?.email,
+            phone: b.client?.phone
           },
-          {
-            id: '2',
-            created_at: new Date().toISOString(),
-            booking_type: 'experience',
-            status: 'assigned',
-            from_location: null,
-            to_location: null,
-            scheduled_date: '2024-01-16',
-            scheduled_time: '14:00',
-            passenger_count: 4,
-            total_price: 650,
-            notes: 'Anniversary celebration',
-            profiles: {
-              full_name: 'Maria Garcia',
-              email: 'maria@example.com',
-              phone: '+502 5555 5678'
-            },
-            experiences: {
-              name: 'Lake Atitlán Discovery',
-              location: 'Lake Atitlán',
-              duration_hours: 2
-            }
-          }
-        ])
+          experiences: b.experiences || (b.experience ? {
+            name: b.experience.name,
+            location: b.experience.location || '',
+            duration_hours: b.experience.duration_hours || 0
+          } : null)
+        }))
+        setBookings(transformedBookings)
       }
     } catch (err) {
-      // Demo data for pilot view
-      setBookings([
-        {
-          id: '1',
-          created_at: new Date().toISOString(),
-          booking_type: 'transport',
-          status: 'assigned',
-          from_location: 'GUA',
-          to_location: 'FRS',
-          scheduled_date: '2024-01-15',
-          scheduled_time: '10:00',
-          passenger_count: 2,
-          total_price: 350,
-          notes: 'Business travelers, punctuality important',
-          profiles: {
-            full_name: 'John Smith',
-            email: 'john@example.com',
-            phone: '+502 5555 1234'
-          },
-          experiences: null
-        },
-        {
-          id: '2',
-          created_at: new Date().toISOString(),
-          booking_type: 'experience',
-          status: 'assigned',
-          from_location: null,
-          to_location: null,
-          scheduled_date: '2024-01-16',
-          scheduled_time: '14:00',
-          passenger_count: 4,
-          total_price: 650,
-          notes: 'Anniversary celebration',
-          profiles: {
-            full_name: 'Maria Garcia',
-            email: 'maria@example.com',
-            phone: '+502 5555 5678'
-          },
-          experiences: {
-            name: 'Lake Atitlán Discovery',
-            location: 'Lake Atitlán',
-            duration_hours: 2
-          }
-        }
-      ])
+      console.error('Error fetching bookings:', err)
+      setBookings([])
     } finally {
       setLoading(false)
     }
@@ -175,18 +102,26 @@ export default function PilotDashboard() {
 
   const acceptMission = async (bookingId: string) => {
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'accepted' })
-        .eq('id', bookingId)
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'accepted' })
+      })
 
-      if (!error) {
+      if (response.ok) {
         fetchBookings()
+      } else {
+        console.error('Error accepting mission')
+        // Update local state for optimistic UI
+        setBookings(prev => prev.map(b =>
+          b.id === bookingId ? { ...b, status: 'accepted' } : b
+        ))
       }
     } catch (err) {
       console.error('Error accepting mission:', err)
-      // Update local state for demo
-      setBookings(prev => prev.map(b => 
+      // Update local state for optimistic UI
+      setBookings(prev => prev.map(b =>
         b.id === bookingId ? { ...b, status: 'accepted' } : b
       ))
     }
@@ -194,18 +129,26 @@ export default function PilotDashboard() {
 
   const markAsCompleted = async (bookingId: string) => {
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'completed' })
-        .eq('id', bookingId)
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'completed' })
+      })
 
-      if (!error) {
+      if (response.ok) {
         fetchBookings()
+      } else {
+        console.error('Error completing mission')
+        // Update local state for optimistic UI
+        setBookings(prev => prev.map(b =>
+          b.id === bookingId ? { ...b, status: 'completed' } : b
+        ))
       }
     } catch (err) {
       console.error('Error completing mission:', err)
-      // Update local state for demo
-      setBookings(prev => prev.map(b => 
+      // Update local state for optimistic UI
+      setBookings(prev => prev.map(b =>
         b.id === bookingId ? { ...b, status: 'completed' } : b
       ))
     }
@@ -234,7 +177,7 @@ export default function PilotDashboard() {
           </Link>
           <div className="flex items-center space-x-6">
             <div className="text-sm">
-              {profile?.kyc_verified ? (
+              {profile?.kycVerified ? (
                 <span className="flex items-center text-green-400">
                   <CheckCircle className="h-4 w-4 mr-1" />
                   Verified Pilot
@@ -247,11 +190,11 @@ export default function PilotDashboard() {
               )}
             </div>
             <div className="text-sm">
-              {profile?.full_name || profile?.email}
+              {profile?.fullName || profile?.email}
             </div>
             <button
               onClick={async () => {
-                await supabase.auth.signOut()
+                await logout()
                 router.push('/')
               }}
               className="text-sm hover:text-luxury-gold"
@@ -299,7 +242,7 @@ export default function PilotDashboard() {
           </div>
         </div>
 
-        {!profile?.kyc_verified && (
+        {!profile?.kycVerified && (
           <div className="card-luxury bg-yellow-50 border-yellow-200 mb-6">
             <div className="flex items-center">
               <AlertCircle className="h-6 w-6 text-yellow-600 mr-3" />
