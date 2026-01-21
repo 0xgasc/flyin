@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { logout, getAuthHeaders } from '@/lib/auth-client'
+import { useToast } from '@/lib/toast-store'
 import {
   Plane, Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
   User, Mail, Phone, Upload, Save, Wallet, FileText, CheckCircle, Eye, EyeOff
@@ -45,7 +46,8 @@ export default function DashboardPage() {
   const router = useRouter()
   const { profile, user, setProfile, loading: authLoading } = useAuthStore()
   const { t, locale } = useTranslation()
-  
+  const toast = useToast()
+
   // Tab management
   const [activeTab, setActiveTab] = useState<'bookings' | 'profile' | 'payments'>('bookings')
   
@@ -138,7 +140,21 @@ export default function DashboardPage() {
       })
       const json = await res.json()
       if (json.success && json.bookings) {
-        setBookings(json.bookings)
+        // Transform snake_case API response to camelCase for frontend
+        const transformed = json.bookings.map((b: any) => ({
+          id: b.id,
+          createdAt: b.created_at,
+          bookingType: b.booking_type,
+          status: b.status,
+          fromLocation: b.from_location,
+          toLocation: b.to_location,
+          scheduledDate: b.scheduled_date,
+          scheduledTime: b.scheduled_time,
+          totalPrice: b.total_price,
+          paymentStatus: b.payment_status,
+          experience: b.experience || b.experiences,
+        }))
+        setBookings(transformed)
       }
     } catch (error) {
       console.error('Error fetching bookings:', error)
@@ -225,9 +241,9 @@ export default function DashboardPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to submit top-up request')
 
-      alert(locale === 'es'
-        ? '¡Solicitud de recarga enviada! Te contactaremos pronto con la confirmación.'
-        : 'Top-up request submitted! We will contact you soon with confirmation.'
+      toast.success(locale === 'es'
+        ? '¡Solicitud de recarga enviada! Te contactaremos pronto.'
+        : 'Top-up request submitted! We will contact you soon.'
       )
 
       // Reset form
@@ -292,7 +308,7 @@ export default function DashboardPage() {
         accountBalance: (profile.accountBalance || 0) - amount
       })
 
-      alert(`Payment successful! $${amount} deducted from your account.\n\nYour flight is now confirmed and you'll receive final details soon.`)
+      toast.success(`Payment successful! $${amount} deducted. Your flight is confirmed.`)
 
       // Refresh data
       fetchBookings()
@@ -301,7 +317,7 @@ export default function DashboardPage() {
 
     } catch (error: any) {
       console.error('Payment error:', error)
-      alert('Payment failed: ' + error.message)
+      toast.error('Payment failed: ' + error.message)
     } finally {
       setPaymentLoading(false)
     }
@@ -327,7 +343,7 @@ export default function DashboardPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Bank deposit failed')
 
-      alert(`Bank deposit initiated!\n\nYour payment is being processed. You'll receive confirmation within 24 hours.`)
+      toast.success('Bank deposit initiated! You\'ll receive confirmation within 24 hours.')
 
       fetchBookings()
       fetchPaymentProofs()
@@ -335,18 +351,18 @@ export default function DashboardPage() {
 
     } catch (error: any) {
       console.error('Bank deposit error:', error)
-      alert('Bank deposit failed: ' + error.message)
+      toast.error('Bank deposit failed: ' + error.message)
     } finally {
       setPaymentLoading(false)
     }
   }
 
   const handleCreditCardPayment = () => {
-    alert('Credit Card payment coming soon! Please use Bank Deposit or Account Balance for now.')
+    toast.info('Credit Card payment coming soon! Please use Bank Deposit or Account Balance for now.')
   }
 
   const handleCryptoPayment = () => {
-    alert('Crypto payment coming soon! We\'ll be integrating stablecoin payments via StablePay.')
+    toast.info('Crypto payment coming soon! Stablecoin payments via StablePay.')
   }
 
   const getStatusColor = (status: string) => {
@@ -799,12 +815,13 @@ function PaymentModal({
   loading: boolean
   profile: any
 }) {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'balance' | 'bank' | 'card' | 'crypto'>('balance')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'balance' | 'bank'>('balance')
   const [proofFile, setProofFile] = useState<File | null>(null)
-  
+  const toast = useToast()
+
   const handleBankDepositSubmit = () => {
     if (!proofFile) {
-      alert('Please upload payment proof before submitting.')
+      toast.warning('Please upload payment proof before submitting.')
       return
     }
     onPayBankDeposit(proofFile)
@@ -881,42 +898,34 @@ function PaymentModal({
             </div>
           </button>
 
-          {/* Credit Card */}
-          <button
-            onClick={() => setSelectedPaymentMethod('card')}
-            className={`w-full p-4 rounded-lg border-2 transition-colors ${
-              selectedPaymentMethod === 'card'
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <div className="flex items-center">
-              <CreditCard className="w-6 h-6 text-green-600 mr-3" />
-              <div className="text-left">
-                <div className="font-semibold">Credit Card</div>
-                <div className="text-sm text-gray-600">Coming Soon</div>
-              </div>
-            </div>
-          </button>
-
-          {/* Crypto */}
-          <button
-            onClick={() => setSelectedPaymentMethod('crypto')}
-            className={`w-full p-4 rounded-lg border-2 transition-colors ${
-              selectedPaymentMethod === 'crypto'
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <div className="flex items-center">
-              <Coins className="w-6 h-6 text-orange-600 mr-3" />
-              <div className="text-left">
-                <div className="font-semibold">Cryptocurrency</div>
-                <div className="text-sm text-gray-600">USDC, USDT via StablePay</div>
-              </div>
-            </div>
-          </button>
         </div>
+
+        {/* Coming Soon Payment Methods - Collapsible */}
+        <details className="mb-4">
+          <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 py-2">
+            More payment options coming soon...
+          </summary>
+          <div className="mt-2 space-y-2 opacity-60">
+            <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
+              <div className="flex items-center">
+                <CreditCard className="w-5 h-5 text-gray-400 mr-3" />
+                <div>
+                  <div className="font-medium text-gray-600">Credit Card</div>
+                  <div className="text-xs text-gray-400">Coming Soon</div>
+                </div>
+              </div>
+            </div>
+            <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
+              <div className="flex items-center">
+                <Coins className="w-5 h-5 text-gray-400 mr-3" />
+                <div>
+                  <div className="font-medium text-gray-600">Cryptocurrency</div>
+                  <div className="text-xs text-gray-400">USDC, USDT via StablePay - Coming Soon</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
 
         {/* Bank Deposit Details */}
         {selectedPaymentMethod === 'bank' && (
@@ -959,29 +968,17 @@ function PaymentModal({
           
           <button
             onClick={() => {
-              switch (selectedPaymentMethod) {
-                case 'balance':
-                  onPayAccountBalance()
-                  break
-                case 'bank':
-                  handleBankDepositSubmit()
-                  break
-                case 'card':
-                  onPayCreditCard()
-                  break
-                case 'crypto':
-                  onPayCrypto()
-                  break
+              if (selectedPaymentMethod === 'balance') {
+                onPayAccountBalance()
+              } else if (selectedPaymentMethod === 'bank') {
+                handleBankDepositSubmit()
               }
             }}
             disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.accountBalance || profile.accountBalance < booking.totalPrice))}
             className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Processing...' : 
-             selectedPaymentMethod === 'balance' ? 'Pay Now' :
-             selectedPaymentMethod === 'bank' ? 'Submit Proof' :
-             selectedPaymentMethod === 'card' ? 'Coming Soon' :
-             'Coming Soon'
+            {loading ? 'Processing...' :
+             selectedPaymentMethod === 'balance' ? 'Pay Now' : 'Submit Proof'
             }
           </button>
         </div>
