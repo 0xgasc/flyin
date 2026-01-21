@@ -198,21 +198,21 @@ function BookingCard({
                 disabled={refreshing}
                 className="w-full px-3 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
               >
-                {refreshing ? '...' : `✓ ${t('admin.approve_as_is')}`}
+                {refreshing ? '...' : t('admin.approve_as_is')}
               </button>
               <button
                 onClick={() => onApproveWithChanges(booking)}
                 disabled={refreshing}
                 className="w-full px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
-                ✏️ {t('admin.approve_with_changes')}
+                {t('admin.approve_with_changes')}
               </button>
               <button
                 onClick={() => onCancel(booking.id)}
                 disabled={refreshing}
                 className="w-full px-3 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 disabled:opacity-50 transition-colors"
               >
-                ✗ {t('admin.cancel')}
+                {t('admin.cancel')}
               </button>
             </>
           )}
@@ -220,7 +220,7 @@ function BookingCard({
           {booking.status === 'needs_revision' && (
             <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
               <p className="text-xs text-yellow-800 font-medium text-center">
-                📝 Awaiting Client Review
+                Awaiting Client Review
               </p>
               <p className="text-xs text-yellow-600 text-center mt-1">
                 Changes requested
@@ -234,7 +234,7 @@ function BookingCard({
               disabled={refreshing}
               className="w-full px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              💳 Awaiting Payment
+              Awaiting Payment
             </button>
           )}
 
@@ -254,7 +254,7 @@ function BookingCard({
               disabled={refreshing}
               className="w-full px-3 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
             >
-              ✓ Mark Completed
+              Mark Completed
             </button>
           )}
 
@@ -268,7 +268,7 @@ function BookingCard({
               disabled={refreshing}
               className="w-full px-3 py-2 bg-gray-600 text-white text-sm font-medium rounded hover:bg-gray-700 disabled:opacity-50 transition-colors"
             >
-              ✏️ Edit Booking
+              Edit Booking
             </button>
 
             {/* Cancel Button - for non-cancelled bookings */}
@@ -278,7 +278,7 @@ function BookingCard({
                 disabled={refreshing}
                 className="w-full px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
-                ✗ Cancel Booking
+                Cancel Booking
               </button>
             )}
 
@@ -289,7 +289,7 @@ function BookingCard({
                 disabled={refreshing}
                 className="w-full px-3 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 disabled:opacity-50 transition-colors"
               >
-                🗑️ Delete Booking
+                Delete Booking
               </button>
             ) : (
               <div className="bg-red-50 border border-red-200 rounded p-2">

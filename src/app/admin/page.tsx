@@ -1688,19 +1688,19 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                               onClick={() => approveBookingAsIs(booking.id)}
                               className="block w-full px-3 py-2 mb-1 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700"
                             >
-                              ✓ {t('admin.approve_as_is')}
+                              {t('admin.approve_as_is')}
                             </button>
                             <button
                               onClick={() => openEditBookingModal(booking)}
                               className="block w-full px-3 py-2 mb-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
                             >
-                              ✏️ {t('admin.approve_with_changes')}
+                              {t('admin.approve_with_changes')}
                             </button>
                             <button
                               onClick={() => updateBookingStatus(booking.id, 'cancelled')}
                               className="block w-full px-3 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700"
                             >
-                              ✗ {t('admin.cancel')}
+                              {t('admin.cancel')}
                             </button>
                           </>
                         )}
@@ -1708,7 +1708,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         {booking.status === 'needs_revision' && (
                           <div className="bg-yellow-50 border border-yellow-200 rounded p-2">
                             <p className="text-xs text-yellow-800 font-medium text-center">
-                              📝 Awaiting Client Review
+                              Awaiting Client Review
                             </p>
                             <p className="text-xs text-yellow-600 text-center">
                               Changes requested
@@ -1721,7 +1721,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             onClick={() => updateBookingStatus(booking.id, 'pending_payment')}
                             className="block w-full px-3 py-2 mb-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
                           >
-                            💳 Awaiting Payment
+                            Awaiting Payment
                           </button>
                         )}
                         {booking.status === 'approved' && !booking.pilot_id && (
@@ -1741,7 +1741,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             onClick={() => updateBookingStatus(booking.id, 'completed')}
                             className="block w-full px-3 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700"
                           >
-                            ✓ Mark Completed
+                            Mark Completed
                           </button>
                         )}
 
@@ -1754,7 +1754,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             onClick={() => openEditBookingModal(booking)}
                             className="block w-full px-3 py-2 bg-gray-600 text-white text-sm font-medium rounded hover:bg-gray-700"
                           >
-                            ✏️ Edit Booking
+                            Edit Booking
                           </button>
 
                           {/* Cancel Button - for non-cancelled/completed bookings */}
@@ -1763,7 +1763,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                               onClick={() => updateBookingStatus(booking.id, 'cancelled')}
                               className="block w-full px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700"
                             >
-                              ✗ Cancel Booking
+                              Cancel Booking
                             </button>
                           )}
 
@@ -1776,7 +1776,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             }}
                             className="block w-full px-3 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700"
                           >
-                            🗑️ Delete Booking
+                            Delete Booking
                           </button>
                         </div>
                       </div>
@@ -2045,7 +2045,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                           onClick={() => openEditUserModal(user)}
                           className="block w-full px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
                         >
-                          ✏️ Edit Profile
+                          Edit Profile
                         </button>
                         {!user.kyc_verified && (
                           <button
@@ -2055,7 +2055,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             }}
                             className="block w-full px-3 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700"
                           >
-                            ✓ Verify KYC
+                            Verify KYC
                           </button>
                         )}
                         {user.role !== 'admin' && (
@@ -2306,7 +2306,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         onClick={() => openEditUserModal(pilot)}
                         className="bg-blue-600 text-white text-sm px-3 py-2 rounded hover:bg-blue-700 w-full"
                       >
-                        ✏️ Edit Profile
+                        Edit Profile
                       </button>
                       {!pilot.kyc_verified && (
                         <button
@@ -3263,7 +3263,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         onChange={() => setEditUserData({ ...editUserData, kyc_verified: true })}
                         className="mr-2"
                       />
-                      <span className="text-sm text-green-700">✓ Verified</span>
+                      <span className="text-sm text-green-700">Verified</span>
                     </label>
                     <label className="flex items-center">
                       <input
@@ -3273,7 +3273,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         onChange={() => setEditUserData({ ...editUserData, kyc_verified: false })}
                         className="mr-2"
                       />
-                      <span className="text-sm text-yellow-700">⏳ Pending</span>
+                      <span className="text-sm text-yellow-700">Pending</span>
                     </label>
                   </div>
                 </div>
@@ -3296,7 +3296,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               {editUserData.role !== selectedUser.role && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
                   <p className="text-sm text-yellow-800">
-                    ⚠️ <strong>Warning:</strong> Changing the user role will affect their access permissions.
+                    <strong>Warning:</strong> Changing the user role will affect their access permissions.
                   </p>
                 </div>
               )}

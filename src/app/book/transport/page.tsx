@@ -368,7 +368,7 @@ export default function BookTransportPage() {
                     <option value="MONTERRICO">Monterrico Beach</option>
                     <option value="LIVINGSTON">Livingston</option>
                   </optgroup>
-                  <option value="custom">🗺️ {t('booking.form.custom_location')}</option>
+                  <option value="custom">{t('booking.form.custom_location')}</option>
                 </select>
                 {formData.fromLocation === 'custom' && (
                   <input
@@ -408,7 +408,7 @@ export default function BookTransportPage() {
                     <option value="MONTERRICO">Monterrico Beach</option>
                     <option value="LIVINGSTON">Livingston</option>
                   </optgroup>
-                  <option value="custom">🗺️ {t('booking.form.custom_location')}</option>
+                  <option value="custom">{t('booking.form.custom_location')}</option>
                 </select>
                 {formData.toLocation === 'custom' && (
                   <input

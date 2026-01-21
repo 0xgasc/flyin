@@ -118,7 +118,7 @@ export function UsersTab({
                     onClick={() => onEditUser(user)}
                     className="w-full px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
                   >
-                    ✏️ Edit Profile
+                    Edit Profile
                   </button>
 
                   {!user.kyc_verified && (
@@ -126,7 +126,7 @@ export function UsersTab({
                       onClick={() => onVerifyKYC(user.id)}
                       className="w-full px-3 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition-colors"
                     >
-                      ✓ Verify KYC
+                      Verify KYC
                     </button>
                   )}
 

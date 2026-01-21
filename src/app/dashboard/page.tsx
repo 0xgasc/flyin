@@ -516,7 +516,7 @@ export default function DashboardPage() {
                       <div className="ml-4 flex flex-col space-y-2">
                         {booking.status === 'pending' && (
                           <button className="text-red-600 hover:text-red-700 text-sm px-3 py-1 border border-red-300 rounded hover:bg-red-50">
-                            ✗ Cancel
+                            Cancel
                           </button>
                         )}
 
@@ -526,10 +526,10 @@ export default function DashboardPage() {
                               onClick={() => openPaymentModal(booking)}
                               className="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700 flex items-center"
                             >
-                              💳 Choose Payment
+                              Choose Payment
                             </button>
                             <p className="text-xs text-gray-500 text-center">
-                              {booking.status === 'approved' ? 'Flight approved!' : '✈️ Flight Assigned!'}
+                              {booking.status === 'approved' ? 'Flight approved!' : 'Flight Assigned!'}
                               <br/>Ready for payment
                             </p>
                           </>
@@ -538,7 +538,7 @@ export default function DashboardPage() {
                         {booking.status === 'assigned' && booking.paymentStatus === 'paid' && (
                           <div className="bg-green-50 border border-green-200 rounded p-2">
                             <p className="text-xs text-green-800 font-medium text-center">
-                              ✈️ Ready to Fly!
+                              Ready to Fly!
                             </p>
                             <p className="text-xs text-green-600 text-center">
                               All confirmed
@@ -549,7 +549,7 @@ export default function DashboardPage() {
                         {booking.status === 'completed' && (
                           <div className="bg-green-50 border border-green-200 rounded p-2">
                             <p className="text-xs text-green-800 font-medium text-center">
-                              ✓ Completed
+                              Completed
                             </p>
                             <button className="text-xs text-green-600 hover:text-green-700 underline">
                               Leave Review
@@ -949,7 +949,7 @@ function PaymentModal({
                 className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
               />
               {proofFile && (
-                <p className="text-xs text-green-600 mt-1">✓ {proofFile.name}</p>
+                <p className="text-xs text-green-600 mt-1">{proofFile.name}</p>
               )}
             </div>
           </div>

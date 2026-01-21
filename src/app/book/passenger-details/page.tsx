@@ -246,11 +246,11 @@ function PassengerDetailsContent() {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'service': return '🎯'
-      case 'comfort': return '🛋️'
-      case 'catering': return '🍽️'
-      case 'equipment': return '🎒'
-      default: return '✨'
+      case 'service': return ''
+      case 'comfort': return ''
+      case 'catering': return ''
+      case 'equipment': return ''
+      default: return ''
     }
   }
 
