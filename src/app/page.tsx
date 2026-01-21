@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { MapPin, Sparkles, Users, Shield, Clock, Star } from 'lucide-react'
+import { Users, Shield, Clock, Star } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
@@ -27,7 +27,7 @@ export default function HomePage() {
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23455a64' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }} />
         </div>
 
@@ -98,9 +98,8 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/book/transport"
-                className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center gap-2"
+                className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center"
               >
-                <MapPin className="h-5 w-5" />
                 {t('services.transport.cta')}
               </Link>
               <Link
@@ -114,23 +113,23 @@ export default function HomePage() {
         </div>
 
         {/* Trust Indicators */}
-        <div className="relative border-t border-gray-800">
+        <div className="relative border-t border-luxury-slate/30">
           <div className="container mx-auto px-4 sm:px-6 py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
-                <Shield className="h-8 w-8 text-luxury-gold mx-auto mb-2" />
+                <Shield className="h-8 w-8 text-brand-accent mx-auto mb-2" />
                 <p className="text-sm text-gray-400">Licensed & Insured</p>
               </div>
               <div>
-                <Clock className="h-8 w-8 text-luxury-gold mx-auto mb-2" />
+                <Clock className="h-8 w-8 text-brand-accent mx-auto mb-2" />
                 <p className="text-sm text-gray-400">24/7 Availability</p>
               </div>
               <div>
-                <Star className="h-8 w-8 text-luxury-gold mx-auto mb-2" />
+                <Star className="h-8 w-8 text-brand-accent mx-auto mb-2" />
                 <p className="text-sm text-gray-400">Premium Service</p>
               </div>
               <div>
-                <Users className="h-8 w-8 text-luxury-gold mx-auto mb-2" />
+                <Users className="h-8 w-8 text-brand-accent mx-auto mb-2" />
                 <p className="text-sm text-gray-400">Expert Pilots</p>
               </div>
             </div>
@@ -142,43 +141,40 @@ export default function HomePage() {
       <main className="bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-luxury-black mb-4">
               Our Services
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-brand-muted max-w-2xl mx-auto">
               Choose your adventure - from point-to-point transport to unforgettable experiences
             </p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
             {/* Transport Card */}
-            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-primary-600"></div>
+            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-luxury-slate to-luxury-navy"></div>
               <div className="p-8">
-                <div className="bg-primary-50 w-16 h-16 rounded-none flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <MapPin className="h-8 w-8 text-primary-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('services.transport.title')}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <h3 className="text-2xl font-bold text-luxury-black mb-3">{t('services.transport.title')}</h3>
+                <p className="text-brand-muted mb-6 leading-relaxed">
                   {t('services.transport.description')}
                 </p>
-                <ul className="space-y-2 mb-8 text-sm text-gray-600">
+                <ul className="space-y-2 mb-8 text-sm text-brand-muted">
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
                     Guatemala City to any destination
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
                     Inter-city transfers available
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
                     Up to 5 passengers per flight
                   </li>
                 </ul>
                 <Link
                   href="/book/transport"
-                  className="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700 transition-colors"
+                  className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:text-brand-green transition-colors"
                 >
                   Book Transport
                   <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
@@ -187,33 +183,30 @@ export default function HomePage() {
             </div>
 
             {/* Experiences Card */}
-            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-600 to-gray-800"></div>
+            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-accent to-brand-green"></div>
               <div className="p-8">
-                <div className="bg-gray-100 w-16 h-16 rounded-none flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-8 w-8 text-gray-700" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('services.experiences.title')}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <h3 className="text-2xl font-bold text-luxury-black mb-3">{t('services.experiences.title')}</h3>
+                <p className="text-brand-muted mb-6 leading-relaxed">
                   {t('services.experiences.description')}
                 </p>
-                <ul className="space-y-2 mb-8 text-sm text-gray-600">
+                <ul className="space-y-2 mb-8 text-sm text-brand-muted">
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
                     Lake Atitlan scenic tours
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
                     Tikal archaeological flights
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
                     Volcano discovery expeditions
                   </li>
                 </ul>
                 <Link
                   href="/book/experiences"
-                  className="inline-flex items-center gap-2 text-gray-700 font-semibold hover:text-gray-900 transition-colors"
+                  className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:text-brand-green transition-colors"
                 >
                   Explore Experiences
                   <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
@@ -230,9 +223,9 @@ export default function HomePage() {
         <div className="bg-luxury-black text-white py-16">
           <div className="container mx-auto px-4 sm:px-6 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Ready for <span className="text-luxury-gold">takeoff</span>?
+              Ready for <span className="text-brand-accent">takeoff</span>?
             </h2>
-            <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+            <p className="text-brand-muted mb-8 max-w-xl mx-auto">
               Experience Guatemala like never before. Book your flight today.
             </p>
             <Link

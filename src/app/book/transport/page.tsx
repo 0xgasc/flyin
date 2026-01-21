@@ -11,7 +11,20 @@ import { format } from 'date-fns'
 // Helicopter selection moved to admin assignment workflow
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
 import GuatemalaInteractiveMap from '@/components/guatemala-interactive-map'
-import GuatemalaRealMap from '@/components/guatemala-real-map'
+import dynamic from 'next/dynamic'
+
+// Dynamically import MapLibre to avoid SSR issues
+const GuatemalaMapLibre = dynamic(() => import('@/components/guatemala-maplibre'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-96 sm:h-[500px] bg-luxury-black/50 flex items-center justify-center rounded-none">
+      <div className="text-center">
+        <div className="animate-spin h-8 w-8 border-4 border-brand-accent border-t-transparent rounded-full mx-auto mb-2"></div>
+        <p className="text-gray-400 text-sm">Loading map...</p>
+      </div>
+    </div>
+  )
+})
 import DestinationSelectorModal from '@/components/destination-selector-modal'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 
@@ -331,28 +344,28 @@ export default function BookTransportPage() {
                 
                 {/* Map Style Toggle - Only show when in map mode */}
                 {selectionMode === 'map' && (
-                  <div className="flex items-center space-x-2 bg-blue-100 rounded-none p-1">
+                  <div className="flex items-center space-x-2 bg-luxury-slate/30 rounded-none p-1">
                     <button
                       type="button"
                       onClick={() => setMapStyle('custom')}
-                      className={`px-2 py-1 rounded-none text-xs font-medium transition-colors ${
-                        mapStyle === 'custom' 
-                          ? 'bg-white text-blue-600 shadow' 
-                          : 'text-blue-600 hover:text-blue-800'
+                      className={`px-3 py-1.5 rounded-none text-xs font-medium transition-colors ${
+                        mapStyle === 'custom'
+                          ? 'bg-brand-accent text-white shadow'
+                          : 'text-gray-300 hover:text-white'
                       }`}
                     >
-                      FlyIn
+                      Simple
                     </button>
                     <button
                       type="button"
                       onClick={() => setMapStyle('real')}
-                      className={`px-2 py-1 rounded-none text-xs font-medium transition-colors ${
-                        mapStyle === 'real' 
-                          ? 'bg-white text-blue-600 shadow' 
-                          : 'text-blue-600 hover:text-blue-800'
+                      className={`px-3 py-1.5 rounded-none text-xs font-medium transition-colors ${
+                        mapStyle === 'real'
+                          ? 'bg-brand-accent text-white shadow'
+                          : 'text-gray-300 hover:text-white'
                       }`}
                     >
-                      Real Map
+                      Interactive
                     </button>
                   </div>
                 )}
@@ -446,43 +459,43 @@ export default function BookTransportPage() {
               <div className="space-y-6">
                 <div className="text-center text-slate-300 mb-6">
                   <p className="text-sm">
-                    {mapStyle === 'custom' 
+                    {mapStyle === 'custom'
                       ? 'Click on any department in Guatemala to see available destinations'
-                      : 'Click on any marker to select destinations - Real Guatemala geography!'
+                      : 'Click on markers to select your departure and destination'
                     }
                   </p>
                 </div>
-                
+
                 {mapStyle === 'custom' ? (
-                  <GuatemalaInteractiveMap 
+                  <GuatemalaInteractiveMap
                     onDepartmentClick={handleDepartmentClick}
                     selectedFrom={formData.fromLocation}
                     selectedTo={formData.toLocation}
                     mode="both"
                   />
                 ) : (
-                  <GuatemalaRealMap 
+                  <GuatemalaMapLibre
                     onDepartmentClick={handleDepartmentClick}
                     selectedFrom={formData.fromLocation}
                     selectedTo={formData.toLocation}
                     mode="both"
                   />
                 )}
-                
+
                 {/* Selected Locations Display */}
                 {(formData.fromLocation || formData.toLocation) && (
-                  <div className="bg-slate-800/30 border border-slate-600 rounded-none p-4 backdrop-blur-sm">
-                    <h3 className="font-semibold text-slate-200 mb-2">Selected Route:</h3>
+                  <div className="bg-luxury-black/30 border border-luxury-slate/30 rounded-none p-4 backdrop-blur-sm">
+                    <h3 className="font-semibold text-gray-200 mb-2">Selected Route:</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-slate-400">From:</span>
-                        <p className="font-medium text-blue-400">
+                        <span className="text-gray-400">From:</span>
+                        <p className="font-medium text-brand-accent">
                           {formData.fromLocation || 'Not selected'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-slate-400">To:</span>
-                        <p className="font-medium text-blue-400">
+                        <span className="text-gray-400">To:</span>
+                        <p className="font-medium text-amber-400">
                           {formData.toLocation || 'Not selected'}
                         </p>
                       </div>

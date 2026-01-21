@@ -8,34 +8,37 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Dark slate theme inspired by flyinguate.com
+        // Navy blue luxury theme
         primary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
         },
-        // Dark luxury palette
+        // Dark luxury navy palette
         luxury: {
-          gold: '#94a3b8',      // Slate accent (was gold)
+          gold: '#10b981',      // Emerald green accent
           silver: '#e2e8f0',    // Light slate
-          black: '#0a0a0a',     // True black
-          charcoal: '#161616',  // Dark charcoal
-          slate: '#455a64',     // Slate blue accent
+          black: '#0a1628',     // Dark navy
+          charcoal: '#0f1d32',  // Navy charcoal
+          slate: '#1e3a5f',     // Navy blue
+          navy: '#0d2137',      // Deep navy
         },
-        // Brand colors
+        // Brand colors - navy/green
         brand: {
-          dark: '#000000',
-          charcoal: '#161616',
+          dark: '#0a1628',
+          navy: '#0d2137',
+          charcoal: '#0f1d32',
           text: '#f7f7f7',
-          muted: '#919191',
-          accent: '#455a64',
+          muted: '#94a3b8',
+          accent: '#10b981',    // Emerald green
+          green: '#059669',     // Darker emerald
         },
         // Semantic status colors for consistent use across all views
         status: {

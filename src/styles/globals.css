@@ -14,7 +14,7 @@
   }
 
   .btn-luxury {
-    @apply bg-luxury-black text-white px-6 sm:px-8 py-4 rounded-none font-semibold hover:bg-luxury-charcoal transition-all duration-300 shadow-xl hover:shadow-2xl tracking-wider uppercase min-h-[44px] text-base border border-luxury-slate;
+    @apply bg-luxury-black text-brand-accent px-6 sm:px-8 py-4 rounded-none font-semibold hover:bg-luxury-charcoal transition-all duration-300 shadow-xl hover:shadow-2xl tracking-wider uppercase min-h-[44px] text-base border border-brand-accent/30;
   }
 
   .card-luxury {
