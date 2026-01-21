@@ -8,22 +8,34 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Dark slate theme inspired by flyinguate.com
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a',
         },
+        // Dark luxury palette
         luxury: {
-          gold: '#D4AF37',
-          silver: '#C0C0C0',
-          black: '#0A0A0A',
+          gold: '#94a3b8',      // Slate accent (was gold)
+          silver: '#e2e8f0',    // Light slate
+          black: '#0a0a0a',     // True black
+          charcoal: '#161616',  // Dark charcoal
+          slate: '#455a64',     // Slate blue accent
+        },
+        // Brand colors
+        brand: {
+          dark: '#000000',
+          charcoal: '#161616',
+          text: '#f7f7f7',
+          muted: '#919191',
+          accent: '#455a64',
         },
         // Semantic status colors for consistent use across all views
         status: {

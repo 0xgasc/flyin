@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useToast } from '@/lib/toast-store'
-import { Users, Plus, Trash2, ShoppingCart, Plane, DollarSign } from 'lucide-react'
+import { Users, Plus, Trash2, ShoppingCart, DollarSign } from 'lucide-react'
 
 interface PassengerDetails {
   name: string
@@ -292,8 +292,7 @@ function PassengerDetailsContent() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Plane className="h-8 w-8 text-luxury-gold" />
+          <Link href="/" className="hover:opacity-80 transition-opacity">
             <span className="text-2xl font-bold">FlyInGuate</span>
           </Link>
           <div className="text-sm">

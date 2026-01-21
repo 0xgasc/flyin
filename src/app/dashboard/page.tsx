@@ -9,7 +9,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { logout, getAuthHeaders } from '@/lib/auth-client'
 import { useToast } from '@/lib/toast-store'
 import {
-  Plane, Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
+  Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
   User, Mail, Phone, Upload, Save, Wallet, FileText, CheckCircle, Eye, EyeOff
 } from 'lucide-react'
 import { format } from 'date-fns'
@@ -381,8 +381,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Plane className="h-8 w-8 text-luxury-gold" />
+          <Link href="/" className="hover:opacity-80 transition-opacity">
             <span className="text-2xl font-bold">FlyInGuate</span>
           </Link>
           <div className="flex items-center space-x-6">
@@ -469,7 +468,7 @@ export default function DashboardPage() {
               </div>
             ) : bookings.length === 0 ? (
               <div className="card-luxury text-center py-12">
-                <Plane className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">No bookings yet</h3>
                 <p className="text-gray-500">Start your journey by booking a flight or experience</p>
               </div>

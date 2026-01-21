@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Plane, Menu, X, Home, User, Calendar, Settings, LogOut, Globe } from 'lucide-react'
+import { Menu, X, Home, User, Calendar, Settings, LogOut, Globe, Briefcase } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { useI18n } from '@/lib/i18n'
@@ -64,7 +64,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
     {
       href: '/pilot',
       label: 'Pilot Dashboard',
-      icon: <Plane className="h-5 w-5" />,
+      icon: <Briefcase className="h-5 w-5" />,
       show: profile?.role === 'pilot'
     },
     {
@@ -91,8 +91,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
               </button>
             ) : (
               <Link href="/" className="flex items-center space-x-2">
-                <Plane className="h-6 w-6 text-luxury-gold" />
-                <span className="text-lg font-bold hidden sm:block">{title}</span>
+                <span className="text-lg font-bold">{title}</span>
               </Link>
             )}
           </div>

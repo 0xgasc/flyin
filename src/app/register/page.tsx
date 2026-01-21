@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { register } from '@/lib/auth-client'
-import { Plane, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react'
+import { Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react'
 
 // Email validation regex
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -97,8 +97,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 text-luxury-black mb-4">
-            <Plane className="h-10 w-10 text-luxury-gold" />
+          <Link href="/" className="inline-block text-luxury-black mb-4">
             <span className="text-3xl font-bold">FlyInGuate</span>
           </Link>
           <h1 className="text-2xl font-semibold text-gray-900">Create Account</h1>

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { login, getCurrentUser } from '@/lib/auth-client'
-import { Plane, Mail, Lock } from 'lucide-react'
+import { Mail, Lock } from 'lucide-react'
 
 // Validate redirect URL to prevent open redirect attacks
 const getSafeRedirect = (redirect: string | null): string => {
@@ -72,8 +72,7 @@ function LoginContent() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 text-luxury-black mb-4">
-            <Plane className="h-10 w-10 text-luxury-gold" />
+          <Link href="/" className="inline-block text-luxury-black mb-4">
             <span className="text-3xl font-bold">FlyInGuate</span>
           </Link>
           <h1 className="text-2xl font-semibold text-gray-900">Welcome Back</h1>

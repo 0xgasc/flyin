@@ -124,8 +124,7 @@ export function AdminLayout({
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
           {sidebarOpen && (
             <Link href="/" className="flex items-center gap-2">
-              <Plane className="w-6 h-6 text-primary-600" />
-              <span className="font-bold text-gray-900">Admin</span>
+              <span className="font-bold text-gray-900">FlyInGuate Admin</span>
             </Link>
           )}
           <button
@@ -156,8 +155,7 @@ export function AdminLayout({
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-40 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <Plane className="w-6 h-6 text-primary-600" />
-          <span className="font-bold text-gray-900">Admin</span>
+          <span className="font-bold text-gray-900">FlyInGuate Admin</span>
         </Link>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

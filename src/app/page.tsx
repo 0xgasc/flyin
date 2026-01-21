@@ -27,7 +27,7 @@ export default function HomePage() {
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23455a64' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }} />
         </div>
 
@@ -188,10 +188,10 @@ export default function HomePage() {
 
             {/* Experiences Card */}
             <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-luxury-gold to-yellow-500"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-600 to-gray-800"></div>
               <div className="p-8">
-                <div className="bg-yellow-50 w-16 h-16 rounded-none flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-8 w-8 text-luxury-gold" />
+                <div className="bg-gray-100 w-16 h-16 rounded-none flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Sparkles className="h-8 w-8 text-gray-700" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('services.experiences.title')}</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
@@ -199,21 +199,21 @@ export default function HomePage() {
                 </p>
                 <ul className="space-y-2 mb-8 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-luxury-gold rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
                     Lake Atitlan scenic tours
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-luxury-gold rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
                     Tikal archaeological flights
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-luxury-gold rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
                     Volcano discovery expeditions
                   </li>
                 </ul>
                 <Link
                   href="/book/experiences"
-                  className="inline-flex items-center gap-2 text-luxury-gold font-semibold hover:text-yellow-600 transition-colors"
+                  className="inline-flex items-center gap-2 text-gray-700 font-semibold hover:text-gray-900 transition-colors"
                 >
                   Explore Experiences
                   <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>

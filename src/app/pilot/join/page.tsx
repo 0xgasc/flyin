@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { 
-  Plane, DollarSign, Calendar, Shield, Users, Clock, 
-  Star, CheckCircle, ArrowRight, MapPin, BarChart3 
+import {
+  DollarSign, Calendar, Shield, Users, Clock,
+  Star, CheckCircle, ArrowRight, MapPin, BarChart3
 } from 'lucide-react'
 
 export default function PilotJoinPage() {
@@ -12,8 +12,7 @@ export default function PilotJoinPage() {
       {/* Navigation */}
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <Plane className="h-8 w-8 text-luxury-gold" />
+          <Link href="/">
             <span className="text-2xl font-bold">FlyInGuate</span>
           </Link>
           <div className="space-x-6">
