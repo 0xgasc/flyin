@@ -59,10 +59,16 @@ export async function GET(request: NextRequest) {
       updated_at: e.updatedAt
     }))
 
+    // Cache public requests for 5 minutes (admin requests bypass cache)
+    const headers: HeadersInit = {}
+    if (!isAdmin) {
+      headers['Cache-Control'] = 'public, s-maxage=300, stale-while-revalidate=60'
+    }
+
     return NextResponse.json({
       success: true,
       experiences: transformedExperiences
-    })
+    }, { headers })
   } catch (error: any) {
     console.error('Get experiences error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

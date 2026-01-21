@@ -226,8 +226,11 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'admin.view_details': { en: 'View Details', es: 'Ver Detalles' },
     'admin.edit_booking': { en: 'Edit Booking', es: 'Editar Reserva' },
     'admin.mark_completed': { en: 'Mark Completed', es: 'Marcar como Completado' },
-    
-    
+    'admin.no_bookings': { en: 'No bookings found', es: 'No se encontraron reservas' },
+    'admin.experiences': { en: 'Experiences', es: 'Experiencias' },
+    'admin.destinations': { en: 'Destinations', es: 'Destinos' },
+    'admin.aircrafts': { en: 'Aircraft', es: 'Aeronaves' },
+
     // Form fields
     'form.full_name': { en: 'Full Name', es: 'Nombre Completo' },
     'form.email': { en: 'Email', es: 'Correo Electrónico' },

@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
+import { useToast } from '@/lib/toast-store'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import {
   ArrowLeft, MapPin, CheckCircle,
@@ -43,6 +44,7 @@ export default function DestinationDetailPage() {
   const params = useParams()
   const { profile } = useAuthStore()
   const { t, locale } = useTranslation()
+  const toast = useToast()
   
   const [destination, setDestination] = useState<Destination | null>(null)
   const [images, setImages] = useState<DestinationImage[]>([])
@@ -112,7 +114,7 @@ export default function DestinationDetailPage() {
     e.preventDefault()
 
     if (!profile) {
-      alert('Please login to book transport to this destination')
+      toast.warning('Please login to book transport to this destination')
       router.push('/login?redirect=' + encodeURIComponent(`/book/destinations/${params.id}`))
       return
     }
@@ -144,11 +146,11 @@ export default function DestinationDetailPage() {
         throw new Error(data.error || 'Failed to create booking')
       }
 
-      alert(locale === 'es' ? '¡Solicitud enviada! Te contactaremos con una cotización...' : 'Request submitted! We will contact you with a quote...')
+      toast.success(locale === 'es' ? '¡Solicitud enviada! Te contactaremos pronto.' : 'Request submitted! We will contact you soon.')
       router.push('/dashboard')
     } catch (error: any) {
       console.error('Error creating booking:', error)
-      alert('Error creating booking: ' + error.message)
+      toast.error('Error creating booking: ' + error.message)
     }
   }
 

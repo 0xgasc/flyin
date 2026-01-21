@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from '@/components/auth-provider'
+import { ToastContainer } from '@/components/ui/Toast'
 import '../styles/globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  // Removed maximumScale: 1 to allow user zoom (accessibility)
 }
 
 export default function RootLayout({
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           {children}
+          <ToastContainer />
         </AuthProvider>
       </body>
     </html>

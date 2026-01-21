@@ -74,10 +74,16 @@ export async function GET(request: NextRequest) {
       destination_images: includeImages ? (imagesByDestination[d._id.toString()] || []) : undefined
     }))
 
+    // Cache public requests for 5 minutes (admin requests bypass cache)
+    const headers: HeadersInit = {}
+    if (!isAdmin) {
+      headers['Cache-Control'] = 'public, s-maxage=300, stale-while-revalidate=60'
+    }
+
     return NextResponse.json({
       success: true,
       destinations: transformedDestinations
-    })
+    }, { headers })
   } catch (error: any) {
     console.error('Get destinations error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

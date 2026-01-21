@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
+import { useToast } from '@/lib/toast-store'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import {
   ArrowLeft, Clock, Users, MapPin, CheckCircle,
@@ -54,6 +55,7 @@ export default function ExperienceDetailPage() {
   const params = useParams()
   const { profile } = useAuthStore()
   const { t, locale } = useTranslation()
+  const toast = useToast()
   
   const [experience, setExperience] = useState<Experience | null>(null)
   const [images, setImages] = useState<ExperienceImage[]>([])
@@ -130,7 +132,7 @@ export default function ExperienceDetailPage() {
     e.preventDefault()
 
     if (!profile) {
-      alert('Please login to book an experience')
+      toast.warning('Please login to book an experience')
       router.push('/login?redirect=' + encodeURIComponent(`/book/experiences/${params.id}`))
       return
     }
@@ -140,7 +142,7 @@ export default function ExperienceDetailPage() {
     today.setHours(0, 0, 0, 0)
     const selectedDate = new Date(formData.date)
     if (selectedDate < today) {
-      alert(locale === 'es' ? 'La fecha no puede ser en el pasado' : 'Date cannot be in the past')
+      toast.error(locale === 'es' ? 'La fecha no puede ser en el pasado' : 'Date cannot be in the past')
       return
     }
 
@@ -166,11 +168,11 @@ export default function ExperienceDetailPage() {
         throw new Error(data.error || 'Failed to create booking')
       }
 
-      alert(locale === 'es' ? '¡Reserva exitosa! Redirigiendo a su panel...' : 'Booking successful! Redirecting to your dashboard...')
+      toast.success(locale === 'es' ? '¡Reserva exitosa! Redirigiendo...' : 'Booking successful! Redirecting...')
       router.push('/dashboard')
     } catch (error: any) {
       console.error('Error creating booking:', error)
-      alert('Error creating booking: ' + error.message)
+      toast.error('Error creating booking: ' + error.message)
     }
   }
 

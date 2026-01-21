@@ -12,6 +12,8 @@ import {
   Plus, Edit, Trash2, Upload, Image as ImageIcon, Eye, GripVertical
 } from 'lucide-react'
 import IrysUpload from '@/components/IrysUpload'
+import { AdminLayout } from './components/AdminLayout'
+import type { AdminTab } from './types'
 import { HELICOPTER_FLEET } from '@/types/helicopters'
 import { format } from 'date-fns'
 import {
@@ -89,7 +91,7 @@ export default function AdminDashboard() {
   const { t } = useTranslation()
   
   // All state hooks must be declared before any conditional returns
-  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'aircrafts' | 'analytics' | 'experiences' | 'destinations'>('bookings')
+  const [activeTab, setActiveTab] = useState<AdminTab>('bookings')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [pilots, setPilots] = useState<Pilot[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -1558,125 +1560,18 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     )
   }
 
+  // Calculate pending counts for badges
+  const pendingBookingsCount = bookings.filter(b => b.status === 'pending').length
+  const pendingTransactionsCount = transactions.filter(t => t.status === 'pending').length
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-luxury-black text-white p-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Plane className="h-8 w-8 text-luxury-gold" />
-            <span className="text-2xl font-bold">FlyInGuate - Admin</span>
-          </Link>
-          <div className="flex items-center space-x-6">
-            <Link href="/dashboard" className="text-sm hover:text-luxury-gold transition-colors">
-              {profile?.fullName || profile?.email}
-            </Link>
-            <button
-              onClick={async () => {
-                await logout()
-                router.push('/')
-              }}
-              className="text-sm hover:text-luxury-gold"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex space-x-1 mb-8 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('bookings')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'bookings'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('admin.bookings')}
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'calendar'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('admin.flight_calendar')}
-          </button>
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'users'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('admin.users')}
-          </button>
-          <button
-            onClick={() => setActiveTab('pilots')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'pilots'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('admin.pilots')}
-          </button>
-          <button
-            onClick={() => setActiveTab('transactions')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'transactions'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('admin.transactions')}
-          </button>
-          <button
-            onClick={() => setActiveTab('aircrafts')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'aircrafts'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            Aircrafts
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'analytics'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('admin.analytics')}
-          </button>
-          <button
-            onClick={() => setActiveTab('experiences')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'experiences'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            Experiences
-          </button>
-          <button
-            onClick={() => setActiveTab('destinations')}
-            className={`px-6 py-3 rounded-t-lg font-medium whitespace-nowrap ${
-              activeTab === 'destinations'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            Destinations
-          </button>
-        </div>
-
+    <AdminLayout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      pendingBookings={pendingBookingsCount}
+      pendingTransactions={pendingTransactionsCount}
+    >
+      <div className="p-6">
         {activeTab === 'bookings' && (
           <div>
             <div className="flex justify-between items-center mb-6">
@@ -4017,6 +3912,6 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 import { MapPin, Plane } from 'lucide-react'
 
@@ -11,19 +11,51 @@ interface GuatemalaInteractiveMapProps {
   mode?: 'from' | 'to' | 'both'
 }
 
-export default function GuatemalaInteractiveMap({ 
-  onDepartmentClick, 
-  selectedFrom, 
+export default function GuatemalaInteractiveMap({
+  onDepartmentClick,
+  selectedFrom,
   selectedTo,
-  mode = 'both' 
+  mode = 'both'
 }: GuatemalaInteractiveMapProps) {
   const [hoveredDept, setHoveredDept] = useState<string | null>(null)
   const [selectedDept, setSelectedDept] = useState<string | null>(null)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
+  const [previewedDept, setPreviewedDept] = useState<string | null>(null)
+
+  // Detect touch device
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  }, [])
 
   const handleDepartmentClick = (dept: Department) => {
-    setSelectedDept(dept.id)
-    if (onDepartmentClick) {
-      onDepartmentClick(dept)
+    if (isTouchDevice) {
+      // On touch: first tap shows preview, second tap selects
+      if (previewedDept === dept.id) {
+        // Second tap - select
+        setSelectedDept(dept.id)
+        setPreviewedDept(null)
+        if (onDepartmentClick) {
+          onDepartmentClick(dept)
+        }
+      } else {
+        // First tap - show preview
+        setPreviewedDept(dept.id)
+        setHoveredDept(dept.id)
+      }
+    } else {
+      // Desktop: click selects immediately
+      setSelectedDept(dept.id)
+      if (onDepartmentClick) {
+        onDepartmentClick(dept)
+      }
+    }
+  }
+
+  // Handle click outside to close preview on touch
+  const handleMapClick = (e: React.MouseEvent) => {
+    if (isTouchDevice && previewedDept && e.target === e.currentTarget) {
+      setPreviewedDept(null)
+      setHoveredDept(null)
     }
   }
 
@@ -203,20 +235,29 @@ export default function GuatemalaInteractiveMap({
                 {/* Destination Dots */}
                 {destinations.map((destination, idx) => (
                   <g key={idx}>
+                    {/* Invisible larger touch target for accessibility (44px minimum) */}
                     <circle
                       cx={destination.x * 2.8}
                       cy={destination.y * 2.4}
-                      r="6"
-                      fill="rgba(0, 0, 0, 0.9)"
-                      stroke="rgba(255, 255, 255, 0.9)"
-                      strokeWidth="2"
-                      className="cursor-pointer transition-transform duration-150 hover:scale-110"
-                      onMouseEnter={() => setHoveredDept(dept.id)}
-                      onMouseLeave={() => setHoveredDept(null)}
+                      r="22"
+                      fill="transparent"
+                      className="cursor-pointer"
+                      onMouseEnter={() => !isTouchDevice && setHoveredDept(dept.id)}
+                      onMouseLeave={() => !isTouchDevice && setHoveredDept(null)}
                       onClick={() => handleDepartmentClick(dept)}
                       style={{ touchAction: 'manipulation' }}
                     />
-                    
+                    {/* Visible dot */}
+                    <circle
+                      cx={destination.x * 2.8}
+                      cy={destination.y * 2.4}
+                      r={previewedDept === dept.id ? "10" : "8"}
+                      fill={previewedDept === dept.id ? "rgba(59, 130, 246, 0.9)" : "rgba(0, 0, 0, 0.9)"}
+                      stroke="rgba(255, 255, 255, 0.9)"
+                      strokeWidth="2"
+                      className="pointer-events-none transition-all duration-150"
+                    />
+
                     {/* Destination Name */}
                     <text
                       x={destination.x * 2.8}
@@ -309,7 +350,9 @@ export default function GuatemalaInteractiveMap({
               </div>
             )}
             
-            <p className="text-xs text-blue-400 font-medium mt-2">Tap to select destinations</p>
+            <p className="text-xs text-blue-400 font-medium mt-2">
+              {isTouchDevice ? 'Tap again to select this destination' : 'Click to select this destination'}
+            </p>
           </div>
         )}
       </div>
@@ -343,7 +386,11 @@ export default function GuatemalaInteractiveMap({
           </p>
         )}
         {!selectedFrom && !selectedTo && (
-          <p className="text-sm text-slate-400">Tap departments to select your route</p>
+          <p className="text-sm text-slate-400">
+            {isTouchDevice
+              ? 'Tap a location to preview, tap again to select'
+              : 'Click on locations to select your route'}
+          </p>
         )}
       </div>
     </div>

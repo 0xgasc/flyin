@@ -28,27 +28,17 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
   const { locale, setLocale } = useI18n()
   const router = useRouter()
 
-  const handleSignOut = async (e?: React.MouseEvent) => {
-    console.log('handleSignOut called')
-
-    if (e) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-
+  const handleSignOut = async () => {
     // Close menu immediately for better UX
     setIsOpen(false)
 
     try {
-      console.log('Calling logout()')
       await logout()
-      console.log('Successfully signed out')
     } catch (error) {
-      console.error('Sign out error:', error)
+      // Silently handle - we'll redirect anyway
     }
 
     // Always redirect regardless of success/failure
-    console.log('Redirecting to home page')
     window.location.href = '/'
   }
 
@@ -222,50 +212,13 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                     <div className="p-3 text-sm text-gray-400">
                       {profile.fullName || profile.email}
                     </div>
-                    <div 
-                      onTouchStart={(e) => {
-                        console.log('Touch start on sign out')
-                        e.currentTarget.style.backgroundColor = '#dc2626'
-                      }}
-                      onTouchEnd={(e) => {
-                        console.log('Touch end on sign out')
-                        e.currentTarget.style.backgroundColor = ''
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleSignOut()
-                      }}
-                      onClick={(e) => {
-                        console.log('Click on sign out')
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleSignOut()
-                      }}
-                      className="flex items-center space-x-3 p-4 hover:bg-red-600 rounded-lg transition-colors w-full text-left text-red-400 hover:text-white border-2 border-red-500 cursor-pointer select-none"
-                      style={{ 
-                        touchAction: 'manipulation', 
-                        minHeight: '48px',
-                        WebkitTapHighlightColor: 'transparent'
-                      }}
-                    >
-                      <LogOut className="h-5 w-5 pointer-events-none" />
-                      <span className="pointer-events-none">Sign Out</span>
-                    </div>
-                    
-                    {/* Alternative simple button */}
                     <button
-                      onTouchStart={() => {
-                        console.log('Alternative button touch start')
-                        setTimeout(() => {
-                          console.log('Executing sign out after delay')
-                          window.location.href = '/'
-                        }, 100)
-                      }}
-                      className="flex items-center space-x-3 p-4 bg-green-600 hover:bg-green-700 rounded-lg transition-colors w-full text-left text-white mt-2 border-2 border-green-400"
+                      onClick={handleSignOut}
                       type="button"
-                      style={{ minHeight: '48px', touchAction: 'manipulation' }}
+                      className="flex items-center space-x-3 p-4 hover:bg-red-600 rounded-lg transition-colors w-full text-left text-red-400 hover:text-white min-h-[48px]"
                     >
                       <LogOut className="h-5 w-5" />
-                      <span>Quick Sign Out</span>
+                      <span>Sign Out</span>
                     </button>
                   </>
                 )}

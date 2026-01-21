@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
+import { useToast } from '@/lib/toast-store'
 import { Users, Plus, Trash2, ShoppingCart, Plane, DollarSign } from 'lucide-react'
 
 interface PassengerDetails {
@@ -34,6 +35,7 @@ function PassengerDetailsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { profile, user } = useAuthStore()
+  const toast = useToast()
 
   // Get booking ID from URL params
   const bookingId = searchParams.get('booking_id')
@@ -232,7 +234,7 @@ function PassengerDetailsContent() {
       }
 
       // Redirect to payment confirmation
-      alert('Passenger details saved! Proceeding to payment...')
+      toast.success('Passenger details saved! Proceeding to payment...')
       router.push(`/dashboard?highlight=${bookingData.booking_id}`)
 
     } catch (error: any) {
