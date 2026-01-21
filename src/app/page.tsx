@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { MapPin, Sparkles, Users, Shield, Clock, Star, Plane } from 'lucide-react'
+import { MapPin, Sparkles, Users, Shield, Clock, Star } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
@@ -82,13 +82,6 @@ export default function HomePage() {
         {/* Hero Content */}
         <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Logo/Brand accent */}
-            <div className="flex justify-center mb-6">
-              <div className="bg-luxury-gold/20 p-4 rounded-full">
-                <Plane className="h-12 w-12 sm:h-16 sm:w-16 text-luxury-gold" />
-              </div>
-            </div>
-
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
               <span className="text-luxury-gold">FlyIn</span>Guate
             </h1>
@@ -112,9 +105,8 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/book/experiences"
-                className="btn-luxury text-lg px-8 py-4 inline-flex items-center justify-center gap-2"
+                className="btn-luxury text-lg px-8 py-4 inline-flex items-center justify-center"
               >
-                <Sparkles className="h-5 w-5" />
                 {t('services.experiences.cta')}
               </Link>
             </div>
