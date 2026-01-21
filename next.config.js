@@ -14,6 +14,11 @@ const nextConfig = {
         hostname: 'isteam.wsimg.com',
         pathname: '/ip/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
     ],
   },
 }
