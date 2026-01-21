@@ -352,7 +352,22 @@ export default function AdminDashboard() {
       const data = await response.json()
 
       if (data.success && data.transactions) {
-        setTransactions(data.transactions)
+        // Transform camelCase API response to snake_case for frontend
+        const transformed = data.transactions.map((t: any) => ({
+          id: t.id || t._id,
+          created_at: t.createdAt || t.created_at,
+          user_id: t.userId || t.user_id,
+          type: t.type,
+          amount: t.amount,
+          payment_method: t.paymentMethod || t.payment_method || 'unknown',
+          status: t.status,
+          reference: t.reference,
+          payment_proof_url: t.paymentProofUrl || t.payment_proof_url,
+          processed_at: t.processedAt || t.processed_at,
+          admin_notes: t.adminNotes || t.admin_notes,
+          user: t.user,
+        }))
+        setTransactions(transformed)
       } else {
         console.error('Error fetching transactions:', data.error)
         // Demo data with payment proof URLs
@@ -2093,7 +2108,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                           <div>
                             <p><span className="font-medium">Client:</span> {transaction.user?.full_name}</p>
                             <p><span className="font-medium">{t('form.email')}:</span> {transaction.user?.email}</p>
-                            <p><span className="font-medium">Method:</span> {transaction.payment_method.replace('_', ' ').toUpperCase()}</p>
+                            <p><span className="font-medium">Method:</span> {(transaction.payment_method || 'unknown').replace('_', ' ').toUpperCase()}</p>
                           </div>
                           <div>
                             <p><span className="font-medium">Reference:</span> {transaction.reference}</p>
@@ -2403,7 +2418,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             record.status === 'scheduled' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-red-100 text-red-800'
                           }`}>
-                            {record.status.replace('_', ' ')}
+                            {(record.status || 'unknown').replace('_', ' ')}
                           </span>
                         </td>
                         <td className="py-3 px-4">{record.cost ? `$${record.cost}` : 'N/A'}</td>
@@ -2559,7 +2574,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     businessRevenue.slice(0, 10).map((revenue) => (
                       <div key={revenue.id} className="flex items-center justify-between py-2 border-b border-gray-100">
                         <div className="flex-1">
-                          <p className="text-sm font-medium">{revenue.revenue_type.replace('_', ' ').toUpperCase()}</p>
+                          <p className="text-sm font-medium">{(revenue.revenue_type || 'revenue').replace('_', ' ').toUpperCase()}</p>
                           <p className="text-xs text-gray-600">
                             {revenue.booking?.from_location} → {revenue.booking?.to_location}
                           </p>
@@ -2587,7 +2602,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     operationalCosts.slice(0, 10).map((cost) => (
                       <div key={cost.id} className="flex items-center justify-between py-2 border-b border-gray-100">
                         <div className="flex-1">
-                          <p className="text-sm font-medium">{cost.cost_type.replace('_', ' ').toUpperCase()}</p>
+                          <p className="text-sm font-medium">{(cost.cost_type || 'cost').replace('_', ' ').toUpperCase()}</p>
                           <p className="text-xs text-gray-600">By: {cost.pilot?.full_name || 'System'}</p>
                           <p className="text-xs text-gray-500">
                             {new Date(cost.created_at).toLocaleDateString()}
@@ -2974,7 +2989,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <p><span className="font-medium">Amount:</span> ${selectedTransaction.amount}</p>
                 </div>
                 <div>
-                  <p><span className="font-medium">Method:</span> {selectedTransaction.payment_method.replace('_', ' ').toUpperCase()}</p>
+                  <p><span className="font-medium">Method:</span> {(selectedTransaction.payment_method || 'unknown').replace('_', ' ').toUpperCase()}</p>
                   <p><span className="font-medium">Reference:</span> {selectedTransaction.reference}</p>
                   <p><span className="font-medium">Submitted:</span> {new Date(selectedTransaction.created_at).toLocaleString()}</p>
                 </div>

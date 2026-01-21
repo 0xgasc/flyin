@@ -180,7 +180,7 @@ function TransactionCard({
             <div className="space-y-1">
               <p><span className="font-medium">Client:</span> {transaction.user?.full_name}</p>
               <p><span className="font-medium">{t('form.email')}:</span> {transaction.user?.email}</p>
-              <p><span className="font-medium">Method:</span> {transaction.payment_method.replace('_', ' ').toUpperCase()}</p>
+              <p><span className="font-medium">Method:</span> {(transaction.payment_method || 'unknown').replace('_', ' ').toUpperCase()}</p>
             </div>
             <div className="space-y-1">
               <p><span className="font-medium">Reference:</span> {transaction.reference}</p>
