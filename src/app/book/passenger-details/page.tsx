@@ -277,7 +277,7 @@ function PassengerDetailsContent() {
   if (!bookingData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
+        <div className="bg-red-50 border border-red-200 rounded-none p-6 max-w-md text-center">
           <p className="text-red-800 font-medium mb-2">Unable to load booking</p>
           <p className="text-red-700 text-sm mb-4">{error || 'Booking not found'}</p>
           <Link href="/book/transport" className="btn-primary inline-block">
@@ -312,7 +312,7 @@ function PassengerDetailsContent() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-none">
               {error}
             </div>
           )}
@@ -326,7 +326,7 @@ function PassengerDetailsContent() {
 
             <div className="space-y-6">
               {passengers.map((passenger, index) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4">
+                <div key={index} className="bg-gray-50 rounded-none p-4">
                   <h3 className="font-medium text-gray-900 mb-4">
                     Passenger {index + 1} {index === 0 && '(Primary)'}
                   </h3>
@@ -340,7 +340,7 @@ function PassengerDetailsContent() {
                         type="text"
                         value={passenger.name}
                         onChange={(e) => updatePassenger(index, 'name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                         required
                         placeholder="Enter full name"
                       />
@@ -354,7 +354,7 @@ function PassengerDetailsContent() {
                         type="number"
                         value={passenger.age}
                         onChange={(e) => updatePassenger(index, 'age', parseInt(e.target.value) || 0)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                         required
                         min="1"
                         max="120"
@@ -369,7 +369,7 @@ function PassengerDetailsContent() {
                         type="text"
                         value={passenger.passport}
                         onChange={(e) => updatePassenger(index, 'passport', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Passport or ID number"
                       />
                     </div>
@@ -382,7 +382,7 @@ function PassengerDetailsContent() {
                         type="text"
                         value={passenger.emergency_contact}
                         onChange={(e) => updatePassenger(index, 'emergency_contact', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Name and phone number"
                       />
                     </div>
@@ -395,7 +395,7 @@ function PassengerDetailsContent() {
                         type="text"
                         value={passenger.dietary_restrictions}
                         onChange={(e) => updatePassenger(index, 'dietary_restrictions', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Allergies, vegetarian, etc."
                       />
                     </div>
@@ -408,7 +408,7 @@ function PassengerDetailsContent() {
                         type="text"
                         value={passenger.special_requests}
                         onChange={(e) => updatePassenger(index, 'special_requests', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Mobility assistance, etc."
                       />
                     </div>
@@ -434,7 +434,7 @@ function PassengerDetailsContent() {
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     {addons.map((addon) => (
-                      <div key={addon.id} className="bg-gray-50 rounded-lg p-4 flex justify-between items-start">
+                      <div key={addon.id} className="bg-gray-50 rounded-none p-4 flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-medium text-gray-900">{addon.name}</h4>
@@ -515,7 +515,7 @@ function PassengerDetailsContent() {
               type="button"
               onClick={() => router.back()}
               disabled={submitting}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50 disabled:opacity-50"
             >
               Back
             </button>

@@ -77,7 +77,7 @@ export function AdminLayout({
                     setMobileMenuOpen(false)
                   }}
                   className={`
-                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-none text-sm font-medium
                     transition-colors duration-150
                     ${isActive
                       ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
@@ -130,7 +130,7 @@ export function AdminLayout({
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-none"
           >
             {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
           </button>
@@ -143,7 +143,7 @@ export function AdminLayout({
           <button
             onClick={handleSignOut}
             className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+              w-full flex items-center gap-3 px-3 py-2.5 rounded-none text-sm font-medium
               text-red-600 hover:bg-red-50 transition-colors
             `}
           >
@@ -161,7 +161,7 @@ export function AdminLayout({
         </Link>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+          className="p-2 text-gray-600 hover:bg-gray-100 rounded-none"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -178,7 +178,7 @@ export function AdminLayout({
             <div className="p-4 border-t border-gray-200">
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-none text-sm font-medium text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Sign Out</span>

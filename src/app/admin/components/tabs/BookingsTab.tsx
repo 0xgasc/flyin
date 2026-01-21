@@ -49,7 +49,7 @@ export function BookingsTab({
         <select
           value={statusFilter}
           onChange={(e) => onFilterChange(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         >
           <option value="all">{t('admin.filter_by_status')} - {t('status.all')}</option>
           <option value="pending">{t('status.pending')}</option>
@@ -65,7 +65,7 @@ export function BookingsTab({
           <LoadingSpinner size="lg" />
         </div>
       ) : bookings.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
+        <div className="text-center py-12 bg-gray-50 rounded-none">
           <p className="text-gray-500">{t('admin.no_bookings')}</p>
         </div>
       ) : (

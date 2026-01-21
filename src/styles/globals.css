@@ -10,15 +10,15 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 text-white px-6 py-3 sm:py-3 py-4 rounded-lg font-medium hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl min-h-[44px] text-base;
+    @apply bg-primary-600 text-white px-6 py-3 sm:py-3 py-4 rounded-none font-medium hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl min-h-[44px] text-base;
   }
 
   .btn-luxury {
-    @apply bg-luxury-black text-luxury-gold px-6 sm:px-8 py-4 rounded-lg font-semibold hover:bg-gray-900 transition-all duration-300 shadow-xl hover:shadow-2xl tracking-wider uppercase min-h-[44px] text-base;
+    @apply bg-luxury-black text-luxury-gold px-6 sm:px-8 py-4 rounded-none font-semibold hover:bg-gray-900 transition-all duration-300 shadow-xl hover:shadow-2xl tracking-wider uppercase min-h-[44px] text-base;
   }
 
   .card-luxury {
-    @apply bg-white rounded-xl shadow-xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300;
+    @apply bg-white rounded-none shadow-xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300;
   }
 
   /* Mobile-optimized form inputs */
@@ -27,7 +27,7 @@
     @apply min-h-[44px] text-base;
   }
 
-  /* Consistent loading spinner */
+  /* Consistent loading spinner - keep rounded-full for circular animation */
   .loading-spinner {
     @apply w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin;
   }
@@ -43,14 +43,14 @@
     @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4;
   }
   .modal-content {
-    @apply bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto;
+    @apply bg-white rounded-none shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto;
   }
   .modal-content-lg {
-    @apply bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto;
+    @apply bg-white rounded-none shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto;
   }
 
-  /* Status badge classes - use with Tailwind's arbitrary value syntax for colors */
+  /* Status badge classes */
   .status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium;
   }
 }

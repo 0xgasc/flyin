@@ -152,10 +152,10 @@ export default function HomePage() {
 
           <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
             {/* Transport Card */}
-            <div className="group relative bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-primary-600"></div>
               <div className="p-8">
-                <div className="bg-primary-50 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="bg-primary-50 w-16 h-16 rounded-none flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <MapPin className="h-8 w-8 text-primary-600" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('services.transport.title')}</h3>
@@ -187,10 +187,10 @@ export default function HomePage() {
             </div>
 
             {/* Experiences Card */}
-            <div className="group relative bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-luxury-gold to-yellow-500"></div>
               <div className="p-8">
-                <div className="bg-yellow-50 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="bg-yellow-50 w-16 h-16 rounded-none flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Sparkles className="h-8 w-8 text-luxury-gold" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('services.experiences.title')}</h3>

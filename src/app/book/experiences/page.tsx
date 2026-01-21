@@ -289,7 +289,7 @@ export default function BookExperiencesPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredExperiences.map((experience) => (
                 <div key={experience.id} className="card-luxury hover:scale-105 transition-transform">
-                  <div className="aspect-video bg-gray-200 rounded-lg mb-4 relative overflow-hidden">
+                  <div className="aspect-video bg-gray-200 rounded-none mb-4 relative overflow-hidden">
                     {(() => {
                       // Get primary image from experience_images or destination_images
                       const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images

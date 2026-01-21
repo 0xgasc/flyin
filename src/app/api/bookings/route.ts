@@ -4,6 +4,21 @@ import Booking from '@/models/Booking'
 import { extractToken, verifyToken } from '@/lib/jwt'
 import mongoose from 'mongoose'
 
+// Valid enum values for query parameter validation (prevents NoSQL injection)
+const VALID_STATUSES = ['pending', 'approved', 'assigned', 'accepted', 'completed', 'cancelled'] as const
+const VALID_BOOKING_TYPES = ['transport', 'experience'] as const
+
+type BookingStatus = typeof VALID_STATUSES[number]
+type BookingType = typeof VALID_BOOKING_TYPES[number]
+
+function isValidStatus(value: string): value is BookingStatus {
+  return VALID_STATUSES.includes(value as BookingStatus)
+}
+
+function isValidBookingType(value: string): value is BookingType {
+  return VALID_BOOKING_TYPES.includes(value as BookingType)
+}
+
 // GET - List bookings for current user (or all for admin)
 export async function GET(request: NextRequest) {
   try {
@@ -20,13 +35,14 @@ export async function GET(request: NextRequest) {
     await connectDB()
 
     const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
-    const bookingType = searchParams.get('type')
-    const limit = parseInt(searchParams.get('limit') || '50')
-    const offset = parseInt(searchParams.get('offset') || '0')
+    const rawStatus = searchParams.get('status')
+    const rawBookingType = searchParams.get('type')
+    // Sanitize limit and offset to prevent abuse
+    const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '50', 10) || 50, 1), 100)
+    const offset = Math.max(parseInt(searchParams.get('offset') || '0', 10) || 0, 0)
 
-    // Build query
-    const query: any = {}
+    // Build query with type safety
+    const query: Record<string, unknown> = {}
 
     // Non-admins can only see their own bookings
     if (payload.role !== 'admin') {
@@ -40,8 +56,13 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    if (status) query.status = status
-    if (bookingType) query.bookingType = bookingType
+    // Only add to query if valid enum value (prevents NoSQL injection)
+    if (rawStatus && isValidStatus(rawStatus)) {
+      query.status = rawStatus
+    }
+    if (rawBookingType && isValidBookingType(rawBookingType)) {
+      query.bookingType = rawBookingType
+    }
 
     const [bookings, total] = await Promise.all([
       Booking.find(query)

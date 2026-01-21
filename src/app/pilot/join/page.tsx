@@ -93,7 +93,7 @@ export default function PilotJoinPage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-8 mt-12 max-w-2xl mx-auto">
+          <div className="bg-gray-50 rounded-none p-8 mt-12 max-w-2xl mx-auto">
             <h3 className="text-xl font-bold mb-4 text-center">Real Pilot Earnings</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
@@ -275,7 +275,7 @@ export default function PilotJoinPage() {
             <Link href="/register" className="inline-block btn-luxury text-lg px-8 py-4 mr-4">
               Apply Now
             </Link>
-            <Link href="/pilot" className="inline-block bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-primary-900 transition-all">
+            <Link href="/pilot" className="inline-block bg-transparent border-2 border-white text-white px-8 py-4 rounded-none hover:bg-white hover:text-primary-900 transition-all">
               View Pilot Portal
             </Link>
           </div>

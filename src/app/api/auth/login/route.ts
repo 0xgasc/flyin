@@ -66,10 +66,10 @@ export async function POST(request: NextRequest) {
     })
 
     return response
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to login' },
+      { error: 'An error occurred during login. Please try again.' },
       { status: 500 }
     )
   }

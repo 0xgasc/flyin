@@ -84,7 +84,7 @@ export default function GuatemalaRealMap({
 
   return (
     <div className="relative w-full">
-      <div className="rounded-xl overflow-hidden shadow-2xl">
+      <div className="rounded-none overflow-hidden shadow-2xl">
         {/* Real Guatemala Map Container */}
         <div 
           className="relative w-full h-96 sm:h-[500px] border-4 border-green-500"
@@ -121,7 +121,7 @@ export default function GuatemalaRealMap({
           
           
           {/* Top branding overlay */}
-          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg z-10">
+          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-none px-3 py-2 shadow-lg z-10">
             <h3 className="font-bold text-blue-800 text-sm">FlyIn Guatemala</h3>
             <p className="text-xs text-blue-600">Real Map View ✓</p>
             <p className="text-xs text-green-600">Guatemala Geography</p>
@@ -187,7 +187,7 @@ export default function GuatemalaRealMap({
 
           {/* Hover Info Box - Fixed position to avoid clipping */}
           {hoveredDestination && (
-            <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-xl p-3 max-w-xs z-20 pointer-events-none">
+            <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-none shadow-xl p-3 max-w-xs z-20 pointer-events-none">
               <h3 className="font-bold text-blue-800 text-sm">{hoveredDestination}</h3>
               <p className="text-xs text-gray-600">Click to select as destination</p>
               {(selectedFrom === hoveredDestination || selectedTo === hoveredDestination) && (
@@ -200,31 +200,31 @@ export default function GuatemalaRealMap({
       
       {/* Legend */}
       <div className="mt-6 flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-none">
           <div className="w-4 h-4 bg-red-600 rounded-full shadow-lg flex items-center justify-center">
             <div className="w-2 h-2 bg-white rounded-full"></div>
           </div>
           <span className="text-slate-200">Guatemala City Hub</span>
         </div>
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-none">
           <div className="w-4 h-4 bg-blue-600 rounded-full shadow-lg flex items-center justify-center">
             <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
           </div>
           <span className="text-slate-200">Tourist Destinations</span>
         </div>
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-none">
           <div className="w-4 h-4 bg-yellow-500 rounded-full shadow-lg flex items-center justify-center">
             <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
           </div>
           <span className="text-slate-200">Selected</span>
         </div>
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-none">
           <span className="text-slate-300">🗺️ Real Guatemala Geography</span>
         </div>
       </div>
       
       {/* Selection Status */}
-      <div className="mt-6 text-center bg-slate-800/30 rounded-xl p-4 backdrop-blur-sm">
+      <div className="mt-6 text-center bg-slate-800/30 rounded-none p-4 backdrop-blur-sm">
         {selectedFrom && (
           <p className="text-sm text-slate-300 mb-1">
             From: <span className="font-semibold text-yellow-400">{selectedFrom}</span>

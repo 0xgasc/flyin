@@ -153,13 +153,13 @@ export default function GuatemalaInteractiveMap({
     <div className="relative w-full">
       {/* Map Container with REAL Guatemala map background */}
       <div 
-        className="relative rounded-xl p-6 shadow-2xl"
+        className="relative rounded-none p-6 shadow-2xl"
         style={{
           backgroundColor: '#2563eb'
         }}
       >
         {/* Overlay for better contrast */}
-        <div className="absolute inset-0 bg-blue-600/70 rounded-xl"></div>
+        <div className="absolute inset-0 bg-blue-600/70 rounded-none"></div>
         
         {/* SVG Overlay for Interactive Elements */}
         <div className="relative z-10">
@@ -308,7 +308,7 @@ export default function GuatemalaInteractiveMap({
         
         {/* Hover Info Box - Positioned outside map area to prevent interference */}
         {hoveredDept && (
-          <div className="absolute -top-2 -right-2 bg-slate-800/95 backdrop-blur-sm border border-slate-600 rounded-xl shadow-2xl p-3 md:p-4 max-w-xs z-20 pointer-events-none">
+          <div className="absolute -top-2 -right-2 bg-slate-800/95 backdrop-blur-sm border border-slate-600 rounded-none shadow-2xl p-3 md:p-4 max-w-xs z-20 pointer-events-none">
             <h3 className="font-semibold text-base md:text-lg mb-2 text-slate-100">{getDepartmentInfo(hoveredDept)?.name}</h3>
             
             {getDepartmentInfo(hoveredDept)?.airports.length! > 0 && (
@@ -359,22 +359,22 @@ export default function GuatemalaInteractiveMap({
       
       {/* Legend */}
       <div className="mt-6 flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-none">
           <div className="w-3 h-3 md:w-4 md:h-4 bg-blue-500 rounded-full shadow-lg"></div>
           <span className="text-slate-200">International</span>
         </div>
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-none">
           <div className="w-3 h-3 md:w-4 md:h-4 bg-green-500 rounded-full shadow-lg"></div>
           <span className="text-slate-200">Regional</span>
         </div>
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-2 rounded-none">
           <div className="w-3 h-3 md:w-4 md:h-4 bg-slate-400 rounded-full shadow-lg"></div>
           <span className="text-slate-200">Helipad</span>
         </div>
       </div>
       
       {/* Selection Status */}
-      <div className="mt-6 text-center bg-slate-800/30 rounded-xl p-4 backdrop-blur-sm">
+      <div className="mt-6 text-center bg-slate-800/30 rounded-none p-4 backdrop-blur-sm">
         {selectedFrom && (
           <p className="text-sm text-slate-300 mb-1">
             From: <span className="font-semibold text-blue-400">{selectedFrom}</span>

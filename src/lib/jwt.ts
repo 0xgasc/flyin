@@ -1,7 +1,18 @@
 import jwt from 'jsonwebtoken'
 import { IUser } from '@/models/User'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    throw new Error(
+      'CRITICAL: JWT_SECRET environment variable is not set. ' +
+      'Authentication will not work without it.'
+    )
+  }
+  return secret
+}
+
+const JWT_SECRET = getJwtSecret()
 const JWT_EXPIRES_IN = '7d'
 
 export interface JWTPayload {

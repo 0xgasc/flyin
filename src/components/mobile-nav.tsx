@@ -84,7 +84,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
             {showBackButton ? (
               <button
                 onClick={() => router.back()}
-                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-800 rounded-none transition-colors"
                 aria-label="Go back"
               >
                 <X className="h-6 w-6" />
@@ -135,7 +135,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
             {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              className="md:hidden p-2 hover:bg-gray-800 rounded-none transition-colors"
               aria-label="Toggle menu"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -153,7 +153,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                   setLocale(locale === 'en' ? 'es' : 'en')
                   setIsOpen(false)
                 }}
-                className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-lg transition-colors w-full text-left"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-none transition-colors w-full text-left"
               >
                 <Globe className="h-5 w-5" />
                 <span>Language: {locale === 'en' ? 'English' : 'Español'}</span>
@@ -167,7 +167,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-lg transition-colors"
+                  className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-none transition-colors"
                 >
                   {item.icon}
                   <span>{item.label}</span>
@@ -180,7 +180,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-lg transition-colors"
+                  className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-none transition-colors"
                 >
                   {item.icon}
                   <span>{item.label}</span>
@@ -193,7 +193,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                     <Link
                       href="/login"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-lg transition-colors"
+                      className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-none transition-colors"
                     >
                       <User className="h-5 w-5" />
                       <span>Sign In</span>
@@ -201,7 +201,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                     <Link
                       href="/register"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-3 p-3 hover:bg-primary-600 rounded-lg transition-colors"
+                      className="flex items-center space-x-3 p-3 hover:bg-primary-600 rounded-none transition-colors"
                     >
                       <User className="h-5 w-5" />
                       <span>Register</span>
@@ -215,7 +215,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                     <button
                       onClick={handleSignOut}
                       type="button"
-                      className="flex items-center space-x-3 p-4 hover:bg-red-600 rounded-lg transition-colors w-full text-left text-red-400 hover:text-white min-h-[48px]"
+                      className="flex items-center space-x-3 p-4 hover:bg-red-600 rounded-none transition-colors w-full text-left text-red-400 hover:text-white min-h-[48px]"
                     >
                       <LogOut className="h-5 w-5" />
                       <span>Sign Out</span>

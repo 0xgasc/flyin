@@ -237,7 +237,7 @@ export default function DestinationDetailPage() {
           <div className="space-y-4">
             {images.length > 0 ? (
               <div className="relative">
-                <div className="relative w-full bg-gray-200 rounded-lg overflow-hidden">
+                <div className="relative w-full bg-gray-200 rounded-none overflow-hidden">
                   <img
                     src={images[currentImageIndex]?.image_url}
                     alt={images[currentImageIndex]?.caption || destination.name}
@@ -263,7 +263,7 @@ export default function DestinationDetailPage() {
                 )}
               </div>
             ) : (
-              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded-none flex items-center justify-center">
                 <Camera className="w-12 h-12 text-gray-400" />
               </div>
             )}
@@ -275,7 +275,7 @@ export default function DestinationDetailPage() {
                   <button
                     key={image.id}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-14 sm:h-16 rounded-lg overflow-hidden border-2 ${
+                    className={`flex-shrink-0 w-20 h-14 sm:h-16 rounded-none overflow-hidden border-2 ${
                       index === currentImageIndex ? 'border-primary-600' : 'border-gray-300'
                     }`}
                   >
@@ -314,7 +314,7 @@ export default function DestinationDetailPage() {
             <p className="text-gray-700 leading-relaxed">{destination.description}</p>
 
             {/* Key Details */}
-            <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="p-4 bg-white rounded-none shadow-sm">
               <div className="text-center">
                 <DollarSign className="w-6 h-6 text-primary-600 mx-auto mb-1" />
                 <div className="text-lg font-medium text-gray-900">Custom Quote</div>
@@ -403,7 +403,7 @@ export default function DestinationDetailPage() {
             {destination.coordinates && (
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">Location</h3>
-                <div className="p-3 bg-white rounded-lg shadow-sm">
+                <div className="p-3 bg-white rounded-none shadow-sm">
                   <div className="text-sm text-gray-600">
                     Coordinates: {destination.coordinates.lat.toFixed(6)}, {destination.coordinates.lng.toFixed(6)}
                   </div>
@@ -414,7 +414,7 @@ export default function DestinationDetailPage() {
             {/* Request Transport Button */}
             <button
               onClick={() => setShowBookingModal(true)}
-              className="w-full bg-primary-600 text-white py-4 px-6 rounded-lg hover:bg-primary-700 transition-colors font-medium text-lg"
+              className="w-full bg-primary-600 text-white py-4 px-6 rounded-none hover:bg-primary-700 transition-colors font-medium text-lg"
             >
               Request Transport to {destination.name}
             </button>
@@ -425,7 +425,7 @@ export default function DestinationDetailPage() {
       {/* Booking Modal */}
       {showBookingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-screen overflow-y-auto">
+          <div className="bg-white rounded-none p-6 max-w-md w-full max-h-screen overflow-y-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Request Transport</h2>
             <p className="text-gray-600 mb-4">Transport to {destination.name}</p>
             
@@ -438,7 +438,7 @@ export default function DestinationDetailPage() {
                   type="text"
                   value={formData.fromLocation}
                   onChange={(e) => setFormData({...formData, fromLocation: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="e.g., Guatemala City, Hotel name, address..."
                   required
                 />
@@ -452,7 +452,7 @@ export default function DestinationDetailPage() {
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -465,7 +465,7 @@ export default function DestinationDetailPage() {
                   type="time"
                   value={formData.time}
                   onChange={(e) => setFormData({...formData, time: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -493,7 +493,7 @@ export default function DestinationDetailPage() {
                       type="date"
                       value={formData.returnDate}
                       onChange={(e) => setFormData({...formData, returnDate: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       required={formData.isRoundTrip}
                     />
                   </div>
@@ -506,7 +506,7 @@ export default function DestinationDetailPage() {
                       type="time"
                       value={formData.returnTime}
                       onChange={(e) => setFormData({...formData, returnTime: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       required={formData.isRoundTrip}
                     />
                   </div>
@@ -520,7 +520,7 @@ export default function DestinationDetailPage() {
                 <select
                   value={formData.passengers}
                   onChange={(e) => setFormData({...formData, passengers: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   {Array.from({length: 8}, (_, i) => i + 1).map((num) => (
                     <option key={num} value={num}>
@@ -538,7 +538,7 @@ export default function DestinationDetailPage() {
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Any special requirements, luggage details, etc..."
                 />
               </div>
@@ -547,13 +547,13 @@ export default function DestinationDetailPage() {
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-none hover:bg-primary-700"
                 >
                   Submit Request
                 </button>

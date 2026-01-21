@@ -311,7 +311,7 @@ export default function EditDestinationPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-none shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-6">Destination Details</h2>
             
             <form onSubmit={handleSave} className="space-y-6">
@@ -323,7 +323,7 @@ export default function EditDestinationPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -336,7 +336,7 @@ export default function EditDestinationPage() {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -348,7 +348,7 @@ export default function EditDestinationPage() {
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -367,7 +367,7 @@ export default function EditDestinationPage() {
                         ...prev,
                         coordinates: { ...prev.coordinates, lat: parseFloat(e.target.value) }
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -380,7 +380,7 @@ export default function EditDestinationPage() {
                         ...prev,
                         coordinates: { ...prev.coordinates, lng: parseFloat(e.target.value) }
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -394,7 +394,7 @@ export default function EditDestinationPage() {
                 <div className="space-y-2">
                   {formData.features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{feature}</span>
+                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-none">{feature}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('features', index)}
@@ -410,7 +410,7 @@ export default function EditDestinationPage() {
                       value={newFeature}
                       onChange={(e) => setNewFeature(e.target.value)}
                       placeholder="Add feature..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
@@ -418,7 +418,7 @@ export default function EditDestinationPage() {
                         addToArray('features', newFeature)
                         setNewFeature('')
                       }}
-                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      className="px-3 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -434,7 +434,7 @@ export default function EditDestinationPage() {
                 <div className="space-y-2">
                   {formData.highlights.map((highlight, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{highlight}</span>
+                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-none">{highlight}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('highlights', index)}
@@ -450,7 +450,7 @@ export default function EditDestinationPage() {
                       value={newHighlight}
                       onChange={(e) => setNewHighlight(e.target.value)}
                       placeholder="Add highlight..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
@@ -458,7 +458,7 @@ export default function EditDestinationPage() {
                         addToArray('highlights', newHighlight)
                         setNewHighlight('')
                       }}
-                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      className="px-3 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -474,7 +474,7 @@ export default function EditDestinationPage() {
                 <div className="space-y-2">
                   {formData.requirements.map((requirement, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{requirement}</span>
+                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-none">{requirement}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('requirements', index)}
@@ -490,7 +490,7 @@ export default function EditDestinationPage() {
                       value={newRequirement}
                       onChange={(e) => setNewRequirement(e.target.value)}
                       placeholder="Add requirement..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
@@ -498,7 +498,7 @@ export default function EditDestinationPage() {
                         addToArray('requirements', newRequirement)
                         setNewRequirement('')
                       }}
-                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      className="px-3 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -517,7 +517,7 @@ export default function EditDestinationPage() {
                   value={formData.meeting_point}
                   onChange={(e) => setFormData(prev => ({ ...prev, meeting_point: e.target.value }))}
                   placeholder="e.g., Hotel lobby, Airport terminal, etc."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -532,7 +532,7 @@ export default function EditDestinationPage() {
                   value={formData.best_time}
                   onChange={(e) => setFormData(prev => ({ ...prev, best_time: e.target.value }))}
                   placeholder="e.g., Early morning for clear views"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -545,7 +545,7 @@ export default function EditDestinationPage() {
                   id="difficulty_level"
                   value={formData.difficulty_level}
                   onChange={(e) => setFormData(prev => ({ ...prev, difficulty_level: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select difficulty...</option>
                   <option value="easy">Easy</option>
@@ -572,7 +572,7 @@ export default function EditDestinationPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-none hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -581,12 +581,12 @@ export default function EditDestinationPage() {
           </div>
 
           {/* Images Section */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-none shadow-sm p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">Destination Images</h2>
               <button
                 onClick={() => setShowImageUpload(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center space-x-2"
+                className="bg-blue-600 text-white px-4 py-2 rounded-none hover:bg-blue-700 flex items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Image</span>
@@ -602,12 +602,12 @@ export default function EditDestinationPage() {
                 </div>
               ) : (
                 images.map((image) => (
-                  <div key={image.id} className="border rounded-lg p-4">
+                  <div key={image.id} className="border rounded-none p-4">
                     <div className="flex items-start space-x-4">
                       <img
                         src={image.image_url}
                         alt={image.caption || 'Destination image'}
-                        className="w-24 h-24 object-cover rounded-lg"
+                        className="w-24 h-24 object-cover rounded-none"
                       />
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">

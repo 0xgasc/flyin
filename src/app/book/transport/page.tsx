@@ -288,7 +288,7 @@ export default function BookTransportPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-none">
               {error}
             </div>
           )}
@@ -302,11 +302,11 @@ export default function BookTransportPage() {
               
               {/* Selection Mode Toggle */}
               <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+                <div className="flex items-center space-x-2 bg-gray-100 rounded-none p-1">
                   <button
                     type="button"
                     onClick={() => setSelectionMode('dropdown')}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${
                       selectionMode === 'dropdown' 
                         ? 'bg-white text-primary-600 shadow' 
                         : 'text-gray-600 hover:text-gray-800'
@@ -318,7 +318,7 @@ export default function BookTransportPage() {
                   <button
                     type="button"
                     onClick={() => setSelectionMode('map')}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${
                       selectionMode === 'map' 
                         ? 'bg-white text-primary-600 shadow' 
                         : 'text-gray-600 hover:text-gray-800'
@@ -331,11 +331,11 @@ export default function BookTransportPage() {
                 
                 {/* Map Style Toggle - Only show when in map mode */}
                 {selectionMode === 'map' && (
-                  <div className="flex items-center space-x-2 bg-blue-100 rounded-lg p-1">
+                  <div className="flex items-center space-x-2 bg-blue-100 rounded-none p-1">
                     <button
                       type="button"
                       onClick={() => setMapStyle('custom')}
-                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                      className={`px-2 py-1 rounded-none text-xs font-medium transition-colors ${
                         mapStyle === 'custom' 
                           ? 'bg-white text-blue-600 shadow' 
                           : 'text-blue-600 hover:text-blue-800'
@@ -346,7 +346,7 @@ export default function BookTransportPage() {
                     <button
                       type="button"
                       onClick={() => setMapStyle('real')}
-                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                      className={`px-2 py-1 rounded-none text-xs font-medium transition-colors ${
                         mapStyle === 'real' 
                           ? 'bg-white text-blue-600 shadow' 
                           : 'text-blue-600 hover:text-blue-800'
@@ -368,7 +368,7 @@ export default function BookTransportPage() {
                 <select
                   value={formData.fromLocation}
                   onChange={(e) => setFormData({ ...formData, fromLocation: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                   required
                 >
                   <option value="">Select departure</option>
@@ -394,7 +394,7 @@ export default function BookTransportPage() {
                     type="text"
                     value={formData.fromCustom}
                     onChange={(e) => setFormData({ ...formData, fromCustom: e.target.value })}
-                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter departure location"
                     required
                   />
@@ -408,7 +408,7 @@ export default function BookTransportPage() {
                 <select
                   value={formData.toLocation}
                   onChange={(e) => setFormData({ ...formData, toLocation: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                   required
                 >
                   <option value="">Select destination</option>
@@ -434,7 +434,7 @@ export default function BookTransportPage() {
                     type="text"
                     value={formData.toCustom}
                     onChange={(e) => setFormData({ ...formData, toCustom: e.target.value })}
-                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter destination"
                     required
                   />
@@ -471,7 +471,7 @@ export default function BookTransportPage() {
                 
                 {/* Selected Locations Display */}
                 {(formData.fromLocation || formData.toLocation) && (
-                  <div className="bg-slate-800/30 border border-slate-600 rounded-xl p-4 backdrop-blur-sm">
+                  <div className="bg-slate-800/30 border border-slate-600 rounded-none p-4 backdrop-blur-sm">
                     <h3 className="font-semibold text-slate-200 mb-2">Selected Route:</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
@@ -501,7 +501,7 @@ export default function BookTransportPage() {
             </h2>
 
             {/* Trip Type Toggle */}
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 rounded-none p-4">
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium text-gray-700">{t('booking.form.trip_type')}</span>
                 <label className="flex items-center">
@@ -542,7 +542,7 @@ export default function BookTransportPage() {
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     min={format(new Date(), 'yyyy-MM-dd')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -555,7 +555,7 @@ export default function BookTransportPage() {
                     type="time"
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -576,7 +576,7 @@ export default function BookTransportPage() {
                       value={formData.returnDate}
                       onChange={(e) => setFormData({ ...formData, returnDate: e.target.value })}
                       min={formData.date || format(new Date(), 'yyyy-MM-dd')}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                       required
                     />
                     
@@ -613,7 +613,7 @@ export default function BookTransportPage() {
                       type="time"
                       value={formData.returnTime}
                       onChange={(e) => setFormData({ ...formData, returnTime: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                       required
                     />
                   </div>
@@ -621,7 +621,7 @@ export default function BookTransportPage() {
 
                 {/* Same Day Return Notice */}
                 {formData.date && formData.returnDate && formData.date === formData.returnDate && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded-none p-3 mt-3">
                     <p className="text-sm text-blue-800">
                       💡 <strong>Same Day Return:</strong> 10% discount applied! Great for quick business trips or day tours.
                     </p>
@@ -644,7 +644,7 @@ export default function BookTransportPage() {
               <select
                 value={formData.passengers}
                 onChange={(e) => setFormData({ ...formData, passengers: parseInt(e.target.value) })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
               >
                 {[1, 2, 3, 4, 5, 6].map((num) => (
                   <option key={num} value={num}>
@@ -662,7 +662,7 @@ export default function BookTransportPage() {
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                 placeholder={t('booking.form.special_requirements')}
               />
             </div>
@@ -730,7 +730,7 @@ export default function BookTransportPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-full sm:flex-1 px-6 py-4 sm:py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium text-base"
+              className="w-full sm:flex-1 px-6 py-4 sm:py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50 font-medium text-base"
             >
               Cancel
             </button>

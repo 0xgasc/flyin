@@ -131,14 +131,14 @@ export default function ExperiencesPage() {
             <div className="flex gap-3">
               <Link
                 href="/admin/experiences/new"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 <span>New Experience</span>
               </Link>
               <Link
                 href="/admin/experiences/import"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-colors"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2 transition-colors"
               >
                 <Upload className="w-5 h-5" />
                 <span>Bulk Import</span>
@@ -148,7 +148,7 @@ export default function ExperiencesPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-none shadow-sm p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -158,7 +158,7 @@ export default function ExperiencesPage() {
                   placeholder="Search experiences..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function ExperiencesPage() {
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {categories.map(cat => (
                   <option key={cat} value={cat}>
@@ -180,7 +180,7 @@ export default function ExperiencesPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-none shadow-sm p-6">
             <div className="flex items-center">
               <div className="bg-blue-100 p-3 rounded-full">
                 <MapPin className="w-6 h-6 text-blue-600" />
@@ -191,7 +191,7 @@ export default function ExperiencesPage() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-none shadow-sm p-6">
             <div className="flex items-center">
               <div className="bg-green-100 p-3 rounded-full">
                 <Eye className="w-6 h-6 text-green-600" />
@@ -204,7 +204,7 @@ export default function ExperiencesPage() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-none shadow-sm p-6">
             <div className="flex items-center">
               <div className="bg-yellow-100 p-3 rounded-full">
                 <DollarSign className="w-6 h-6 text-yellow-600" />
@@ -219,7 +219,7 @@ export default function ExperiencesPage() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-none shadow-sm p-6">
             <div className="flex items-center">
               <div className="bg-purple-100 p-3 rounded-full">
                 <Users className="w-6 h-6 text-purple-600" />
@@ -235,7 +235,7 @@ export default function ExperiencesPage() {
         </div>
 
         {/* Experiences Table */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-none shadow-sm overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

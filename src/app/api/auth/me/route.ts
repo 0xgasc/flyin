@@ -45,10 +45,10 @@ export async function GET(request: NextRequest) {
         kycVerified: user.kycVerified
       }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Auth check error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to get user' },
+      { error: 'An error occurred. Please try again.' },
       { status: 500 }
     )
   }

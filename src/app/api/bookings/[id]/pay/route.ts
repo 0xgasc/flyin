@@ -41,19 +41,29 @@ export async function POST(
     const amount = booking.totalPrice
 
     if (paymentMethod === 'account_balance') {
-      // Get user and check balance
-      const user = await User.findById(authUser.userId)
-      if (!user) {
-        return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 })
-      }
+      // Atomic operation: deduct balance only if sufficient funds exist
+      // This prevents race conditions where concurrent requests could overdraw
+      const updatedUser = await User.findOneAndUpdate(
+        {
+          _id: authUser.userId,
+          accountBalance: { $gte: amount }  // Only update if balance >= amount
+        },
+        {
+          $inc: { accountBalance: -amount }
+        },
+        {
+          new: true  // Return updated document
+        }
+      )
 
-      if ((user.accountBalance || 0) < amount) {
+      if (!updatedUser) {
+        // Either user not found or insufficient balance
+        const user = await User.findById(authUser.userId)
+        if (!user) {
+          return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 })
+        }
         return NextResponse.json({ success: false, error: 'Insufficient balance' }, { status: 400 })
       }
-
-      // Deduct from balance
-      user.accountBalance = (user.accountBalance || 0) - amount
-      await user.save()
 
       // Update booking payment status
       booking.paymentStatus = 'paid'
@@ -73,7 +83,7 @@ export async function POST(
       return NextResponse.json({
         success: true,
         message: 'Payment successful',
-        newBalance: user.accountBalance
+        newBalance: updatedUser.accountBalance
       })
     } else if (paymentMethod === 'bank_transfer') {
       // For bank transfer, set status to processing and create pending transaction
@@ -100,8 +110,11 @@ export async function POST(
         { status: 400 }
       )
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Payment error:', error)
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: 'An error occurred processing payment. Please try again.' },
+      { status: 500 }
+    )
   }
 }

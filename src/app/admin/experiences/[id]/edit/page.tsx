@@ -415,7 +415,7 @@ export default function EditExperiencePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
+          <div className="bg-white rounded-none shadow-lg border border-slate-200 p-8">
             <h2 className="text-2xl font-bold mb-6 text-navy-900" style={{ color: '#1e3a8a' }}>Experience Details</h2>
             
             <form onSubmit={handleSave} className="space-y-6">
@@ -427,7 +427,7 @@ export default function EditExperiencePage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -440,7 +440,7 @@ export default function EditExperiencePage() {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -453,7 +453,7 @@ export default function EditExperiencePage() {
                     type="text"
                     value={formData.location}
                     onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -467,7 +467,7 @@ export default function EditExperiencePage() {
                     min="0.5"
                     value={formData.duration_hours}
                     onChange={(e) => setFormData(prev => ({ ...prev, duration_hours: parseFloat(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -482,13 +482,13 @@ export default function EditExperiencePage() {
                     max="59"
                     value={formData.duration_minutes || 0}
                     onChange={(e) => setFormData(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               {/* Pricing Matrix */}
-              <div className="border-2 border-navy-200 rounded-lg p-6" style={{ borderColor: '#bfdbfe' }}>
+              <div className="border-2 border-navy-200 rounded-none p-6" style={{ borderColor: '#bfdbfe' }}>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold text-navy-900" style={{ color: '#1e3a8a' }}>
                     Pricing Tiers
@@ -496,7 +496,7 @@ export default function EditExperiencePage() {
                   <button
                     type="button"
                     onClick={addPricingTier}
-                    className="flex items-center space-x-2 px-4 py-2 bg-navy-600 text-white rounded-lg hover:bg-navy-700 transition-colors shadow-sm"
+                    className="flex items-center space-x-2 px-4 py-2 bg-navy-600 text-white rounded-none hover:bg-navy-700 transition-colors shadow-sm"
                     style={{ backgroundColor: '#1e40af' }}
                   >
                     <Plus className="w-4 h-4" />
@@ -505,7 +505,7 @@ export default function EditExperiencePage() {
                 </div>
 
                 {/* Base Price (always visible) */}
-                <div className="mb-4 p-4 bg-navy-50 rounded-lg" style={{ backgroundColor: '#eff6ff' }}>
+                <div className="mb-4 p-4 bg-navy-50 rounded-none" style={{ backgroundColor: '#eff6ff' }}>
                   <label className="block text-sm font-semibold text-navy-900 mb-2" style={{ color: '#1e3a8a' }}>
                     Base Price (Default)
                   </label>
@@ -517,7 +517,7 @@ export default function EditExperiencePage() {
                         min="1"
                         value={formData.min_passengers || 1}
                         onChange={(e) => setFormData(prev => ({ ...prev, min_passengers: parseInt(e.target.value) }))}
-                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                         style={{ borderColor: '#93c5fd' }}
                       />
                     </div>
@@ -528,7 +528,7 @@ export default function EditExperiencePage() {
                         min="1"
                         value={formData.max_passengers}
                         onChange={(e) => setFormData(prev => ({ ...prev, max_passengers: parseInt(e.target.value) }))}
-                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                         style={{ borderColor: '#93c5fd' }}
                       />
                     </div>
@@ -539,7 +539,7 @@ export default function EditExperiencePage() {
                         min="0"
                         value={formData.base_price}
                         onChange={(e) => setFormData(prev => ({ ...prev, base_price: parseFloat(e.target.value) }))}
-                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 font-semibold"
+                        className="w-full px-3 py-2 border-2 border-navy-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500 font-semibold"
                         style={{ borderColor: '#93c5fd' }}
                       />
                     </div>
@@ -551,7 +551,7 @@ export default function EditExperiencePage() {
                   <div className="space-y-3">
                     <p className="text-sm font-medium text-gray-600">Additional Price Brackets:</p>
                     {formData.pricing_tiers.map((tier) => (
-                      <div key={tier.id} className="p-4 bg-white border-2 border-slate-200 rounded-lg">
+                      <div key={tier.id} className="p-4 bg-white border-2 border-slate-200 rounded-none">
                         <div className="grid grid-cols-3 gap-4">
                           <div>
                             <label className="block text-xs text-gray-600 mb-1">Min Pass.</label>
@@ -560,7 +560,7 @@ export default function EditExperiencePage() {
                               min="1"
                               value={tier.min_passengers}
                               onChange={(e) => updatePricingTier(tier.id, 'min_passengers', parseInt(e.target.value))}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                             />
                           </div>
                           <div>
@@ -570,7 +570,7 @@ export default function EditExperiencePage() {
                               min="1"
                               value={tier.max_passengers}
                               onChange={(e) => updatePricingTier(tier.id, 'max_passengers', parseInt(e.target.value))}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                             />
                           </div>
                           <div className="flex items-end space-x-2">
@@ -581,13 +581,13 @@ export default function EditExperiencePage() {
                                 min="0"
                                 value={tier.price}
                                 onChange={(e) => updatePricingTier(tier.id, 'price', parseFloat(e.target.value))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                               />
                             </div>
                             <button
                               type="button"
                               onClick={() => removePricingTier(tier.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-none transition-colors"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -607,11 +607,11 @@ export default function EditExperiencePage() {
                 <div className="space-y-2">
                   {formData.includes.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded-lg border border-blue-200">{item}</span>
+                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded-none border border-blue-200">{item}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('includes', index)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-none transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -625,7 +625,7 @@ export default function EditExperiencePage() {
                         onChange={(e) => setNewInclude(e.target.value)}
                         onFocus={() => setShowIncludesDropdown(true)}
                         placeholder="Type or select from presets..."
-                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                         style={{ borderColor: '#93c5fd' }}
                       />
                       <button
@@ -637,14 +637,14 @@ export default function EditExperiencePage() {
                             setShowIncludesDropdown(false)
                           }
                         }}
-                        className="px-5 py-3 bg-navy-600 text-white rounded-lg hover:bg-navy-700 transition-colors shadow-sm"
+                        className="px-5 py-3 bg-navy-600 text-white rounded-none hover:bg-navy-700 transition-colors shadow-sm"
                         style={{ backgroundColor: '#1e40af' }}
                       >
                         <Plus className="w-5 h-5" />
                       </button>
                     </div>
                     {showIncludesDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-none shadow-lg max-h-60 overflow-y-auto">
                         {INCLUDES_PRESETS.filter(preset =>
                           !formData.includes.includes(preset) &&
                           preset.toLowerCase().includes(newInclude.toLowerCase())
@@ -676,11 +676,11 @@ export default function EditExperiencePage() {
                 <div className="space-y-2">
                   {formData.highlights.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded-lg border border-blue-200">{item}</span>
+                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded-none border border-blue-200">{item}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('highlights', index)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-none transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -694,7 +694,7 @@ export default function EditExperiencePage() {
                         onChange={(e) => setNewHighlight(e.target.value)}
                         onFocus={() => setShowHighlightsDropdown(true)}
                         placeholder="Type or select from presets..."
-                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500"
+                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                         style={{ borderColor: '#93c5fd' }}
                       />
                       <button
@@ -706,14 +706,14 @@ export default function EditExperiencePage() {
                             setShowHighlightsDropdown(false)
                           }
                         }}
-                        className="px-5 py-3 bg-navy-600 text-white rounded-lg hover:bg-navy-700 transition-colors shadow-sm"
+                        className="px-5 py-3 bg-navy-600 text-white rounded-none hover:bg-navy-700 transition-colors shadow-sm"
                         style={{ backgroundColor: '#1e40af' }}
                       >
                         <Plus className="w-5 h-5" />
                       </button>
                     </div>
                     {showHighlightsDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-none shadow-lg max-h-60 overflow-y-auto">
                         {HIGHLIGHTS_PRESETS.filter(preset =>
                           !formData.highlights.includes(preset) &&
                           preset.toLowerCase().includes(newHighlight.toLowerCase())
@@ -745,7 +745,7 @@ export default function EditExperiencePage() {
                 <div className="space-y-2">
                   {formData.requirements.map((requirement, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-md">{requirement}</span>
+                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded-none">{requirement}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('requirements', index)}
@@ -761,7 +761,7 @@ export default function EditExperiencePage() {
                       value={newRequirement}
                       onChange={(e) => setNewRequirement(e.target.value)}
                       placeholder="Add requirement..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
@@ -769,7 +769,7 @@ export default function EditExperiencePage() {
                         addToArray('requirements', newRequirement)
                         setNewRequirement('')
                       }}
-                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      className="px-3 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -790,11 +790,11 @@ export default function EditExperiencePage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, meeting_point: e.target.value }))}
                     onFocus={() => setShowMeetingPointDropdown(true)}
                     placeholder="Type or select from presets..."
-                    className="w-full px-4 py-3 border-2 border-navy-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500"
+                    className="w-full px-4 py-3 border-2 border-navy-300 rounded-none focus:outline-none focus:ring-2 focus:ring-navy-500"
                     style={{ borderColor: '#93c5fd' }}
                   />
                   {showMeetingPointDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded-none shadow-lg max-h-60 overflow-y-auto">
                       {MEETING_POINT_PRESETS.filter(preset =>
                         preset.toLowerCase().includes(formData.meeting_point.toLowerCase())
                       ).map((preset, idx) => (
@@ -815,7 +815,7 @@ export default function EditExperiencePage() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded-lg">
+              <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded-none">
                 <input
                   type="checkbox"
                   id="is_active"
@@ -832,7 +832,7 @@ export default function EditExperiencePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-navy-600 text-white py-4 px-6 rounded-lg hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-500 disabled:opacity-50 font-semibold text-lg shadow-lg transition-all"
+                  className="flex-1 bg-navy-600 text-white py-4 px-6 rounded-none hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-500 disabled:opacity-50 font-semibold text-lg shadow-lg transition-all"
                   style={{ backgroundColor: '#1e40af' }}
                 >
                   {saving ? 'Saving Changes...' : '💾 Save Experience'}
@@ -842,12 +842,12 @@ export default function EditExperiencePage() {
           </div>
 
           {/* Images Section */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
+          <div className="bg-white rounded-none shadow-lg border border-slate-200 p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-navy-900" style={{ color: '#1e3a8a' }}>Experience Gallery</h2>
               <button
                 onClick={() => setShowImageUpload(true)}
-                className="bg-navy-600 text-white px-5 py-3 rounded-lg hover:bg-navy-700 flex items-center space-x-2 shadow-sm transition-colors"
+                className="bg-navy-600 text-white px-5 py-3 rounded-none hover:bg-navy-700 flex items-center space-x-2 shadow-sm transition-colors"
                 style={{ backgroundColor: '#1e40af' }}
               >
                 <Plus className="w-5 h-5" />
@@ -864,12 +864,12 @@ export default function EditExperiencePage() {
                 </div>
               ) : (
                 images.map((image) => (
-                  <div key={image.id} className="border rounded-lg p-4">
+                  <div key={image.id} className="border rounded-none p-4">
                     <div className="flex items-start space-x-4">
                       <img
                         src={image.image_url}
                         alt={image.caption || 'Experience image'}
-                        className="w-24 h-24 object-cover rounded-lg"
+                        className="w-24 h-24 object-cover rounded-none"
                       />
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">

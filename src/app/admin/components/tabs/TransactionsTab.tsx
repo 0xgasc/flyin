@@ -199,7 +199,7 @@ function TransactionCard({
 
           {/* Payment Proof */}
           {transaction.payment_proof_url && (
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="bg-gray-50 rounded-none p-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">Payment Proof Submitted:</span>
                 <button
@@ -232,20 +232,20 @@ function TransactionCard({
             <>
               <button
                 onClick={() => onApprove(transaction.id)}
-                className="w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors min-h-[44px]"
+                className="w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded-none hover:bg-green-700 transition-colors min-h-[44px]"
               >
                 ✅ {t('admin.approve_fund_account')}
               </button>
               <button
                 onClick={() => onReject(transaction.id)}
-                className="w-full px-4 py-3 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors min-h-[44px]"
+                className="w-full px-4 py-3 bg-red-600 text-white text-sm font-medium rounded-none hover:bg-red-700 transition-colors min-h-[44px]"
               >
                 ❌ {t('admin.reject_request')}
               </button>
               {transaction.payment_proof_url && (
                 <button
                   onClick={() => onViewProof(transaction)}
-                  className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                  className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-none hover:bg-blue-700 transition-colors"
                 >
                   🔍 Review Proof
                 </button>
@@ -254,14 +254,14 @@ function TransactionCard({
           )}
 
           {transaction.status === 'approved' && (
-            <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+            <div className="text-center p-3 bg-green-50 rounded-none border border-green-200">
               <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-1" />
               <p className="text-xs text-green-800 font-medium">Funds Added</p>
             </div>
           )}
 
           {transaction.status === 'rejected' && (
-            <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
+            <div className="text-center p-3 bg-red-50 rounded-none border border-red-200">
               <XCircle className="h-6 w-6 text-red-600 mx-auto mb-1" />
               <p className="text-xs text-red-800 font-medium">Request Denied</p>
             </div>

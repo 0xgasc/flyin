@@ -22,7 +22,12 @@ interface JWTPayload {
 
 async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret')
+    const jwtSecret = process.env.JWT_SECRET
+    if (!jwtSecret) {
+      console.error('CRITICAL: JWT_SECRET environment variable is not set')
+      return null
+    }
+    const secret = new TextEncoder().encode(jwtSecret)
     const { payload } = await jwtVerify(token, secret)
     return payload as unknown as JWTPayload
   } catch {
