@@ -1,252 +1,407 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Users, Shield, Clock, Star } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Users, Shield, Clock, Star, MapPin, Calendar, ChevronDown } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
-import { useRouter } from 'next/navigation'
-import { PhotoGallery } from '@/components/PhotoGallery'
+import dynamic from 'next/dynamic'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
+
+// Dynamically import MapLibre to avoid SSR issues
+const GuatemalaMapLibre = dynamic(() => import('@/components/guatemala-maplibre'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-luxury-black/50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin h-8 w-8 border-4 border-brand-accent border-t-transparent rounded-full mx-auto mb-2"></div>
+        <p className="text-gray-400 text-sm">Loading map...</p>
+      </div>
+    </div>
+  )
+})
+
+const DESTINATIONS = [
+  { value: '', label: 'Select destination' },
+  { value: 'GUA', label: 'Guatemala City (GUA)' },
+  { value: 'ANTIGUA', label: 'Antigua Guatemala' },
+  { value: 'ATITLAN', label: 'Lake Atitlan' },
+  { value: 'TIKAL', label: 'Tikal' },
+  { value: 'FRS', label: 'Flores (FRS)' },
+  { value: 'SEMUC', label: 'Semuc Champey' },
+  { value: 'MONTERRICO', label: 'Monterrico Beach' },
+]
 
 export default function HomePage() {
   const { t } = useTranslation()
   const { profile } = useAuthStore()
   const router = useRouter()
 
+  const [bookingForm, setBookingForm] = useState({
+    from: '',
+    to: '',
+    date: '',
+    passengers: '2'
+  })
+
   const handleSignOut = async () => {
     await logout()
     router.push('/')
   }
 
+  const handleQuickBook = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Navigate to transport page with pre-filled data
+    const params = new URLSearchParams()
+    if (bookingForm.from) params.set('from', bookingForm.from)
+    if (bookingForm.to) params.set('to', bookingForm.to)
+    if (bookingForm.date) params.set('date', bookingForm.date)
+    if (bookingForm.passengers) params.set('passengers', bookingForm.passengers)
+    router.push(`/book/transport?${params.toString()}`)
+  }
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section with Dark Background */}
-      <div className="relative bg-luxury-black text-white overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
+    <div className="min-h-screen bg-luxury-black">
+      {/* Hero Section - Full viewport height with background */}
+      <div className="relative min-h-screen flex flex-col">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1540962351504-03099e0a754b?q=80&w=2000&auto=format&fit=crop')`,
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
         </div>
 
-        <MobileNav
-          customActions={
-            <div className="hidden md:flex items-center space-x-6">
-              <LanguageSwitcher />
-              {!profile && (
-                <Link href="/pilot/join" className="hover:text-luxury-gold transition-colors text-sm">
-                  {t('nav.pilot_opportunities')}
-                </Link>
-              )}
-              {profile ? (
-                <>
-                  <span className="text-sm text-gray-300">
-                    {profile.fullName || profile.email}
-                  </span>
-                  {profile.role === 'admin' && (
-                    <Link href="/admin" className="hover:text-luxury-gold transition-colors text-sm">
-                      Admin Panel
+        {/* Navigation */}
+        <div className="relative z-10">
+          <MobileNav
+            customActions={
+              <div className="hidden md:flex items-center space-x-6">
+                <LanguageSwitcher />
+                {!profile && (
+                  <Link href="/pilot/join" className="hover:text-luxury-gold transition-colors text-sm">
+                    {t('nav.pilot_opportunities')}
+                  </Link>
+                )}
+                {profile ? (
+                  <>
+                    <Link href="/dashboard" className="hover:text-luxury-gold transition-colors text-sm">
+                      Dashboard
                     </Link>
-                  )}
-                  <button
-                    onClick={handleSignOut}
-                    className="hover:text-luxury-gold transition-colors text-sm"
-                  >
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" className="hover:text-luxury-gold transition-colors text-sm">
-                    {t('nav.login')}
-                  </Link>
-                  <Link href="/register" className="btn-luxury text-sm">
-                    {t('nav.register')}
-                  </Link>
-                </>
-              )}
-            </div>
-          }
-          additionalMobileItems={[
-            {
-              href: '/pilot/join',
-              label: t('nav.pilot_opportunities'),
-              icon: <Users className="h-5 w-5" />,
-              show: !profile
+                    {profile.role === 'admin' && (
+                      <Link href="/admin" className="hover:text-luxury-gold transition-colors text-sm">
+                        Admin
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleSignOut}
+                      className="hover:text-luxury-gold transition-colors text-sm"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" className="hover:text-luxury-gold transition-colors text-sm">
+                      {t('nav.login')}
+                    </Link>
+                    <Link href="/register" className="btn-luxury text-sm px-4 py-2">
+                      {t('nav.register')}
+                    </Link>
+                  </>
+                )}
+              </div>
             }
-          ]}
-        />
+            additionalMobileItems={[
+              {
+                href: '/pilot/join',
+                label: t('nav.pilot_opportunities'),
+                icon: <Users className="h-5 w-5" />,
+                show: !profile
+              }
+            ]}
+          />
+        </div>
 
-        {/* Hero Content */}
-        <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-32">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex justify-center mb-6">
-              <Image
-                src={LOGO_URL}
-                alt="FlyInGuate"
-                width={274}
-                height={96}
-                className="h-20 sm:h-24 md:h-28 w-auto"
-                priority
-              />
-            </div>
+        {/* Hero Content - Centered */}
+        <div className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6">
+          <div className="text-center max-w-4xl mx-auto">
+            <Image
+              src={LOGO_URL}
+              alt="FlyInGuate"
+              width={350}
+              height={122}
+              className="h-24 sm:h-32 md:h-40 w-auto mx-auto mb-8"
+              priority
+            />
 
-            <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-4 font-light">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-4 tracking-wide">
               {t('hero.title')}
-            </p>
+            </h1>
 
-            <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+            <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto mb-12">
               {t('hero.subtitle')}
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/book/transport"
-                className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center"
-              >
-                {t('services.transport.cta')}
-              </Link>
-              <Link
-                href="/book/experiences"
-                className="btn-luxury text-lg px-8 py-4 inline-flex items-center justify-center"
-              >
-                {t('services.experiences.cta')}
-              </Link>
+            {/* Trust Indicators */}
+            <div className="flex flex-wrap justify-center gap-8 text-gray-400">
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-brand-accent" />
+                <span className="text-sm">Licensed & Insured</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-brand-accent" />
+                <span className="text-sm">24/7 Service</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-brand-accent" />
+                <span className="text-sm">Premium Fleet</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Trust Indicators */}
-        <div className="relative border-t border-luxury-slate/30">
-          <div className="container mx-auto px-4 sm:px-6 py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div>
-                <Shield className="h-8 w-8 text-brand-accent mx-auto mb-2" />
-                <p className="text-sm text-gray-400">Licensed & Insured</p>
-              </div>
-              <div>
-                <Clock className="h-8 w-8 text-brand-accent mx-auto mb-2" />
-                <p className="text-sm text-gray-400">24/7 Availability</p>
-              </div>
-              <div>
-                <Star className="h-8 w-8 text-brand-accent mx-auto mb-2" />
-                <p className="text-sm text-gray-400">Premium Service</p>
-              </div>
-              <div>
-                <Users className="h-8 w-8 text-brand-accent mx-auto mb-2" />
-                <p className="text-sm text-gray-400">Expert Pilots</p>
-              </div>
+        {/* Scroll Indicator */}
+        <div className="relative z-10 pb-8 text-center">
+          <div className="animate-bounce">
+            <ChevronDown className="h-8 w-8 text-white/50 mx-auto" />
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Section with Map */}
+      <div className="bg-luxury-charcoal">
+        <div className="container mx-auto px-4 sm:px-6 py-16 lg:py-24">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Book Your Flight
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Select your route on the map or use the form below to get started
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
+            {/* Booking Form */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded p-6 sm:p-8">
+              <form onSubmit={handleQuickBook} className="space-y-6">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <MapPin className="h-4 w-4 inline mr-1" />
+                      From
+                    </label>
+                    <select
+                      value={bookingForm.from}
+                      onChange={(e) => setBookingForm({ ...bookingForm, from: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                    >
+                      {DESTINATIONS.map(d => (
+                        <option key={d.value} value={d.value} className="bg-luxury-black text-white">
+                          {d.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <MapPin className="h-4 w-4 inline mr-1" />
+                      To
+                    </label>
+                    <select
+                      value={bookingForm.to}
+                      onChange={(e) => setBookingForm({ ...bookingForm, to: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                    >
+                      {DESTINATIONS.map(d => (
+                        <option key={d.value} value={d.value} className="bg-luxury-black text-white">
+                          {d.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <Calendar className="h-4 w-4 inline mr-1" />
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      value={bookingForm.date}
+                      onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <Users className="h-4 w-4 inline mr-1" />
+                      Passengers
+                    </label>
+                    <select
+                      value={bookingForm.passengers}
+                      onChange={(e) => setBookingForm({ ...bookingForm, passengers: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                    >
+                      {[1, 2, 3, 4, 5, 6].map(n => (
+                        <option key={n} value={n} className="bg-luxury-black text-white">
+                          {n} {n === 1 ? 'Passenger' : 'Passengers'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full btn-luxury py-4 text-lg"
+                >
+                  Get Quote
+                </button>
+
+                <p className="text-center text-gray-500 text-sm">
+                  Or browse our <Link href="/book/experiences" className="text-brand-accent hover:underline">scenic experiences</Link>
+                </p>
+              </form>
+            </div>
+
+            {/* Map */}
+            <div className="h-[400px] lg:h-[500px] rounded overflow-hidden border border-white/10">
+              <GuatemalaMapLibre
+                onDepartmentClick={(dept) => {
+                  // Select first destination from department
+                  if (dept.destinations.length > 0) {
+                    const dest = dept.destinations[0]
+                    if (!bookingForm.from) {
+                      setBookingForm({ ...bookingForm, from: dest })
+                    } else if (!bookingForm.to) {
+                      setBookingForm({ ...bookingForm, to: dest })
+                    }
+                  }
+                }}
+                selectedFrom={bookingForm.from}
+                selectedTo={bookingForm.to}
+                mode="both"
+              />
             </div>
           </div>
         </div>
       </div>
 
       {/* Services Section */}
-      <main className="bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24">
+      <div className="bg-white py-16 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-luxury-black mb-4">
               Our Services
             </h2>
-            <p className="text-brand-muted max-w-2xl mx-auto">
-              Choose your adventure - from point-to-point transport to unforgettable experiences
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              From executive transport to unforgettable aerial experiences
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
-            {/* Transport Card */}
-            <div className="group relative bg-white rounded shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-luxury-slate to-luxury-navy"></div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-luxury-black mb-3">{t('services.transport.title')}</h3>
-                <p className="text-brand-muted mb-6 leading-relaxed">
-                  {t('services.transport.description')}
-                </p>
-                <ul className="space-y-2 mb-8 text-sm text-brand-muted">
-                  <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
-                    Guatemala City to any destination
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
-                    Inter-city transfers available
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
-                    Up to 5 passengers per flight
-                  </li>
-                </ul>
-                <Link
-                  href="/book/transport"
-                  className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:text-brand-green transition-colors"
-                >
-                  Book Transport
-                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                </Link>
-              </div>
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Transport */}
+            <div className="group bg-gray-50 rounded p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
+              <h3 className="text-2xl font-bold text-luxury-black mb-4">
+                {t('services.transport.title')}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {t('services.transport.description')}
+              </p>
+              <ul className="space-y-3 mb-8 text-gray-600">
+                <li className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  Guatemala City to any destination
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  Inter-city business transfers
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  Up to 5 passengers per flight
+                </li>
+              </ul>
+              <Link
+                href="/book/transport"
+                className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:gap-3 transition-all"
+              >
+                Book Transport <span>&rarr;</span>
+              </Link>
             </div>
 
-            {/* Experiences Card */}
-            <div className="group relative bg-white rounded shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-accent to-brand-green"></div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-luxury-black mb-3">{t('services.experiences.title')}</h3>
-                <p className="text-brand-muted mb-6 leading-relaxed">
-                  {t('services.experiences.description')}
-                </p>
-                <ul className="space-y-2 mb-8 text-sm text-brand-muted">
-                  <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
-                    Lake Atitlan scenic tours
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
-                    Tikal archaeological flights
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-brand-accent rounded-full"></span>
-                    Volcano discovery expeditions
-                  </li>
-                </ul>
-                <Link
-                  href="/book/experiences"
-                  className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:text-brand-green transition-colors"
-                >
-                  Explore Experiences
-                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                </Link>
-              </div>
+            {/* Experiences */}
+            <div className="group bg-gray-50 rounded p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
+              <h3 className="text-2xl font-bold text-luxury-black mb-4">
+                {t('services.experiences.title')}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {t('services.experiences.description')}
+              </p>
+              <ul className="space-y-3 mb-8 text-gray-600">
+                <li className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  Lake Atitlan scenic tours
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  Tikal archaeological flights
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  Volcano discovery expeditions
+                </li>
+              </ul>
+              <Link
+                href="/book/experiences"
+                className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:gap-3 transition-all"
+              >
+                Explore Experiences <span>&rarr;</span>
+              </Link>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Photo Gallery */}
-        <PhotoGallery />
-
-        {/* Footer CTA */}
-        <div className="bg-luxury-black text-white py-16">
-          <div className="container mx-auto px-4 sm:px-6 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Ready for <span className="text-brand-accent">takeoff</span>?
-            </h2>
-            <p className="text-brand-muted mb-8 max-w-xl mx-auto">
-              Experience Guatemala like never before. Book your flight today.
-            </p>
+      {/* Footer CTA */}
+      <div className="bg-luxury-black text-white py-16">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Ready for <span className="text-brand-accent">takeoff</span>?
+          </h2>
+          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+            Experience Guatemala from above. Book your flight today.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/book/transport"
-              className="btn-luxury text-lg px-10 py-4 inline-block"
+              className="btn-luxury text-lg px-10 py-4"
             >
               Book Now
             </Link>
+            <Link
+              href="/book/experiences"
+              className="border border-white/30 text-white px-10 py-4 rounded hover:bg-white/10 transition-colors text-lg"
+            >
+              View Experiences
+            </Link>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
