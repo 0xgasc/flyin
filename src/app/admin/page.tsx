@@ -612,6 +612,35 @@ export default function AdminDashboard() {
     }
   }
 
+  const deleteBooking = async (bookingId: string) => {
+    setRefreshing(true)
+    try {
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        console.error('Delete error:', data.error)
+        alert('Error deleting booking: ' + (data.error || 'Unknown error'))
+        setRefreshing(false)
+        return
+      }
+
+      // Remove from local state immediately
+      setBookings(prev => prev.filter(booking => booking.id !== bookingId))
+      alert('Booking deleted successfully!')
+
+    } catch (err) {
+      console.error('Error deleting booking:', err)
+      alert('Error deleting booking: ' + err)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   const updateTransactionStatus = async (transactionId: string, status: 'approved' | 'rejected', notes?: string) => {
     console.log('Updating transaction:', { transactionId, status, notes })
 
@@ -1706,6 +1735,50 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             {t('admin.assign_pilot_aircraft')}
                           </button>
                         )}
+
+                        {booking.status === 'assigned' && (
+                          <button
+                            onClick={() => updateBookingStatus(booking.id, 'completed')}
+                            className="block w-full px-3 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700"
+                          >
+                            ✓ Mark Completed
+                          </button>
+                        )}
+
+                        {/* Admin Controls - Always visible */}
+                        <div className="border-t border-gray-200 pt-2 mt-2 space-y-2">
+                          <p className="text-xs text-gray-500 font-medium">Admin Actions:</p>
+
+                          {/* Edit Button */}
+                          <button
+                            onClick={() => openEditBookingModal(booking)}
+                            className="block w-full px-3 py-2 bg-gray-600 text-white text-sm font-medium rounded hover:bg-gray-700"
+                          >
+                            ✏️ Edit Booking
+                          </button>
+
+                          {/* Cancel Button - for non-cancelled/completed bookings */}
+                          {booking.status !== 'cancelled' && booking.status !== 'completed' && booking.status !== 'pending' && (
+                            <button
+                              onClick={() => updateBookingStatus(booking.id, 'cancelled')}
+                              className="block w-full px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700"
+                            >
+                              ✗ Cancel Booking
+                            </button>
+                          )}
+
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => {
+                              if (confirm('Are you sure you want to permanently delete this booking? This cannot be undone.')) {
+                                deleteBooking(booking.id)
+                              }
+                            }}
+                            className="block w-full px-3 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700"
+                          >
+                            🗑️ Delete Booking
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

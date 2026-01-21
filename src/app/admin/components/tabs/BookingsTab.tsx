@@ -15,6 +15,8 @@ interface BookingsTabProps {
   onApproveAsIs: (bookingId: string) => Promise<void>
   onApproveWithChanges: (booking: Booking) => void
   onCancel: (bookingId: string) => Promise<void>
+  onDelete: (bookingId: string) => Promise<void>
+  onEdit: (booking: Booking) => void
   onAssignPilot: (booking: Booking) => void
   onUpdateStatus: (bookingId: string, status: string) => Promise<void>
   onFilterChange: (filter: string) => void
@@ -29,6 +31,8 @@ export function BookingsTab({
   onApproveAsIs,
   onApproveWithChanges,
   onCancel,
+  onDelete,
+  onEdit,
   onAssignPilot,
   onUpdateStatus,
   onFilterChange,
@@ -78,6 +82,8 @@ export function BookingsTab({
               onApproveAsIs={onApproveAsIs}
               onApproveWithChanges={onApproveWithChanges}
               onCancel={onCancel}
+              onDelete={onDelete}
+              onEdit={onEdit}
               onAssignPilot={onAssignPilot}
               onUpdateStatus={onUpdateStatus}
               t={t}
@@ -96,6 +102,8 @@ interface BookingCardProps {
   onApproveAsIs: (bookingId: string) => Promise<void>
   onApproveWithChanges: (booking: Booking) => void
   onCancel: (bookingId: string) => Promise<void>
+  onDelete: (bookingId: string) => Promise<void>
+  onEdit: (booking: Booking) => void
   onAssignPilot: (booking: Booking) => void
   onUpdateStatus: (bookingId: string, status: string) => Promise<void>
   t: (key: string) => string
@@ -108,11 +116,14 @@ function BookingCard({
   onApproveAsIs,
   onApproveWithChanges,
   onCancel,
+  onDelete,
+  onEdit,
   onAssignPilot,
   onUpdateStatus,
   t,
   getPaymentStatusColor
 }: BookingCardProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   return (
     <div className="card-luxury">
       <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
@@ -246,6 +257,64 @@ function BookingCard({
               ✓ Mark Completed
             </button>
           )}
+
+          {/* Admin Controls - Always visible */}
+          <div className="border-t border-gray-200 pt-2 mt-2 space-y-2">
+            <p className="text-xs text-gray-500 font-medium">Admin Actions:</p>
+
+            {/* Edit Button */}
+            <button
+              onClick={() => onEdit(booking)}
+              disabled={refreshing}
+              className="w-full px-3 py-2 bg-gray-600 text-white text-sm font-medium rounded hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            >
+              ✏️ Edit Booking
+            </button>
+
+            {/* Cancel Button - for non-cancelled bookings */}
+            {booking.status !== 'cancelled' && booking.status !== 'completed' && (
+              <button
+                onClick={() => onCancel(booking.id)}
+                disabled={refreshing}
+                className="w-full px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700 disabled:opacity-50 transition-colors"
+              >
+                ✗ Cancel Booking
+              </button>
+            )}
+
+            {/* Delete Button with confirmation */}
+            {!showDeleteConfirm ? (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={refreshing}
+                className="w-full px-3 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 disabled:opacity-50 transition-colors"
+              >
+                🗑️ Delete Booking
+              </button>
+            ) : (
+              <div className="bg-red-50 border border-red-200 rounded p-2">
+                <p className="text-xs text-red-800 mb-2 text-center">Are you sure? This cannot be undone.</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="flex-1 px-2 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      onDelete(booking.id)
+                      setShowDeleteConfirm(false)
+                    }}
+                    disabled={refreshing}
+                    className="flex-1 px-2 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 disabled:opacity-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
