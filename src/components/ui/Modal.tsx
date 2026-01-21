@@ -81,7 +81,7 @@ export function Modal({
         ref={modalRef}
         tabIndex={-1}
         className={`
-          bg-white rounded-none shadow-2xl w-full max-h-[90vh] overflow-y-auto
+          bg-white rounded shadow-2xl w-full max-h-[90vh] overflow-y-auto
           ${sizeClasses[size]}
           ${className}
         `}
@@ -97,7 +97,7 @@ export function Modal({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-none transition-colors ml-auto"
+                className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors ml-auto"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
@@ -150,14 +150,14 @@ export function ConfirmModal({
         <button
           onClick={onClose}
           disabled={isLoading}
-          className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-none font-medium transition-colors disabled:opacity-50"
+          className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded font-medium transition-colors disabled:opacity-50"
         >
           {cancelText}
         </button>
         <button
           onClick={onConfirm}
           disabled={isLoading}
-          className={`px-4 py-2 rounded-none font-medium transition-colors disabled:opacity-50 flex items-center gap-2 ${variantClasses[variant]}`}
+          className={`px-4 py-2 rounded font-medium transition-colors disabled:opacity-50 flex items-center gap-2 ${variantClasses[variant]}`}
         >
           {isLoading && (
             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

@@ -117,7 +117,7 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-none shadow-2xl max-w-md w-full p-6">
+      <div className="bg-white rounded shadow-2xl max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold text-gray-900">Subir Imagen</h3>
           <button
@@ -132,7 +132,7 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
           <>
             {/* File Upload Mode */}
             {!preview ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-none p-8">
+              <div className="border-2 border-dashed border-gray-300 rounded p-8">
                 <label className="cursor-pointer flex flex-col items-center">
                   <Upload className="w-12 h-12 text-gray-400 mb-3" />
                   <span className="text-gray-600 mb-2">Click para seleccionar imagen</span>
@@ -151,17 +151,17 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
                   <img
                     src={preview}
                     alt="Preview"
-                    className="w-full h-48 object-cover rounded-none"
+                    className="w-full h-48 object-cover rounded"
                   />
                   {uploadedUrl && (
-                    <div className="absolute inset-0 bg-green-500 bg-opacity-90 rounded-none flex items-center justify-center">
+                    <div className="absolute inset-0 bg-green-500 bg-opacity-90 rounded flex items-center justify-center">
                       <Check className="w-12 h-12 text-white" />
                     </div>
                   )}
                 </div>
 
                 {uploadedUrl ? (
-                  <div className="bg-green-50 border border-green-200 rounded-none p-3">
+                  <div className="bg-green-50 border border-green-200 rounded p-3">
                     <p className="text-sm font-medium text-green-800 mb-1">¡Imagen subida exitosamente!</p>
                     <p className="text-xs text-green-600 break-all">{uploadedUrl}</p>
                   </div>
@@ -169,7 +169,7 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
                   <button
                     onClick={uploadToIrys}
                     disabled={uploading}
-                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-none flex items-center justify-center space-x-2 disabled:opacity-50"
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded flex items-center justify-center space-x-2 disabled:opacity-50"
                   >
                     {uploading ? (
                       <>
@@ -223,14 +223,14 @@ export default function IrysUpload({ onUpload, onUploadComplete, onClose }: Irys
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   placeholder="https://ejemplo.com/imagen.jpg"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none text-gray-900 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                 />
               </div>
 
               <button
                 onClick={handleUrlSubmit}
                 disabled={!urlInput}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-none disabled:opacity-50"
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded disabled:opacity-50"
               >
                 Usar esta URL
               </button>

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Users, Shield, Clock, Star } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -9,6 +10,8 @@ import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 import { PhotoGallery } from '@/components/PhotoGallery'
+
+const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
 export default function HomePage() {
   const { t } = useTranslation()
@@ -82,9 +85,16 @@ export default function HomePage() {
         {/* Hero Content */}
         <div className="relative container mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
-              <span className="text-luxury-gold">FlyIn</span>Guate
-            </h1>
+            <div className="flex justify-center mb-6">
+              <Image
+                src={LOGO_URL}
+                alt="FlyInGuate"
+                width={274}
+                height={96}
+                className="h-20 sm:h-24 md:h-28 w-auto"
+                priority
+              />
+            </div>
 
             <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-4 font-light">
               {t('hero.title')}
@@ -151,7 +161,7 @@ export default function HomePage() {
 
           <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
             {/* Transport Card */}
-            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div className="group relative bg-white rounded shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-luxury-slate to-luxury-navy"></div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold text-luxury-black mb-3">{t('services.transport.title')}</h3>
@@ -183,7 +193,7 @@ export default function HomePage() {
             </div>
 
             {/* Experiences Card */}
-            <div className="group relative bg-white rounded-none shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div className="group relative bg-white rounded shadow-xl overflow-hidden border border-luxury-slate/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-accent to-brand-green"></div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold text-luxury-black mb-3">{t('services.experiences.title')}</h3>

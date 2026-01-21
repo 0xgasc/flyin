@@ -10,14 +10,13 @@ import { useTranslation } from '@/lib/i18n'
 import { format } from 'date-fns'
 // Helicopter selection moved to admin assignment workflow
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
-import GuatemalaInteractiveMap from '@/components/guatemala-interactive-map'
 import dynamic from 'next/dynamic'
 
 // Dynamically import MapLibre to avoid SSR issues
 const GuatemalaMapLibre = dynamic(() => import('@/components/guatemala-maplibre'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-96 sm:h-[500px] bg-luxury-black/50 flex items-center justify-center rounded-none">
+    <div className="w-full h-96 sm:h-[500px] bg-luxury-black/50 flex items-center justify-center rounded">
       <div className="text-center">
         <div className="animate-spin h-8 w-8 border-4 border-brand-accent border-t-transparent rounded-full mx-auto mb-2"></div>
         <p className="text-gray-400 text-sm">Loading map...</p>
@@ -58,7 +57,6 @@ export default function BookTransportPage() {
   })
   const [priceBredown, setPriceBreakdown] = useState<any>(null)
   const [selectionMode, setSelectionMode] = useState<'dropdown' | 'map'>('dropdown')
-  const [mapStyle, setMapStyle] = useState<'custom' | 'real'>('custom')
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null)
   const [showDestinationModal, setShowDestinationModal] = useState(false)
   const [modalType, setModalType] = useState<'from' | 'to'>('from')
@@ -105,8 +103,8 @@ export default function BookTransportPage() {
   }
 
   const handleDepartmentClick = (dept: Department) => {
-    // For real map (Leaflet), if department has only one destination, select it directly
-    if (mapStyle === 'real' && dept.destinations.length === 1) {
+    // If department has only one destination, select it directly
+    if (dept.destinations.length === 1) {
       const destination = dept.destinations[0]
       if (!formData.fromLocation) {
         setFormData(prev => ({ ...prev, fromLocation: destination }))
@@ -118,8 +116,8 @@ export default function BookTransportPage() {
       }
       return
     }
-    
-    // For custom map or departments with multiple destinations, show modal
+
+    // For departments with multiple destinations, show modal
     setSelectedDepartment(dept)
     setShowDestinationModal(true)
     // Determine modal type based on current selections
@@ -301,7 +299,7 @@ export default function BookTransportPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-none">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
             </div>
           )}
@@ -314,61 +312,31 @@ export default function BookTransportPage() {
               </h2>
               
               {/* Selection Mode Toggle */}
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-2 bg-gray-100 rounded-none p-1">
-                  <button
-                    type="button"
-                    onClick={() => setSelectionMode('dropdown')}
-                    className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${
-                      selectionMode === 'dropdown' 
-                        ? 'bg-white text-primary-600 shadow' 
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    <Grid className="h-4 w-4 inline mr-1" />
-                    List
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectionMode('map')}
-                    className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${
-                      selectionMode === 'map' 
-                        ? 'bg-white text-primary-600 shadow' 
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    <Map className="h-4 w-4 inline mr-1" />
-                    Map
-                  </button>
-                </div>
-                
-                {/* Map Style Toggle - Only show when in map mode */}
-                {selectionMode === 'map' && (
-                  <div className="flex items-center space-x-2 bg-luxury-slate/30 rounded-none p-1">
-                    <button
-                      type="button"
-                      onClick={() => setMapStyle('custom')}
-                      className={`px-3 py-1.5 rounded-none text-xs font-medium transition-colors ${
-                        mapStyle === 'custom'
-                          ? 'bg-brand-accent text-white shadow'
-                          : 'text-gray-300 hover:text-white'
-                      }`}
-                    >
-                      Simple
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMapStyle('real')}
-                      className={`px-3 py-1.5 rounded-none text-xs font-medium transition-colors ${
-                        mapStyle === 'real'
-                          ? 'bg-brand-accent text-white shadow'
-                          : 'text-gray-300 hover:text-white'
-                      }`}
-                    >
-                      Interactive
-                    </button>
-                  </div>
-                )}
+              <div className="flex items-center space-x-2 bg-gray-100 rounded p-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode('dropdown')}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                    selectionMode === 'dropdown'
+                      ? 'bg-white text-primary-600 shadow'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Grid className="h-4 w-4 inline mr-1" />
+                  List
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode('map')}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                    selectionMode === 'map'
+                      ? 'bg-white text-primary-600 shadow'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Map className="h-4 w-4 inline mr-1" />
+                  Map
+                </button>
               </div>
             </div>
 
@@ -381,7 +349,7 @@ export default function BookTransportPage() {
                 <select
                   value={formData.fromLocation}
                   onChange={(e) => setFormData({ ...formData, fromLocation: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   required
                 >
                   <option value="">Select departure</option>
@@ -407,7 +375,7 @@ export default function BookTransportPage() {
                     type="text"
                     value={formData.fromCustom}
                     onChange={(e) => setFormData({ ...formData, fromCustom: e.target.value })}
-                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter departure location"
                     required
                   />
@@ -421,7 +389,7 @@ export default function BookTransportPage() {
                 <select
                   value={formData.toLocation}
                   onChange={(e) => setFormData({ ...formData, toLocation: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   required
                 >
                   <option value="">Select destination</option>
@@ -447,7 +415,7 @@ export default function BookTransportPage() {
                     type="text"
                     value={formData.toCustom}
                     onChange={(e) => setFormData({ ...formData, toCustom: e.target.value })}
-                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter destination"
                     required
                   />
@@ -457,34 +425,22 @@ export default function BookTransportPage() {
             ) : (
               /* Map Selection Mode */
               <div className="space-y-6">
-                <div className="text-center text-slate-300 mb-6">
+                <div className="text-center text-gray-600 mb-6">
                   <p className="text-sm">
-                    {mapStyle === 'custom'
-                      ? 'Click on any department in Guatemala to see available destinations'
-                      : 'Click on markers to select your departure and destination'
-                    }
+                    Click on markers to select your departure and destination
                   </p>
                 </div>
 
-                {mapStyle === 'custom' ? (
-                  <GuatemalaInteractiveMap
-                    onDepartmentClick={handleDepartmentClick}
-                    selectedFrom={formData.fromLocation}
-                    selectedTo={formData.toLocation}
-                    mode="both"
-                  />
-                ) : (
-                  <GuatemalaMapLibre
-                    onDepartmentClick={handleDepartmentClick}
-                    selectedFrom={formData.fromLocation}
-                    selectedTo={formData.toLocation}
-                    mode="both"
-                  />
-                )}
+                <GuatemalaMapLibre
+                  onDepartmentClick={handleDepartmentClick}
+                  selectedFrom={formData.fromLocation}
+                  selectedTo={formData.toLocation}
+                  mode="both"
+                />
 
                 {/* Selected Locations Display */}
                 {(formData.fromLocation || formData.toLocation) && (
-                  <div className="bg-luxury-black/30 border border-luxury-slate/30 rounded-none p-4 backdrop-blur-sm">
+                  <div className="bg-luxury-black/30 border border-luxury-slate/30 rounded p-4 backdrop-blur-sm">
                     <h3 className="font-semibold text-gray-200 mb-2">Selected Route:</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
@@ -514,7 +470,7 @@ export default function BookTransportPage() {
             </h2>
 
             {/* Trip Type Toggle */}
-            <div className="bg-gray-50 rounded-none p-4">
+            <div className="bg-gray-50 rounded p-4">
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium text-gray-700">{t('booking.form.trip_type')}</span>
                 <label className="flex items-center">
@@ -555,7 +511,7 @@ export default function BookTransportPage() {
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     min={format(new Date(), 'yyyy-MM-dd')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -568,7 +524,7 @@ export default function BookTransportPage() {
                     type="time"
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -589,7 +545,7 @@ export default function BookTransportPage() {
                       value={formData.returnDate}
                       onChange={(e) => setFormData({ ...formData, returnDate: e.target.value })}
                       min={formData.date || format(new Date(), 'yyyy-MM-dd')}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                       required
                     />
                     
@@ -626,7 +582,7 @@ export default function BookTransportPage() {
                       type="time"
                       value={formData.returnTime}
                       onChange={(e) => setFormData({ ...formData, returnTime: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                       required
                     />
                   </div>
@@ -634,7 +590,7 @@ export default function BookTransportPage() {
 
                 {/* Same Day Return Notice */}
                 {formData.date && formData.returnDate && formData.date === formData.returnDate && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-none p-3 mt-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
                     <p className="text-sm text-blue-800">
                       💡 <strong>Same Day Return:</strong> 10% discount applied! Great for quick business trips or day tours.
                     </p>
@@ -657,7 +613,7 @@ export default function BookTransportPage() {
               <select
                 value={formData.passengers}
                 onChange={(e) => setFormData({ ...formData, passengers: parseInt(e.target.value) })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
               >
                 {[1, 2, 3, 4, 5, 6].map((num) => (
                   <option key={num} value={num}>
@@ -675,7 +631,7 @@ export default function BookTransportPage() {
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                 placeholder={t('booking.form.special_requirements')}
               />
             </div>
@@ -743,7 +699,7 @@ export default function BookTransportPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-full sm:flex-1 px-6 py-4 sm:py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50 font-medium text-base"
+              className="w-full sm:flex-1 px-6 py-4 sm:py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 font-medium text-base"
             >
               Cancel
             </button>

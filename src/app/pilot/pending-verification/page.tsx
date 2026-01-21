@@ -23,7 +23,7 @@ export default function PendingVerificationPage() {
             our in-person verification process.
           </p>
 
-          <div className="bg-gray-50 rounded-none p-6 mb-8">
+          <div className="bg-gray-50 rounded p-6 mb-8">
             <h2 className="font-semibold text-gray-900 mb-4">What to bring:</h2>
             <div className="space-y-3 text-left max-w-md mx-auto">
               <div className="flex items-start">

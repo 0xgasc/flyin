@@ -8,37 +8,35 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Navy blue luxury theme
+        // FlyInGuate color scheme - matching flyinguate.com
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#455a64',       // Slate blue accent
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         },
-        // Dark luxury navy palette
+        // Dark luxury palette - pure black theme
         luxury: {
-          gold: '#10b981',      // Emerald green accent
-          silver: '#e2e8f0',    // Light slate
-          black: '#0a1628',     // Dark navy
-          charcoal: '#0f1d32',  // Navy charcoal
-          slate: '#1e3a5f',     // Navy blue
-          navy: '#0d2137',      // Deep navy
+          gold: '#455a64',      // Slate blue accent (matching site)
+          silver: '#e2e8f0',
+          black: '#000000',     // Pure black
+          charcoal: '#161616',  // Near black
+          slate: '#455a64',     // Slate blue
         },
-        // Brand colors - navy/green
+        // Brand colors - black/slate
         brand: {
-          dark: '#0a1628',
-          navy: '#0d2137',
-          charcoal: '#0f1d32',
-          text: '#f7f7f7',
-          muted: '#94a3b8',
-          accent: '#10b981',    // Emerald green
-          green: '#059669',     // Darker emerald
+          dark: '#000000',
+          charcoal: '#161616',
+          text: '#f7f7f7',       // Off-white
+          muted: '#919191',      // Medium gray
+          accent: '#455a64',     // Slate blue
+          light: '#c6c6c6',      // Light gray
         },
         // Semantic status colors for consistent use across all views
         status: {

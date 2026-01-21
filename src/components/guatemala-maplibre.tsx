@@ -242,7 +242,7 @@ export default function GuatemalaMapLibre({
 
   return (
     <div className="relative w-full">
-      <div className="rounded-none overflow-hidden shadow-2xl border border-luxury-slate/30">
+      <div className="rounded overflow-hidden shadow-2xl border border-luxury-slate/30">
         {/* Map Container */}
         <div
           ref={mapContainer}
@@ -250,7 +250,7 @@ export default function GuatemalaMapLibre({
         />
 
         {/* Branding overlay */}
-        <div className="absolute top-4 left-4 bg-luxury-black/90 backdrop-blur-sm rounded-none px-3 py-2 shadow-lg z-10 border border-brand-accent/30">
+        <div className="absolute top-4 left-4 bg-luxury-black/90 backdrop-blur-sm rounded px-3 py-2 shadow-lg z-10 border border-brand-accent/30">
           <h3 className="font-bold text-brand-accent text-sm">FlyIn Guatemala</h3>
           <p className="text-xs text-gray-400">Interactive Map</p>
         </div>
@@ -258,19 +258,19 @@ export default function GuatemalaMapLibre({
 
       {/* Legend */}
       <div className="mt-6 flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
-        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded-none border border-luxury-slate/30">
+        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
           <div className="w-4 h-4 bg-red-600 rounded-full shadow-lg flex items-center justify-center">
             <div className="w-2 h-2 bg-white rounded-full"></div>
           </div>
           <span className="text-gray-300">Guatemala City Hub</span>
         </div>
-        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded-none border border-luxury-slate/30">
+        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
           <div className="w-4 h-4 bg-blue-600 rounded-full shadow-lg flex items-center justify-center">
             <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
           </div>
           <span className="text-gray-300">Destinations</span>
         </div>
-        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded-none border border-luxury-slate/30">
+        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
           <div className="w-4 h-4 bg-emerald-500 rounded-full shadow-lg flex items-center justify-center">
             <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
           </div>
@@ -279,7 +279,7 @@ export default function GuatemalaMapLibre({
       </div>
 
       {/* Selection Status */}
-      <div className="mt-6 text-center bg-luxury-black/30 rounded-none p-4 backdrop-blur-sm border border-luxury-slate/30">
+      <div className="mt-6 text-center bg-luxury-black/30 rounded p-4 backdrop-blur-sm border border-luxury-slate/30">
         {selectedFrom && (
           <p className="text-sm text-gray-300 mb-1">
             From: <span className="font-semibold text-brand-accent">{selectedFrom}</span>

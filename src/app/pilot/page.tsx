@@ -210,7 +210,7 @@ export default function PilotDashboard() {
           <div className="flex space-x-2">
             <button
               onClick={() => setFilter('active')}
-              className={`px-4 py-2 rounded-none ${
+              className={`px-4 py-2 rounded ${
                 filter === 'active' 
                   ? 'bg-primary-600 text-white' 
                   : 'bg-white text-gray-700 border border-gray-300'
@@ -220,7 +220,7 @@ export default function PilotDashboard() {
             </button>
             <button
               onClick={() => setFilter('completed')}
-              className={`px-4 py-2 rounded-none ${
+              className={`px-4 py-2 rounded ${
                 filter === 'completed' 
                   ? 'bg-primary-600 text-white' 
                   : 'bg-white text-gray-700 border border-gray-300'
@@ -230,7 +230,7 @@ export default function PilotDashboard() {
             </button>
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-none ${
+              className={`px-4 py-2 rounded ${
                 filter === 'all' 
                   ? 'bg-primary-600 text-white' 
                   : 'bg-white text-gray-700 border border-gray-300'
@@ -321,7 +321,7 @@ export default function PilotDashboard() {
                 </div>
 
                 {booking.notes && (
-                  <div className="bg-gray-50 p-3 rounded-none mb-4">
+                  <div className="bg-gray-50 p-3 rounded mb-4">
                     <p className="text-sm text-gray-700">
                       <span className="font-medium">Notes:</span> {booking.notes}
                     </p>
@@ -339,7 +339,7 @@ export default function PilotDashboard() {
                 {booking.status === 'accepted' && (
                   <button
                     onClick={() => markAsCompleted(booking.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-none transition-colors text-sm"
+                    className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition-colors text-sm"
                   >
                     Mark as Completed
                   </button>

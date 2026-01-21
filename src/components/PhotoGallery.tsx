@@ -126,7 +126,7 @@ export function PhotoGallery() {
               {/* Hover preview - larger showing full image */}
               {hoveredIndex === index && (
                 <div className="absolute inset-0 pointer-events-none z-30">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250%] max-w-[500px] bg-white rounded-none shadow-2xl overflow-hidden border-4 border-white">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250%] max-w-[500px] bg-white rounded shadow-2xl overflow-hidden border-4 border-white">
                     <img
                       src={image.image_url}
                       alt={image.caption || 'FlyInGuate experience'}
@@ -148,7 +148,7 @@ export function PhotoGallery() {
         <div className="flex items-center justify-center gap-4 mt-6">
           <button
             onClick={shuffleImages}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-none transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
             Shuffle
@@ -157,7 +157,7 @@ export function PhotoGallery() {
           {displayCount < allImages.length && (
             <button
               onClick={showMore}
-              className="px-6 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700 transition-colors"
+              className="px-6 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors"
             >
               Show More ({allImages.length - displayCount} remaining)
             </button>

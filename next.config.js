@@ -7,6 +7,15 @@ const nextConfig = {
       bodySizeLimit: '50mb',
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'isteam.wsimg.com',
+        pathname: '/ip/**',
+      },
+    ],
+  },
 }
 
 module.exports = nextConfig

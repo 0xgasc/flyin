@@ -43,13 +43,13 @@ export function UsersTab({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={onRefresh}
-            className="px-4 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700 transition-colors"
+            className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors"
           >
             🔄 Refresh Users
           </button>
           <button
             onClick={onCreateUser}
-            className="px-4 py-2 bg-green-600 text-white rounded-none hover:bg-green-700 transition-colors"
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
           >
             ➕ Create New User
           </button>
@@ -61,7 +61,7 @@ export function UsersTab({
           <LoadingSpinner size="lg" />
         </div>
       ) : users.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-none">
+        <div className="text-center py-12 bg-gray-50 rounded">
           <p className="text-gray-500">No users found</p>
         </div>
       ) : (

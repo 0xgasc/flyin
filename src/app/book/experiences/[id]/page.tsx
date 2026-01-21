@@ -255,7 +255,7 @@ export default function ExperienceDetailPage() {
           <div className="space-y-4">
             {images.length > 0 ? (
               <div className="relative">
-                <div className="relative w-full bg-gray-200 rounded-none overflow-hidden">
+                <div className="relative w-full bg-gray-200 rounded overflow-hidden">
                   <img
                     src={images[currentImageIndex]?.image_url}
                     alt={images[currentImageIndex]?.caption || displayName}
@@ -281,7 +281,7 @@ export default function ExperienceDetailPage() {
                 )}
               </div>
             ) : experience.image_url ? (
-              <div className="relative w-full bg-gray-200 rounded-none overflow-hidden">
+              <div className="relative w-full bg-gray-200 rounded overflow-hidden">
                 <img
                   src={experience.image_url}
                   alt={displayName}
@@ -289,7 +289,7 @@ export default function ExperienceDetailPage() {
                 />
               </div>
             ) : (
-              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded-none flex items-center justify-center">
+              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded flex items-center justify-center">
                 <Camera className="w-12 h-12 text-gray-400" />
               </div>
             )}
@@ -301,7 +301,7 @@ export default function ExperienceDetailPage() {
                   <button
                     key={image.id}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-14 sm:h-16 rounded-none overflow-hidden border-2 ${
+                    className={`flex-shrink-0 w-20 h-14 sm:h-16 rounded overflow-hidden border-2 ${
                       index === currentImageIndex ? 'border-primary-600' : 'border-gray-300'
                     }`}
                   >
@@ -335,7 +335,7 @@ export default function ExperienceDetailPage() {
             <p className="text-gray-700 leading-relaxed">{displayDescription}</p>
 
             {/* Key Details */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-none shadow-sm">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded shadow-sm">
               <div className="text-center">
                 <DollarSign className="w-6 h-6 text-primary-600 mx-auto mb-1" />
                 <div className="text-2xl font-bold text-gray-900">${experience.base_price}</div>
@@ -407,7 +407,7 @@ export default function ExperienceDetailPage() {
             {/* Book Now Button */}
             <button
               onClick={() => setShowBookingModal(true)}
-              className="w-full bg-primary-600 text-white py-4 px-6 rounded-none hover:bg-primary-700 transition-colors font-medium text-lg"
+              className="w-full bg-primary-600 text-white py-4 px-6 rounded hover:bg-primary-700 transition-colors font-medium text-lg"
             >
               Book This Experience
             </button>
@@ -418,7 +418,7 @@ export default function ExperienceDetailPage() {
       {/* Booking Modal */}
       {showBookingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-none p-6 max-w-md w-full max-h-screen overflow-y-auto">
+          <div className="bg-white rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Book {displayName}</h2>
             
             <form onSubmit={handleBooking} className="space-y-4">
@@ -431,7 +431,7 @@ export default function ExperienceDetailPage() {
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
                   min={format(new Date(), 'yyyy-MM-dd')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -444,7 +444,7 @@ export default function ExperienceDetailPage() {
                   type="time"
                   value={formData.time}
                   onChange={(e) => setFormData({...formData, time: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -456,7 +456,7 @@ export default function ExperienceDetailPage() {
                 <select
                   value={formData.passengers}
                   onChange={(e) => setFormData({...formData, passengers: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   {(() => {
                     const minPass = experience?.min_passengers || 1;
@@ -482,7 +482,7 @@ export default function ExperienceDetailPage() {
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder={t('booking.form.notesPlaceholder')}
                 />
               </div>
@@ -491,13 +491,13 @@ export default function ExperienceDetailPage() {
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-none hover:bg-primary-700"
+                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded hover:bg-primary-700"
                 >
                   Confirm Booking
                 </button>

@@ -35,7 +35,7 @@ export default function GuestBookingModal({ show, onClose, onSubmit, bookingData
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
-      <div className="relative bg-white rounded-none shadow-xl p-6 max-w-md w-full mx-4">
+      <div className="relative bg-white rounded shadow-xl p-6 max-w-md w-full mx-4">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -62,7 +62,7 @@ export default function GuestBookingModal({ show, onClose, onSubmit, bookingData
                 type="text"
                 value={guestData.full_name}
                 onChange={(e) => setGuestData({ ...guestData, full_name: e.target.value })}
-                className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                 placeholder="John Doe"
                 required
               />
@@ -79,7 +79,7 @@ export default function GuestBookingModal({ show, onClose, onSubmit, bookingData
                 type="email"
                 value={guestData.email}
                 onChange={(e) => setGuestData({ ...guestData, email: e.target.value })}
-                className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                 placeholder="john@example.com"
                 required
               />
@@ -96,7 +96,7 @@ export default function GuestBookingModal({ show, onClose, onSubmit, bookingData
                 type="tel"
                 value={guestData.phone}
                 onChange={(e) => setGuestData({ ...guestData, phone: e.target.value })}
-                className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                 placeholder="+502 5555 5555"
                 required
               />
@@ -111,7 +111,7 @@ export default function GuestBookingModal({ show, onClose, onSubmit, bookingData
               value={guestData.notes}
               onChange={(e) => setGuestData({ ...guestData, notes: e.target.value })}
               rows={3}
-              className="w-full px-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
               placeholder="Any special requests or preferences..."
             />
           </div>
@@ -120,7 +120,7 @@ export default function GuestBookingModal({ show, onClose, onSubmit, bookingData
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50"
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
             >
               Cancel
             </button>

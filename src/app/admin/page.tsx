@@ -205,7 +205,7 @@ export default function AdminDashboard() {
           <p className="text-gray-600 mb-4">You need admin permissions to access this page.</p>
           <button
             onClick={() => router.push('/')}
-            className="bg-blue-600 text-white px-4 py-2 rounded-none hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Return Home
           </button>
@@ -1013,7 +1013,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         // Show saving indicator
         const savingToast = document.createElement('div');
         savingToast.innerHTML = '💾 Saving order...';
-        savingToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-none shadow-lg z-50';
+        savingToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50';
         document.body.appendChild(savingToast);
         
         // Update database in background with batch operation
@@ -1047,7 +1047,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
           // Success - show confirmation
           savingToast.innerHTML = '✅ Order saved!';
-          savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-none shadow-lg z-50';
+          savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 2000);
 
           console.log('✅ Experience order updated successfully');
@@ -1056,7 +1056,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
           // Show error and rollback
           savingToast.innerHTML = '❌ Save failed - reverting';
-          savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-none shadow-lg z-50';
+          savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 3000);
 
           // Rollback on failure - refetch to restore correct order
@@ -1116,14 +1116,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           <div className="flex gap-3">
             <Link
               href="/admin/experiences/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded font-semibold flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
               <span>New Experience</span>
             </Link>
             <Link
               href="/admin/experiences/import"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold flex items-center space-x-2"
             >
               <Upload className="w-5 h-5" />
               <span>Bulk Import</span>
@@ -1131,7 +1131,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           </div>
         </div>
 
-        <div className="bg-white rounded-none shadow-sm overflow-hidden">
+        <div className="bg-white rounded shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -1367,7 +1367,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         // Show saving indicator
         const savingToast = document.createElement('div');
         savingToast.innerHTML = '💾 Saving order...';
-        savingToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-none shadow-lg z-50';
+        savingToast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50';
         document.body.appendChild(savingToast);
         
         // Update database in background with batch operation
@@ -1401,7 +1401,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
           // Success - show confirmation
           savingToast.innerHTML = '✅ Order saved!';
-          savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-none shadow-lg z-50';
+          savingToast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 2000);
 
           console.log('✅ Destination order updated successfully');
@@ -1410,7 +1410,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
           // Show error and rollback
           savingToast.innerHTML = '❌ Save failed - reverting';
-          savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-none shadow-lg z-50';
+          savingToast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50';
           setTimeout(() => document.body.removeChild(savingToast), 3000);
 
           // Rollback on failure - refetch to restore correct order
@@ -1468,14 +1468,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           <div className="flex gap-3">
             <Link
               href="/admin/destinations/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded font-semibold flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
               <span>New Destination</span>
             </Link>
             <Link
               href="/admin/destinations/import"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold flex items-center space-x-2"
             >
               <Upload className="w-5 h-5" />
               <span>Bulk Import</span>
@@ -1483,7 +1483,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           </div>
         </div>
 
-        <div className="bg-white rounded-none shadow-sm overflow-hidden">
+        <div className="bg-white rounded shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -1594,7 +1594,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-none"
+                className="px-4 py-2 border border-gray-300 rounded"
               >
                 <option value="all">{t('admin.filter_by_status')} - {t('status.all')}</option>
                 <option value="pending">{t('status.pending')}</option>
@@ -1722,7 +1722,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="flex space-x-2">
                 <button 
                   onClick={() => setCurrentWeekOffset(0)}
-                  className={`px-4 py-2 rounded-none transition-colors ${
+                  className={`px-4 py-2 rounded transition-colors ${
                     currentWeekOffset === 0 
                       ? 'bg-primary-600 text-white' 
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -1732,13 +1732,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </button>
                 <button 
                   onClick={() => setCurrentWeekOffset(currentWeekOffset - 1)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   ← Previous Week
                 </button>
                 <button 
                   onClick={() => setCurrentWeekOffset(currentWeekOffset + 1)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Next Week →
                 </button>
@@ -1917,13 +1917,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     console.log('Manual refresh triggered')
                     fetchUsers()
                   }}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700"
+                  className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
                 >
                   🔄 Refresh Users
                 </button>
                 <button
                   onClick={() => setShowCreateUserModal(true)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-none hover:bg-green-700"
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                 >
                   ➕ Create New User
                 </button>
@@ -2127,7 +2127,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
                         {/* Payment Proof Section */}
                         {transaction.payment_proof_url && (
-                          <div className="bg-gray-50 rounded-none p-3 mb-4">
+                          <div className="bg-gray-50 rounded p-3 mb-4">
                             <div className="flex items-center justify-between mb-2">
                               <span className="text-sm font-medium text-gray-700">Payment Proof Submitted:</span>
                               <button
@@ -2160,7 +2160,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                           <>
                             <button
                               onClick={() => updateTransactionStatus(transaction.id, 'approved')}
-                              className="block w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded-none hover:bg-green-700 transition-colors min-h-[44px]"
+                              className="block w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition-colors min-h-[44px]"
                             >
                               ✅ {t('admin.approve_fund_account')}
                             </button>
@@ -2171,14 +2171,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                                   updateTransactionStatus(transaction.id, 'rejected', notes)
                                 }
                               }}
-                              className="block w-full px-4 py-3 bg-red-600 text-white text-sm font-medium rounded-none hover:bg-red-700 transition-colors min-h-[44px]"
+                              className="block w-full px-4 py-3 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition-colors min-h-[44px]"
                             >
                               ❌ {t('admin.reject_request')}
                             </button>
                             {transaction.payment_proof_url && (
                               <button
                                 onClick={() => setSelectedTransaction(transaction)}
-                                className="block w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-none hover:bg-blue-700 transition-colors"
+                                className="block w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
                               >
                                 🔍 Review Proof
                               </button>
@@ -2187,14 +2187,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         )}
                         
                         {transaction.status === 'approved' && (
-                          <div className="text-center p-3 bg-green-50 rounded-none border border-green-200">
+                          <div className="text-center p-3 bg-green-50 rounded border border-green-200">
                             <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-1" />
                             <p className="text-xs text-green-800 font-medium">Funds Added</p>
                           </div>
                         )}
                         
                         {transaction.status === 'rejected' && (
-                          <div className="text-center p-3 bg-red-50 rounded-none border border-red-200">
+                          <div className="text-center p-3 bg-red-50 rounded border border-red-200">
                             <XCircle className="h-6 w-6 text-red-600 mx-auto mb-1" />
                             <p className="text-xs text-red-800 font-medium">Request Denied</p>
                           </div>
@@ -2681,14 +2681,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Pilot Assignment Modal */}
       {selectedBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-6 flex items-center">
               <Plane className="h-6 w-6 mr-2 text-primary-600" />
               {t('admin.assign_flight_crew')}
             </h3>
             
             {/* Booking Details */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
+            <div className="bg-gray-50 rounded p-4 mb-6">
               <h4 className="font-semibold mb-2">Booking Details:</h4>
               <p className="text-sm text-gray-600">
                 {selectedBooking.booking_type === 'transport' 
@@ -2751,7 +2751,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   {HELICOPTER_FLEET.map((helicopter) => (
                     <div
                       key={helicopter.id}
-                      className={`p-3 border rounded-none cursor-pointer transition-all ${
+                      className={`p-3 border rounded cursor-pointer transition-all ${
                         selectedHelicopter === helicopter.id
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
@@ -2782,7 +2782,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   {availablePilots.map((pilot) => (
                     <div
                       key={pilot.id}
-                      className={`p-3 border rounded-none cursor-pointer transition-all ${
+                      className={`p-3 border rounded cursor-pointer transition-all ${
                         selectedPilot === pilot.id
                           ? 'border-green-500 bg-green-50'
                           : 'border-gray-200 hover:border-gray-300'
@@ -2812,7 +2812,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   setSelectedHelicopter('')
                   setSelectedPilot('')
                 }}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
               >
                 {t('admin.cancel')}
               </button>
@@ -2827,7 +2827,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   setSelectedPilot('')
                 }}
                 disabled={!selectedPilot || !selectedHelicopter}
-                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('admin.assign_flight')}
               </button>
@@ -2839,7 +2839,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Create User Modal */}
       {showCreateUserModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-md w-full">
+          <div className="bg-white rounded p-6 max-w-md w-full">
             <h3 className="text-xl font-bold mb-6 flex items-center">
               <Users className="h-6 w-6 mr-2 text-green-600" />
               Create New User
@@ -2854,7 +2854,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   type="email"
                   value={newUserData.email}
                   onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   placeholder="user@example.com"
                   required
                 />
@@ -2868,7 +2868,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   type="password"
                   value={newUserData.password}
                   onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   placeholder="Minimum 6 characters"
                   required
                   minLength={6}
@@ -2883,7 +2883,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   type="text"
                   value={newUserData.full_name}
                   onChange={(e) => setNewUserData({ ...newUserData, full_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   placeholder="John Doe"
                   required
                 />
@@ -2897,7 +2897,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   type="tel"
                   value={newUserData.phone}
                   onChange={(e) => setNewUserData({ ...newUserData, phone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   placeholder="+502 5555 5555"
                 />
               </div>
@@ -2909,7 +2909,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <select
                   value={newUserData.role}
                   onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value as 'client' | 'pilot' | 'admin' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   required
                 >
                   <option value="client">{t('form.client')}</option>
@@ -2923,7 +2923,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </p>
               </div>
               
-              <div className="bg-blue-50 border border-blue-200 rounded-none p-3">
+              <div className="bg-blue-50 border border-blue-200 rounded p-3">
                 <p className="text-xs text-blue-800">
                   <strong>Note:</strong> User will be created and can login immediately. 
                   {newUserData.role === 'admin' ? ' Admin users are auto-verified.' : 
@@ -2945,14 +2945,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       phone: ''
                     })
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-none hover:bg-green-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
                 >
                   {loading ? 'Creating...' : 'Create User'}
                 </button>
@@ -2965,7 +2965,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Payment Proof Viewer Modal */}
       {selectedTransaction && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold flex items-center">
                 <DollarSign className="h-6 w-6 mr-2 text-green-600" />
@@ -2980,7 +2980,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             </div>
             
             {/* Transaction Details */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
+            <div className="bg-gray-50 rounded p-4 mb-6">
               <h4 className="font-semibold mb-3">Transaction Details:</h4>
               <div className="grid md:grid-cols-2 gap-4 text-sm">
                 <div>
@@ -3000,7 +3000,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             <div className="text-center mb-6">
               <h4 className="font-semibold mb-3">Payment Proof Document:</h4>
               {selectedTransaction.payment_proof_url ? (
-                <div className="border rounded-none overflow-hidden">
+                <div className="border rounded overflow-hidden">
                   <img
                     src={selectedTransaction.payment_proof_url}
                     alt="Payment proof document"
@@ -3008,7 +3008,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
               ) : (
-                <div className="bg-gray-100 p-8 rounded-none">
+                <div className="bg-gray-100 p-8 rounded">
                   <p className="text-gray-600">No payment proof attached to this transaction</p>
                 </div>
               )}
@@ -3016,7 +3016,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
             {/* Stablecoin Integration Notice */}
             {selectedTransaction.payment_method === 'cryptocurrency' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-none p-4 mb-6">
+              <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
                 <div className="flex items-center mb-2">
                   <span className="text-blue-800 font-medium">🪙 Stablecoin Payment Integration</span>
                 </div>
@@ -3036,7 +3036,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             <div className="flex gap-4">
               <button
                 onClick={() => setSelectedTransaction(null)}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
               >
                 {t('admin.close')}
               </button>
@@ -3048,7 +3048,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       updateTransactionStatus(selectedTransaction.id, 'approved')
                       setSelectedTransaction(null)
                     }}
-                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-none hover:bg-green-700"
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                   >
                     ✅ {t('admin.approve_fund_account')}
                   </button>
@@ -3060,7 +3060,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         setSelectedTransaction(null)
                       }
                     }}
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-none hover:bg-red-700"
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                   >
                     ❌ {t('admin.reject_request')}
                   </button>
@@ -3074,7 +3074,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Edit User/Pilot Modal */}
       {showEditUserModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold flex items-center">
                 <Users className="h-6 w-6 mr-2 text-blue-600" />
@@ -3092,7 +3092,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             </div>
             
             {/* User Details Summary */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
+            <div className="bg-gray-50 rounded p-4 mb-6">
               <h4 className="font-semibold mb-2">Current Profile:</h4>
               <div className="text-sm text-gray-600">
                 <p><span className="font-medium">User ID:</span> {selectedUser.id}</p>
@@ -3111,7 +3111,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={editUserData.full_name}
                     onChange={(e) => setEditUserData({ ...editUserData, full_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -3124,7 +3124,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="email"
                     value={editUserData.email}
                     disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none bg-gray-100 text-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-500"
                     title="Email cannot be changed"
                   />
                 </div>
@@ -3139,7 +3139,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="tel"
                     value={editUserData.phone}
                     onChange={(e) => setEditUserData({ ...editUserData, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     placeholder="+502 5555 5555"
                   />
                 </div>
@@ -3151,7 +3151,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <select
                     value={editUserData.role}
                     onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   >
                     <option value="client">{t('form.client')}</option>
@@ -3172,7 +3172,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     min="0"
                     value={editUserData.account_balance}
                     onChange={(e) => setEditUserData({ ...editUserData, account_balance: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">Manually adjust user balance</p>
                 </div>
@@ -3214,14 +3214,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   value={editUserData.notes}
                   onChange={(e) => setEditUserData({ ...editUserData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   placeholder="Internal notes about this user (not visible to user)"
                 />
               </div>
               
               {/* Warning for role changes */}
               {editUserData.role !== selectedUser.role && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-none p-3">
+                <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
                   <p className="text-sm text-yellow-800">
                     ⚠️ <strong>Warning:</strong> Changing the user role will affect their access permissions.
                   </p>
@@ -3235,14 +3235,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     setShowEditUserModal(false)
                     setSelectedUser(null)
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                 >
                   {loading ? 'Updating...' : t('admin.save_changes')}
                 </button>
@@ -3255,7 +3255,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Edit Booking Modal */}
       {showEditBookingModal && selectedBookingForEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold flex items-center">
                 <Calendar className="h-6 w-6 mr-2 text-blue-600" />
@@ -3273,7 +3273,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             </div>
             
             {/* Current Booking Details */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
+            <div className="bg-gray-50 rounded p-4 mb-6">
               <h4 className="font-semibold mb-3">Original Booking:</h4>
               <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
                 <div>
@@ -3300,7 +3300,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={editBookingData.from_location}
                     onChange={(e) => setEditBookingData({ ...editBookingData, from_location: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -3313,7 +3313,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={editBookingData.to_location}
                     onChange={(e) => setEditBookingData({ ...editBookingData, to_location: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -3329,7 +3329,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="date"
                     value={editBookingData.scheduled_date}
                     onChange={(e) => setEditBookingData({ ...editBookingData, scheduled_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -3342,7 +3342,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="time"
                     value={editBookingData.scheduled_time}
                     onChange={(e) => setEditBookingData({ ...editBookingData, scheduled_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -3377,7 +3377,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       type="date"
                       value={editBookingData.return_date}
                       onChange={(e) => setEditBookingData({ ...editBookingData, return_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                       required
                     />
                   </div>
@@ -3390,7 +3390,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       type="time"
                       value={editBookingData.return_time}
                       onChange={(e) => setEditBookingData({ ...editBookingData, return_time: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                       required
                     />
                   </div>
@@ -3405,7 +3405,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <select
                   value={editBookingData.passenger_count}
                   onChange={(e) => setEditBookingData({ ...editBookingData, passenger_count: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                 >
                   {[1, 2, 3, 4, 5, 6].map((num) => (
                     <option key={num} value={num}>
@@ -3424,7 +3424,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   value={editBookingData.notes}
                   onChange={(e) => setEditBookingData({ ...editBookingData, notes: e.target.value })}
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   placeholder="Special requests or preferences..."
                 />
               </div>
@@ -3438,13 +3438,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   value={editBookingData.revision_notes}
                   onChange={(e) => setEditBookingData({ ...editBookingData, revision_notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
                   placeholder="Explain the changes you're making and why (client will see this)..."
                   required
                 />
               </div>
               
-              <div className="bg-blue-50 border border-blue-200 rounded-none p-3">
+              <div className="bg-blue-50 border border-blue-200 rounded p-3">
                 <p className="text-sm text-blue-800">
                   💡 <strong>How this works:</strong> Your changes will be sent to the client for review. They can accept the changes and proceed with payment, or request further modifications.
                 </p>
@@ -3457,14 +3457,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     setShowEditBookingModal(false)
                     setSelectedBookingForEdit(null)
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                 >
                   {loading ? 'Sending...' : 'Send Revision to Client'}
                 </button>
@@ -3477,7 +3477,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Add Helicopter Modal */}
       {showAddHelicopterModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-6">Add New Helicopter</h3>
             
             <form onSubmit={async (e) => {
@@ -3522,7 +3522,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={newHelicopterData.name}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3532,7 +3532,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={newHelicopterData.model}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, model: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3542,7 +3542,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={newHelicopterData.manufacturer}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, manufacturer: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3552,7 +3552,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={newHelicopterData.registration_number}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, registration_number: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3562,7 +3562,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="number"
                     value={newHelicopterData.year_manufactured}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, year_manufactured: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3572,7 +3572,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="number"
                     value={newHelicopterData.capacity}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, capacity: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3582,7 +3582,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="number"
                     value={newHelicopterData.hourly_rate}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, hourly_rate: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3592,7 +3592,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="number"
                     value={newHelicopterData.max_range_km}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, max_range_km: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -3601,7 +3601,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={newHelicopterData.location}
                     onChange={(e) => setNewHelicopterData({ ...newHelicopterData, location: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
               </div>
@@ -3611,7 +3611,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <textarea
                   value={newHelicopterData.notes}
                   onChange={(e) => setNewHelicopterData({ ...newHelicopterData, notes: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   rows={3}
                 />
               </div>
@@ -3620,13 +3620,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <button
                   type="button"
                   onClick={() => setShowAddHelicopterModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-none"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded"
                 >
                   Add Helicopter
                 </button>
@@ -3639,7 +3639,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Edit Helicopter Modal */}
       {showEditHelicopterModal && selectedHelicopterForEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-6">Edit Helicopter</h3>
             
             <form onSubmit={async (e) => {
@@ -3687,7 +3687,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={selectedHelicopterForEdit.name}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3697,7 +3697,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={selectedHelicopterForEdit.model}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, model: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3706,7 +3706,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <select
                     value={selectedHelicopterForEdit.status}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, status: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   >
                     <option value="active">Active</option>
                     <option value="maintenance">Maintenance</option>
@@ -3720,7 +3720,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="number"
                     value={selectedHelicopterForEdit.hourly_rate}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, hourly_rate: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                     required
                   />
                 </div>
@@ -3731,7 +3731,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     step="0.1"
                     value={selectedHelicopterForEdit.total_flight_hours || 0}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, total_flight_hours: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -3740,7 +3740,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={selectedHelicopterForEdit.location}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, location: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -3749,7 +3749,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="date"
                     value={selectedHelicopterForEdit.next_maintenance_due || ''}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, next_maintenance_due: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -3758,7 +3758,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="date"
                     value={selectedHelicopterForEdit.insurance_expiry || ''}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, insurance_expiry: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
               </div>
@@ -3768,7 +3768,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <textarea
                   value={selectedHelicopterForEdit.notes || ''}
                   onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, notes: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   rows={3}
                 />
               </div>
@@ -3777,13 +3777,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <button
                   type="button"
                   onClick={() => setShowEditHelicopterModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-none"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded"
                 >
                   Update Helicopter
                 </button>
@@ -3796,7 +3796,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Maintenance Modal */}
       {showMaintenanceModal && selectedHelicopterForEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-lg w-full">
+          <div className="bg-white rounded p-6 max-w-lg w-full">
             <h3 className="text-xl font-bold mb-6">Schedule Maintenance</h3>
             
             <form onSubmit={async (e) => {
@@ -3846,7 +3846,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <label className="block text-sm font-medium text-gray-700 mb-1">Maintenance Type</label>
                 <select
                   name="maintenance_type"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   required
                 >
                   <option value="scheduled">Scheduled Maintenance</option>
@@ -3860,7 +3860,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                   name="description"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   rows={3}
                   required
                   placeholder="Describe the maintenance work..."
@@ -3872,7 +3872,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <input
                   type="date"
                   name="start_date"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   required
                 />
               </div>
@@ -3882,7 +3882,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <input
                   type="text"
                   name="performed_by"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   placeholder="Technician or company name"
                 />
               </div>
@@ -3893,7 +3893,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   type="number"
                   name="cost"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   placeholder="0.00"
                 />
               </div>
@@ -3902,7 +3902,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <textarea
                   name="notes"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded"
                   rows={2}
                   placeholder="Additional notes..."
                 />
@@ -3912,13 +3912,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <button
                   type="button"
                   onClick={() => setShowMaintenanceModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-none"
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded"
                 >
                   Schedule Maintenance
                 </button>
