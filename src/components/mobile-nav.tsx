@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Menu, X, Home, User, Calendar, Settings, LogOut, Globe, Briefcase } from 'lucide-react'
+import { Menu, X, Home, User, Calendar, Settings, LogOut, Globe, Briefcase, HelpCircle } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { useI18n } from '@/lib/i18n'
@@ -50,6 +50,12 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
       href: '/',
       label: 'Home',
       icon: <Home className="h-5 w-5" />,
+      show: true
+    },
+    {
+      href: '/faq',
+      label: 'FAQ',
+      icon: <HelpCircle className="h-5 w-5" />,
       show: true
     },
     {
