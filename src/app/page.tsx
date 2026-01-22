@@ -10,6 +10,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
+import { PhotoGallery } from '@/components/PhotoGallery'
 import dynamic from 'next/dynamic'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
@@ -378,6 +379,9 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Photo Gallery */}
+      <PhotoGallery />
 
       {/* Footer CTA */}
       <div className="bg-luxury-black text-white py-16">
