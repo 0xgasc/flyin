@@ -1,6 +1,103 @@
 # FlyInGuate Session Changes Documentation
 **Date:** January 23, 2026
-**Session Summary:** Design updates, admin features, bulk operations, FAQ page, and invoice/receipt system
+
+---
+
+## 🔒 Security Audit & Design Refresh (v2.1.0)
+**Date:** January 23, 2026
+
+### Security Hardening
+
+#### 1. JWT Library Standardization
+**File:** `src/middleware.ts`
+- Replaced `jose` library with `jsonwebtoken` for consistency across codebase
+- Removed async overhead (jose requires async, jsonwebtoken is synchronous)
+- Unified JWT verification using `@/lib/jwt` utilities
+- Improved performance and maintainability
+
+#### 2. Security Measures Already in Place (Verified)
+The following security best practices were confirmed to be implemented:
+
+**JWT Secret Validation** (`src/lib/jwt.ts:4-13`)
+- Application throws error on startup if `JWT_SECRET` environment variable not set
+- No hardcoded fallback secrets
+- Prevents deployment with default/weak secrets
+
+**Error Sanitization** (All auth routes)
+- Generic error messages returned to clients
+- No stack traces or internal details exposed
+- Files: `login/route.ts:72`, `me/route.ts:51`, `register/route.ts:106`
+
+**Atomic Payment Operations** (`src/app/api/bookings/[id]/pay/route.ts:46-57`)
+- Prevents TOCTOU (Time-of-check to Time-of-use) race conditions
+- Uses MongoDB `findOneAndUpdate` with balance check in single atomic operation
+- Concurrent payment requests cannot cause negative balances
+
+**NoSQL Injection Prevention** (`src/app/api/bookings/route.ts:8-20`)
+- Query parameters validated against enum whitelists
+- Only valid status/type values accepted
+- Prevents malicious query object injection
+
+### Design System Overhaul: Sharp Corners
+
+Completely redesigned UI from rounded corners to sharp edges for a modern, premium aesthetic.
+
+#### Core Styles Updated (`src/styles/globals.css`)
+```css
+.btn-primary: rounded → rounded-none
+.btn-luxury: rounded → rounded-none
+.card-luxury: rounded → rounded-none
+.modal-content: rounded → rounded-none
+.status-badge: rounded → rounded-none
+Form inputs: rounded → rounded-none
+```
+
+**Preserved:** `rounded-full` for loading spinners and avatars (functional requirement)
+
+#### Components Updated (12 files)
+1. **Modal.tsx** - All modal containers and buttons → `rounded-none`
+2. **StatusBadge.tsx** - Badge borders → `rounded-none`
+3. **booking-success-modal.tsx** - Modal and containers → `rounded-none`
+4. **guest-booking-modal.tsx** - All inputs and buttons → `rounded-none`
+5. **destination-selector-modal.tsx** - Modal, buttons, selection cards → `rounded-none`
+6. **PhotoGallery.tsx** - Hover previews and control buttons → `rounded-none`
+
+#### Pages Updated (6 major pages, 185 total changes)
+| Page | Updates | Key Changes |
+|------|---------|-------------|
+| `page.tsx` (Landing) | 9 | Hero sections, booking form, service cards |
+| `login/page.tsx` | 3 | Login form container and inputs |
+| `register/page.tsx` | 8 | Registration form and buttons |
+| `dashboard/page.tsx` | 25 | Dashboard cards, booking cards, action buttons |
+| `admin/page.tsx` | 137 | Admin tables, modals, forms, status badges |
+| `faq/page.tsx` | 3 | FAQ accordion panels |
+
+#### Design Philosophy
+- **Sharp edges** convey precision, professionalism, luxury
+- **Consistent** across all UI elements (buttons, cards, modals, inputs)
+- **Circular elements preserved** only where functionally necessary (spinners, avatars)
+- **Modern aesthetic** aligned with premium helicopter service brand
+
+### Build Verification
+```bash
+✓ Build successful (no TypeScript errors)
+✓ 42 static pages generated
+✓ All routes compiled successfully
+```
+
+### Files Modified
+**Security:** 1 file
+- `src/middleware.ts`
+
+**Design:** 14 files
+- `src/styles/globals.css`
+- 6 components: `Modal.tsx`, `StatusBadge.tsx`, `booking-success-modal.tsx`, `guest-booking-modal.tsx`, `destination-selector-modal.tsx`, `PhotoGallery.tsx`
+- 6 pages: `page.tsx`, `login/page.tsx`, `register/page.tsx`, `dashboard/page.tsx`, `admin/page.tsx`, `faq/page.tsx`
+
+---
+
+## 📦 Previous Updates (v2.0.0)
+**Session Summary:** Admin features, bulk operations, FAQ page, and invoice/receipt system
 
 ---
 

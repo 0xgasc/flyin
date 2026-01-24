@@ -260,10 +260,11 @@ flyin/
 - **Body**: Normal weight, leading-relaxed
 
 ### Components
-- **Border Radius**: `4px` (subtle, not sharp)
+- **Border Radius**: `0px` (sharp corners) - Modern, premium aesthetic
 - **Shadows**: Soft, layered elevation
 - **Transitions**: `150ms ease` for interactions
 - **Buttons**: Slate blue with hover states
+- **Exception**: Circular elements (spinners, avatars) use `rounded-full`
 
 ---
 
@@ -341,14 +342,17 @@ https://example.com/image1.jpg; https://example.com/image2.jpg
 
 ## 🔐 Security Features
 
-- **JWT Authentication** - Secure, stateless sessions
+- **JWT Authentication** - Secure, stateless sessions with required secret validation
 - **Role-based Access Control** - User, Pilot, Admin roles
 - **MongoDB Validation** - Schema-level data validation
-- **Input Sanitization** - Prevents NoSQL injection
+- **Input Sanitization** - Prevents NoSQL injection with enum whitelisting
 - **XSS Protection** - Sanitized outputs
 - **CSRF Protection** - Built into Next.js
 - **Secure Password Storage** - bcrypt hashing
 - **Admin-only Routes** - Protected bulk operations and refunds
+- **Atomic Operations** - Race condition prevention in payment processing
+- **Error Sanitization** - Generic error messages (no stack traces exposed)
+- **Standardized JWT Library** - Consistent jsonwebtoken usage across codebase
 
 ---
 
@@ -419,15 +423,21 @@ NEXT_PUBLIC_APP_URL=https://flyinguate.vercel.app
 
 ---
 
-## 📝 Recent Updates (v2.0.0)
+## 📝 Recent Updates
 
-### Design Updates
+### v2.1.0 - Security Audit & Design Refresh
+- ✅ **Security Hardening** - Standardized JWT library, verified security measures
+- ✅ **Sharp Corners Design** - Complete UI refresh from rounded to sharp edges
+- ✅ **Atomic Payment Operations** - Race condition prevention verified
+- ✅ **NoSQL Injection Prevention** - Enum validation for all query params
+- ✅ **Error Sanitization** - Generic error messages across all routes
+- ✅ 185 design updates across 6 pages, 12 components, core styles
+
+### v2.0.0 - Admin Features & Bulk Operations
 - ✅ Removed all emojis from UI for cleaner interface
 - ✅ Redesigned landing page with full-screen hero
 - ✅ Integrated booking form + interactive map side-by-side
 - ✅ Added photo gallery with lightbox
-
-### New Features
 - ✅ **FAQ Page** - Bilingual accordion-style FAQ (`/faq`)
 - ✅ **Pricing Calculator** - Automated distance-based pricing
 - ✅ **Invoice Generation** - PDF invoices for any booking
@@ -435,8 +445,6 @@ NEXT_PUBLIC_APP_URL=https://flyinguate.vercel.app
 - ✅ **Refund Workflow** - Full/partial refunds with tracking
 - ✅ **Bulk Export** - Excel/CSV export for experiences & destinations
 - ✅ **Bulk Import** - Excel/CSV import with create/update/delete
-
-### Technical
 - ✅ Installed: jspdf, papaparse, xlsx
 - ✅ 8 new API endpoints
 - ✅ MongoDB transaction support for refunds
