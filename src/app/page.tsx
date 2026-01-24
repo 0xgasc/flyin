@@ -195,7 +195,7 @@ export default function HomePage() {
 
           <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
             {/* Booking Form */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded p-6 sm:p-8">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-none p-6 sm:p-8">
               <form onSubmit={handleQuickBook} className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
@@ -206,7 +206,7 @@ export default function HomePage() {
                     <select
                       value={bookingForm.from}
                       onChange={(e) => setBookingForm({ ...bookingForm, from: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
                     >
                       {DESTINATIONS.map(d => (
                         <option key={d.value} value={d.value} className="bg-luxury-black text-white">
@@ -224,7 +224,7 @@ export default function HomePage() {
                     <select
                       value={bookingForm.to}
                       onChange={(e) => setBookingForm({ ...bookingForm, to: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
                     >
                       {DESTINATIONS.map(d => (
                         <option key={d.value} value={d.value} className="bg-luxury-black text-white">
@@ -245,7 +245,7 @@ export default function HomePage() {
                       type="date"
                       value={bookingForm.date}
                       onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
                     />
                   </div>
 
@@ -257,7 +257,7 @@ export default function HomePage() {
                     <select
                       value={bookingForm.passengers}
                       onChange={(e) => setBookingForm({ ...bookingForm, passengers: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
                     >
                       {[1, 2, 3, 4, 5, 6].map(n => (
                         <option key={n} value={n} className="bg-luxury-black text-white">
@@ -282,7 +282,7 @@ export default function HomePage() {
             </div>
 
             {/* Map */}
-            <div className="h-[400px] lg:h-[500px] rounded overflow-hidden border border-white/10">
+            <div className="h-[400px] lg:h-[500px] rounded-none overflow-hidden border border-white/10">
               <GuatemalaMapLibre
                 onDepartmentClick={(dept) => {
                   // Select first destination from department
@@ -318,7 +318,7 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Transport */}
-            <div className="group bg-gray-50 rounded p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
+            <div className="group bg-gray-50 rounded-none p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
               <h3 className="text-2xl font-bold text-luxury-black mb-4">
                 {t('services.transport.title')}
               </h3>
@@ -348,7 +348,7 @@ export default function HomePage() {
             </div>
 
             {/* Experiences */}
-            <div className="group bg-gray-50 rounded p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
+            <div className="group bg-gray-50 rounded-none p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
               <h3 className="text-2xl font-bold text-luxury-black mb-4">
                 {t('services.experiences.title')}
               </h3>
@@ -401,7 +401,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/book/experiences"
-              className="border border-white/30 text-white px-10 py-4 rounded hover:bg-white/10 transition-colors text-lg"
+              className="border border-white/30 text-white px-10 py-4 rounded-none hover:bg-white/10 transition-colors text-lg"
             >
               View Experiences
             </Link>

@@ -154,7 +154,7 @@ export default function FAQPage() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white rounded shadow-md overflow-hidden border border-gray-200"
+                className="bg-white rounded-none shadow-md overflow-hidden border border-gray-200"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
@@ -186,7 +186,7 @@ export default function FAQPage() {
           </div>
 
           {/* Contact CTA */}
-          <div className="mt-12 bg-luxury-black text-white rounded p-8 text-center">
+          <div className="mt-12 bg-luxury-black text-white rounded-none p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">
               {locale === 'es' ? '¿Aún tienes preguntas?' : 'Still have questions?'}
             </h2>
@@ -204,7 +204,7 @@ export default function FAQPage() {
               </Link>
               <a
                 href="mailto:info@flyinguate.com"
-                className="border border-white/30 text-white px-8 py-3 rounded hover:bg-white/10 transition-colors text-lg"
+                className="border border-white/30 text-white px-8 py-3 rounded-none hover:bg-white/10 transition-colors text-lg"
               >
                 {locale === 'es' ? 'Contáctanos' : 'Contact Us'}
               </a>

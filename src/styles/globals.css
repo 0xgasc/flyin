@@ -10,21 +10,21 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 text-white px-6 py-3 sm:py-3 py-4 rounded font-medium hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl min-h-[44px] text-base;
+    @apply bg-primary-600 text-white px-6 py-3 sm:py-3 py-4 rounded-none font-medium hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl min-h-[44px] text-base;
   }
 
   .btn-luxury {
-    @apply bg-luxury-black text-brand-text px-6 sm:px-8 py-4 rounded font-semibold hover:bg-luxury-charcoal transition-all duration-300 shadow-xl hover:shadow-2xl tracking-wider uppercase min-h-[44px] text-base border border-brand-accent/30;
+    @apply bg-luxury-black text-brand-text px-6 sm:px-8 py-4 rounded-none font-semibold hover:bg-luxury-charcoal transition-all duration-300 shadow-xl hover:shadow-2xl tracking-wider uppercase min-h-[44px] text-base border border-brand-accent/30;
   }
 
   .card-luxury {
-    @apply bg-white rounded shadow-xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300;
+    @apply bg-white rounded-none shadow-xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300;
   }
 
   /* Mobile-optimized form inputs */
   input[type="text"], input[type="email"], input[type="password"], input[type="tel"],
   input[type="number"], input[type="date"], input[type="time"], select, textarea {
-    @apply min-h-[44px] text-base rounded;
+    @apply min-h-[44px] text-base rounded-none;
   }
 
   /* Consistent loading spinner - keep rounded-full for circular animation */
@@ -43,14 +43,14 @@
     @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4;
   }
   .modal-content {
-    @apply bg-white rounded shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto;
+    @apply bg-white rounded-none shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto;
   }
   .modal-content-lg {
-    @apply bg-white rounded shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto;
+    @apply bg-white rounded-none shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto;
   }
 
   /* Status badge classes */
   .status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium;
   }
 }

@@ -117,7 +117,7 @@ export default function RegisterPage() {
         <div className="card-luxury">
           <form onSubmit={handleRegister} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-none text-sm">
                 {error}
               </div>
             )}
@@ -130,7 +130,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, role: 'client' })}
-                  className={`p-4 rounded border-2 transition-all ${
+                  className={`p-4 rounded-none border-2 transition-all ${
                     formData.role === 'client'
                       ? 'border-primary-600 bg-primary-50'
                       : 'border-gray-200 hover:border-gray-300'
@@ -142,7 +142,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, role: 'pilot' })}
-                  className={`p-4 rounded border-2 transition-all ${
+                  className={`p-4 rounded-none border-2 transition-all ${
                     formData.role === 'pilot'
                       ? 'border-primary-600 bg-primary-50'
                       : 'border-gray-200 hover:border-gray-300'
@@ -165,7 +165,7 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="John Doe"
                   required
                 />
@@ -183,7 +183,7 @@ export default function RegisterPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="you@example.com"
                   required
                 />
@@ -201,7 +201,7 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="+502 5555 5555"
                 />
               </div>
@@ -220,7 +220,7 @@ export default function RegisterPage() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   onFocus={() => setShowPasswordRequirements(true)}
                   onBlur={() => setShowPasswordRequirements(false)}
-                  className={`w-full pl-10 pr-3 py-3 border rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-3 py-3 border rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                     formData.password && !passwordValidation.isValid
                       ? 'border-amber-400'
                       : formData.password && passwordValidation.isValid
@@ -234,7 +234,7 @@ export default function RegisterPage() {
               </div>
               {/* Password requirements */}
               {(showPasswordRequirements || formData.password) && (
-                <div className="mt-2 p-3 bg-gray-50 rounded text-sm">
+                <div className="mt-2 p-3 bg-gray-50 rounded-none text-sm">
                   <p className="font-medium text-gray-700 mb-2">Password must have:</p>
                   <ul className="space-y-1">
                     <li className={`flex items-center ${passwordValidation.checks.length ? 'text-green-600' : 'text-gray-500'}`}>

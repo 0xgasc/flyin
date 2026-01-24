@@ -415,7 +415,7 @@ export default function DashboardPage() {
         <div className="flex space-x-1 mb-8">
           <button
             onClick={() => setActiveTab('bookings')}
-            className={`px-6 py-3 rounded font-medium ${
+            className={`px-6 py-3 rounded-none font-medium ${
               activeTab === 'bookings'
                 ? 'bg-white text-primary-700 border-b-2 border-primary-600'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -425,7 +425,7 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 rounded font-medium ${
+            className={`px-6 py-3 rounded-none font-medium ${
               activeTab === 'profile'
                 ? 'bg-white text-primary-700 border-b-2 border-primary-600'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -435,7 +435,7 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab('payments')}
-            className={`px-6 py-3 rounded font-medium ${
+            className={`px-6 py-3 rounded-none font-medium ${
               activeTab === 'payments'
                 ? 'bg-white text-primary-700 border-b-2 border-primary-600'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -515,7 +515,7 @@ export default function DashboardPage() {
 
                       <div className="ml-4 flex flex-col space-y-2">
                         {booking.status === 'pending' && (
-                          <button className="text-red-600 hover:text-red-700 text-sm px-3 py-1 border border-red-300 rounded hover:bg-red-50">
+                          <button className="text-red-600 hover:text-red-700 text-sm px-3 py-1 border border-red-300 rounded-none hover:bg-red-50">
                             Cancel
                           </button>
                         )}
@@ -524,7 +524,7 @@ export default function DashboardPage() {
                           <>
                             <button
                               onClick={() => openPaymentModal(booking)}
-                              className="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700 flex items-center"
+                              className="bg-green-600 text-white text-sm px-4 py-2 rounded-none hover:bg-green-700 flex items-center"
                             >
                               Choose Payment
                             </button>
@@ -536,7 +536,7 @@ export default function DashboardPage() {
                         )}
 
                         {booking.status === 'assigned' && booking.paymentStatus === 'paid' && (
-                          <div className="bg-green-50 border border-green-200 rounded p-2">
+                          <div className="bg-green-50 border border-green-200 rounded-none p-2">
                             <p className="text-xs text-green-800 font-medium text-center">
                               Ready to Fly!
                             </p>
@@ -547,7 +547,7 @@ export default function DashboardPage() {
                         )}
 
                         {booking.status === 'completed' && (
-                          <div className="bg-green-50 border border-green-200 rounded p-2">
+                          <div className="bg-green-50 border border-green-200 rounded-none p-2">
                             <p className="text-xs text-green-800 font-medium text-center">
                               Completed
                             </p>
@@ -570,13 +570,13 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile & Settings</h1>
             
             {profileError && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-none mb-6">
                 {profileError}
               </div>
             )}
             
             {profileSuccess && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-none mb-6">
                 {profileSuccess}
               </div>
             )}
@@ -591,7 +591,7 @@ export default function DashboardPage() {
                   type="email"
                   value={profileData.email}
                   disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none bg-gray-50 text-gray-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
               </div>
@@ -605,7 +605,7 @@ export default function DashboardPage() {
                   type="text"
                   value={profileData.fullName}
                   onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -619,7 +619,7 @@ export default function DashboardPage() {
                   type="tel"
                   value={profileData.phone}
                   onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="+502 1234 5678"
                 />
               </div>
@@ -627,7 +627,7 @@ export default function DashboardPage() {
               <button
                 type="submit"
                 disabled={profileLoading}
-                className="w-full flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50"
+                className="w-full flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700 disabled:opacity-50"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {profileLoading ? t('common.loading') : t('profile.update')}
@@ -666,7 +666,7 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {paymentProofs.map((proof) => (
-                    <div key={proof.id} className="flex items-center justify-between p-4 bg-gray-50 rounded">
+                    <div key={proof.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-none">
                       <div>
                         <p className="font-medium">
                           {proof.type === 'deposit' ? 'Top-up' : 'Payment'} - ${Math.abs(proof.amount)}
@@ -709,7 +709,7 @@ export default function DashboardPage() {
       {/* Top-up Modal */}
       {showTopUpModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
+          <div className="bg-white rounded-none p-6 max-w-md w-full max-h-screen overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Top Up Balance</h2>
               <button
@@ -730,7 +730,7 @@ export default function DashboardPage() {
                   step="0.01"
                   value={topUpData.amount}
                   onChange={(e) => setTopUpData({...topUpData, amount: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -743,7 +743,7 @@ export default function DashboardPage() {
                   type="text"
                   value={topUpData.reference}
                   onChange={(e) => setTopUpData({...topUpData, reference: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Transaction ID or reference"
                   required
                 />
@@ -761,7 +761,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div className="p-4 bg-blue-50 rounded border border-blue-200">
+              <div className="p-4 bg-blue-50 rounded-none border border-blue-200">
                 <h4 className="font-semibold text-blue-900 mb-2">Bank Transfer Details</h4>
                 <div className="text-sm text-blue-800 space-y-1">
                   <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
@@ -774,14 +774,14 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowTopUpModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-none hover:bg-primary-700 disabled:opacity-50"
                 >
                   {profileLoading ? 'Submitting...' : 'Submit Request'}
                 </button>
@@ -859,7 +859,7 @@ function PaymentModal({
           {/* Account Balance */}
           <button
             onClick={() => setSelectedPaymentMethod('balance')}
-            className={`w-full p-4 rounded border-2 transition-colors ${
+            className={`w-full p-4 rounded-none border-2 transition-colors ${
               selectedPaymentMethod === 'balance'
                 ? 'border-primary-500 bg-primary-50'
                 : 'border-gray-200 hover:border-gray-300'
@@ -882,7 +882,7 @@ function PaymentModal({
           {/* Bank Deposit */}
           <button
             onClick={() => setSelectedPaymentMethod('bank')}
-            className={`w-full p-4 rounded border-2 transition-colors ${
+            className={`w-full p-4 rounded-none border-2 transition-colors ${
               selectedPaymentMethod === 'bank'
                 ? 'border-primary-500 bg-primary-50'
                 : 'border-gray-200 hover:border-gray-300'
@@ -928,7 +928,7 @@ function PaymentModal({
 
         {/* Bank Deposit Details */}
         {selectedPaymentMethod === 'bank' && (
-          <div className="mb-6 p-4 bg-blue-50 rounded border border-blue-200">
+          <div className="mb-6 p-4 bg-blue-50 rounded-none border border-blue-200">
             <h4 className="font-semibold text-blue-900 mb-3">Bank Transfer Instructions</h4>
             <div className="text-sm text-blue-800 space-y-1">
               <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
@@ -960,7 +960,7 @@ function PaymentModal({
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:opacity-50"
+            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50 disabled:opacity-50"
           >
             Cancel
           </button>
@@ -974,7 +974,7 @@ function PaymentModal({
               }
             }}
             disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.accountBalance || profile.accountBalance < booking.totalPrice))}
-            className="flex-1 px-6 py-3 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-none hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Processing...' :
              selectedPaymentMethod === 'balance' ? 'Pay Now' : 'Submit Proof'

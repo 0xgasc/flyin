@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { jwtVerify } from 'jose'
+import { verifyToken as verifyJWT, type JWTPayload } from '@/lib/jwt'
 
 // Routes that require authentication
 const PROTECTED_ROUTES = ['/dashboard', '/profile', '/pilot', '/admin']
@@ -14,28 +14,15 @@ const ROLE_ROUTES: Record<string, string[]> = {
 // Routes that should redirect to dashboard if already logged in
 const AUTH_ROUTES = ['/login', '/register']
 
-interface JWTPayload {
-  userId: string
-  email: string
-  role: 'client' | 'pilot' | 'admin'
-}
-
-async function verifyToken(token: string): Promise<JWTPayload | null> {
+function verifyToken(token: string): JWTPayload | null {
   try {
-    const jwtSecret = process.env.JWT_SECRET
-    if (!jwtSecret) {
-      console.error('CRITICAL: JWT_SECRET environment variable is not set')
-      return null
-    }
-    const secret = new TextEncoder().encode(jwtSecret)
-    const { payload } = await jwtVerify(token, secret)
-    return payload as unknown as JWTPayload
+    return verifyJWT(token)
   } catch {
     return null
   }
 }
 
-export async function middleware(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const { pathname } = req.nextUrl
 
@@ -55,7 +42,7 @@ export async function middleware(req: NextRequest) {
     req.headers.get('Authorization')?.replace('Bearer ', '')
 
   // Verify token if present
-  const user = token ? await verifyToken(token) : null
+  const user = token ? verifyToken(token) : null
 
   // Handle auth routes (login/register) - redirect to dashboard if already logged in
   if (AUTH_ROUTES.some(route => pathname.startsWith(route))) {
