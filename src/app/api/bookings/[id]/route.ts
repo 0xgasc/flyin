@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Booking from '@/models/Booking'
+import Experience from '@/models/Experience'  // Required for populate
 import { extractToken, verifyToken } from '@/lib/jwt'
 import mongoose from 'mongoose'
+
+// Ensure Experience model is registered for populate
+void Experience
 
 interface RouteContext {
   params: Promise<{ id: string }>

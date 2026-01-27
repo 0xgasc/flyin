@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Booking from '@/models/Booking'
+import Experience from '@/models/Experience'  // Required for populate
 import { extractToken, verifyToken } from '@/lib/jwt'
 import mongoose from 'mongoose'
+
+// Ensure Experience model is registered for populate
+void Experience
 
 // Valid enum values for query parameter validation (prevents NoSQL injection)
 const VALID_STATUSES = ['pending', 'approved', 'assigned', 'accepted', 'completed', 'cancelled'] as const
