@@ -207,127 +207,154 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="max-w-6xl mx-auto">
-            {/* Origin Badge */}
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="flex items-center gap-2 bg-green-500/20 border border-green-500/40 px-4 py-2 rounded-full">
-                <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                <span className="text-green-400 font-medium">Departing from La Aurora Airport (GUA)</span>
-              </div>
-            </div>
-
-            {/* Map */}
-            <div className="h-[450px] lg:h-[550px] rounded-soft overflow-hidden border border-white/10 mb-8">
-              <SafeMapWrapper
-                onDepartmentClick={(dept: Department) => {
-                  // Don't select Guatemala as destination (it's the origin)
-                  if (dept.id !== 'guatemala') {
-                    setSelectedDestination(dept.id)
-                  }
-                }}
-                selectedFrom="guatemala"
-                selectedTo={selectedDestination || undefined}
-                mode="to"
-              />
-            </div>
-
-            {/* Pricing Table */}
-            {selectedDestination && destinationDept && routePricing ? (
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-6 sm:p-8 animate-fade-in">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                  {/* Route Info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">From</div>
-                        <div className="text-lg font-semibold text-white">Guatemala City</div>
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-5 gap-6 items-start">
+              {/* Left Panel - Pricing/Selection */}
+              <div className="lg:col-span-2 order-2 lg:order-1">
+                {selectedDestination && destinationDept && routePricing ? (
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-5 animate-fade-in">
+                    {/* Route Header */}
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                          <span className="text-xs text-gray-500 uppercase tracking-wide">From</span>
+                        </div>
+                        <div className="text-white font-semibold">Guatemala City</div>
                         <div className="text-sm text-gold-400">La Aurora (GUA)</div>
                       </div>
-                      <div className="flex-1 flex items-center justify-center">
-                        <div className="h-px bg-gradient-to-r from-green-500 via-gold-500 to-red-500 flex-1"></div>
-                        <Plane className="h-5 w-5 text-gold-400 mx-2 rotate-90" />
-                        <div className="h-px bg-gradient-to-r from-gold-500 to-red-500 flex-1"></div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">To</div>
-                        <div className="text-lg font-semibold text-white">{destinationDept.name}</div>
+                      <Plane className="h-5 w-5 text-gold-400 rotate-90" />
+                      <div className="flex-1 text-right">
+                        <div className="flex items-center justify-end gap-2 mb-1">
+                          <span className="text-xs text-gray-500 uppercase tracking-wide">To</span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                        </div>
+                        <div className="text-white font-semibold">{destinationDept.name}</div>
                         <div className="text-sm text-gray-400">{destinationDept.destinations[0]}</div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="bg-white/5 rounded-soft p-3">
+                    {/* Flight Details */}
+                    <div className="grid grid-cols-3 gap-3 mb-5">
+                      <div className="bg-white/5 rounded-soft p-3 text-center">
                         <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Distance</div>
                         <div className="text-white font-medium">{routePricing.distance}</div>
                       </div>
-                      <div className="bg-white/5 rounded-soft p-3">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Flight Time</div>
+                      <div className="bg-white/5 rounded-soft p-3 text-center">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Flight</div>
                         <div className="text-white font-medium">{routePricing.flightTime}</div>
                       </div>
-                      <div className="bg-white/5 rounded-soft p-3">
+                      <div className="bg-white/5 rounded-soft p-3 text-center">
                         <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Aircraft</div>
                         <div className="text-white font-medium">Bell 407</div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Pricing & CTA */}
-                  <div className="lg:w-72 bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-500/30 rounded-soft p-6 text-center">
-                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Roundtrip Price (2 pax)</div>
-                    <div className="flex items-center justify-center gap-1 mb-4">
-                      <DollarSign className="h-8 w-8 text-gold-400" />
-                      <span className="text-4xl font-bold text-white">{routePricing.price.toLocaleString()}</span>
-                      <span className="text-gray-400 text-sm self-end mb-1">USD</span>
+                    {/* Price Card */}
+                    <div className="bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-500/30 rounded-soft p-5 text-center mb-5">
+                      <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Roundtrip (2 passengers)</div>
+                      <div className="flex items-center justify-center gap-1 mb-2">
+                        <DollarSign className="h-7 w-7 text-gold-400" />
+                        <span className="text-3xl font-bold text-white">{routePricing.price.toLocaleString()}</span>
+                        <span className="text-gray-400 text-sm self-end mb-1">USD</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mb-4">
+                        ${Math.round(routePricing.price / 2).toLocaleString()} per person
+                      </div>
+                      <button
+                        onClick={() => {
+                          const params = new URLSearchParams()
+                          params.set('from', 'guatemala')
+                          params.set('to', selectedDestination)
+                          params.set('passengers', '2')
+                          router.push(`/book/transport?${params.toString()}`)
+                        }}
+                        className="w-full btn-luxury py-3"
+                      >
+                        Book This Flight
+                      </button>
                     </div>
-                    <div className="text-xs text-gray-500 mb-4">
-                      ${Math.round(routePricing.price / 2).toLocaleString()} per person
-                    </div>
-                    <button
-                      onClick={() => {
-                        const params = new URLSearchParams()
-                        params.set('from', 'guatemala')
-                        params.set('to', selectedDestination)
-                        params.set('passengers', '2')
-                        router.push(`/book/transport?${params.toString()}`)
-                      }}
-                      className="w-full btn-luxury py-3"
-                    >
-                      Book This Flight
-                    </button>
-                  </div>
-                </div>
 
-                {/* Destinations in this region */}
-                <div className="mt-6 pt-6 border-t border-white/10">
-                  <div className="text-sm text-gray-400 mb-3">Popular destinations in {destinationDept.name}:</div>
-                  <div className="flex flex-wrap gap-2">
-                    {destinationDept.destinations.map(dest => (
-                      <span key={dest} className="px-3 py-1 bg-white/10 rounded-full text-sm text-white">
-                        {dest}
-                      </span>
-                    ))}
+                    {/* Destinations */}
+                    <div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Destinations in {destinationDept.name}</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {destinationDept.destinations.map(dest => (
+                          <span key={dest} className="px-2.5 py-1 bg-white/10 rounded-full text-xs text-white">
+                            {dest}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
+                ) : (
+                  /* Prompt to select destination */
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-6">
+                    {/* Origin Badge */}
+                    <div className="flex items-center gap-2 bg-green-500/20 border border-green-500/40 px-3 py-2 rounded-full mb-5 w-fit">
+                      <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                      <span className="text-green-400 text-sm font-medium">Departing from La Aurora (GUA)</span>
+                    </div>
+
+                    <MapPin className="h-10 w-10 text-gold-400 mb-4" />
+                    <h3 className="text-lg font-semibold text-white mb-2">Select Your Destination</h3>
+                    <p className="text-gray-400 text-sm">
+                      Click on any point on the map to see flight details, distance, and pricing.
+                    </p>
+
+                    {/* Quick destination list */}
+                    <div className="mt-5 pt-5 border-t border-white/10">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-3">Popular Routes</div>
+                      <div className="space-y-2">
+                        {['sacatepequez', 'solola', 'peten', 'alta-verapaz'].map(id => {
+                          const dept = guatemalaDepartments.find(d => d.id === id)
+                          const pricing = ROUTE_PRICING[`guatemala-${id}`]
+                          if (!dept || !pricing) return null
+                          return (
+                            <button
+                              key={id}
+                              onClick={() => setSelectedDestination(id)}
+                              className="w-full flex items-center justify-between p-2.5 bg-white/5 hover:bg-white/10 rounded-soft transition-colors text-left"
+                            >
+                              <div>
+                                <div className="text-white text-sm font-medium">{dept.name}</div>
+                                <div className="text-gray-500 text-xs">{pricing.flightTime} • {pricing.distance}</div>
+                              </div>
+                              <div className="text-gold-400 font-semibold">${pricing.price}</div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Quick Links */}
+                <div className="mt-4 text-center">
+                  <p className="text-gray-500 text-sm">
+                    Want a scenic tour?{' '}
+                    <Link href="/book/experiences" className="text-gold-400 hover:underline">
+                      Browse experiences →
+                    </Link>
+                  </p>
                 </div>
               </div>
-            ) : (
-              /* Prompt to select destination */
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-8 text-center">
-                <MapPin className="h-12 w-12 text-gold-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Select Your Destination</h3>
-                <p className="text-gray-400 max-w-md mx-auto">
-                  Click on any point on the map above to see flight details, distance, and pricing for your journey from Guatemala City.
-                </p>
-              </div>
-            )}
 
-            {/* Quick Links */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-500 text-sm">
-                Looking for a scenic experience instead?{' '}
-                <Link href="/book/experiences" className="text-gold-400 hover:underline">
-                  Browse our aerial tours →
-                </Link>
-              </p>
+              {/* Right Panel - Map */}
+              <div className="lg:col-span-3 order-1 lg:order-2">
+                <div className="h-[400px] lg:h-[550px] rounded-soft overflow-hidden border border-white/10">
+                  <SafeMapWrapper
+                    onDepartmentClick={(dept: Department) => {
+                      if (dept.id !== 'guatemala') {
+                        setSelectedDestination(dept.id)
+                      }
+                    }}
+                    selectedFrom="guatemala"
+                    selectedTo={selectedDestination || undefined}
+                    mode="to"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
