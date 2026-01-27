@@ -1,16 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Users, Shield, Clock, Star, MapPin, Calendar, ChevronDown } from 'lucide-react'
+import { Users, Shield, Clock, Star, MapPin, ChevronDown, Plane, DollarSign } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { PhotoGallery } from '@/components/PhotoGallery'
+import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 import dynamic from 'next/dynamic'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
@@ -28,43 +29,56 @@ const SafeMapWrapper = dynamic(() => import('@/components/safe-map-wrapper'), {
   )
 })
 
-const DESTINATIONS = [
-  { value: '', label: 'Select destination' },
-  { value: 'GUA', label: 'Guatemala City (GUA)' },
-  { value: 'ANTIGUA', label: 'Antigua Guatemala' },
-  { value: 'ATITLAN', label: 'Lake Atitlan' },
-  { value: 'TIKAL', label: 'Tikal' },
-  { value: 'FRS', label: 'Flores (FRS)' },
-  { value: 'SEMUC', label: 'Semuc Champey' },
-  { value: 'MONTERRICO', label: 'Monterrico Beach' },
-]
+// Estimated pricing data (per 2 passengers, roundtrip)
+// Pricing is based on distance and flight time estimates
+const ROUTE_PRICING: Record<string, { flightTime: string; price: number; distance: string }> = {
+  'guatemala-sacatepequez': { flightTime: '15 min', price: 850, distance: '25 km' },
+  'guatemala-solola': { flightTime: '35 min', price: 1650, distance: '95 km' },
+  'guatemala-peten': { flightTime: '55 min', price: 2800, distance: '280 km' },
+  'guatemala-izabal': { flightTime: '45 min', price: 2200, distance: '180 km' },
+  'guatemala-quetzaltenango': { flightTime: '40 min', price: 1900, distance: '120 km' },
+  'guatemala-retalhuleu': { flightTime: '35 min', price: 1700, distance: '130 km' },
+  'guatemala-alta-verapaz': { flightTime: '40 min', price: 1850, distance: '140 km' },
+  'guatemala-huehuetenango': { flightTime: '50 min', price: 2400, distance: '200 km' },
+  'guatemala-escuintla': { flightTime: '20 min', price: 950, distance: '45 km' },
+  'guatemala-san-marcos': { flightTime: '55 min', price: 2600, distance: '220 km' },
+  'guatemala-chimaltenango': { flightTime: '18 min', price: 900, distance: '35 km' },
+  'guatemala-zacapa': { flightTime: '35 min', price: 1600, distance: '110 km' },
+  'guatemala-chiquimula': { flightTime: '40 min', price: 1800, distance: '130 km' },
+  'guatemala-jalapa': { flightTime: '30 min', price: 1400, distance: '85 km' },
+  'guatemala-santa-rosa': { flightTime: '25 min', price: 1200, distance: '60 km' },
+  'guatemala-baja-verapaz': { flightTime: '35 min', price: 1550, distance: '100 km' },
+  'guatemala-jutiapa': { flightTime: '35 min', price: 1500, distance: '100 km' },
+  'guatemala-el-progreso': { flightTime: '25 min', price: 1100, distance: '55 km' },
+  'guatemala-totonicapan': { flightTime: '45 min', price: 2100, distance: '150 km' },
+  'guatemala-quiche': { flightTime: '45 min', price: 2050, distance: '145 km' },
+  'guatemala-suchitepequez': { flightTime: '35 min', price: 1650, distance: '115 km' },
+}
 
 export default function HomePage() {
   const { t } = useTranslation()
   const { profile } = useAuthStore()
   const router = useRouter()
 
-  const [bookingForm, setBookingForm] = useState({
-    from: '',
-    to: '',
-    date: '',
-    passengers: '2'
-  })
+  // Default origin is Guatemala City (Aurora Airport)
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null)
+
+  // Get selected destination department
+  const destinationDept = useMemo(() => {
+    if (!selectedDestination) return null
+    return guatemalaDepartments.find(d => d.id === selectedDestination)
+  }, [selectedDestination])
+
+  // Get route pricing
+  const routePricing = useMemo(() => {
+    if (!selectedDestination || selectedDestination === 'guatemala') return null
+    const key = `guatemala-${selectedDestination}`
+    return ROUTE_PRICING[key] || null
+  }, [selectedDestination])
 
   const handleSignOut = async () => {
     await logout()
     router.push('/')
-  }
-
-  const handleQuickBook = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Navigate to transport page with pre-filled data
-    const params = new URLSearchParams()
-    if (bookingForm.from) params.set('from', bookingForm.from)
-    if (bookingForm.to) params.set('to', bookingForm.to)
-    if (bookingForm.date) params.set('date', bookingForm.date)
-    if (bookingForm.passengers) params.set('passengers', bookingForm.passengers)
-    router.push(`/book/transport?${params.toString()}`)
   }
 
   return (
@@ -186,119 +200,134 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 py-16 lg:py-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Book Your Flight
+              Where Would You Like to Fly?
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Select your route on the map or use the form below to get started
+              Click on any destination on the map to see flight details and pricing from Guatemala City
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
-            {/* Booking Form */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-6 sm:p-8">
-              <form onSubmit={handleQuickBook} className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      <MapPin className="h-4 w-4 inline mr-1" />
-                      From
-                    </label>
-                    <select
-                      value={bookingForm.from}
-                      onChange={(e) => setBookingForm({ ...bookingForm, from: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
-                    >
-                      {DESTINATIONS.map(d => (
-                        <option key={d.value} value={d.value} className="bg-luxury-black text-white">
-                          {d.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      <MapPin className="h-4 w-4 inline mr-1" />
-                      To
-                    </label>
-                    <select
-                      value={bookingForm.to}
-                      onChange={(e) => setBookingForm({ ...bookingForm, to: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
-                    >
-                      {DESTINATIONS.map(d => (
-                        <option key={d.value} value={d.value} className="bg-luxury-black text-white">
-                          {d.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      <Calendar className="h-4 w-4 inline mr-1" />
-                      Date
-                    </label>
-                    <input
-                      type="date"
-                      value={bookingForm.date}
-                      onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      <Users className="h-4 w-4 inline mr-1" />
-                      Passengers
-                    </label>
-                    <select
-                      value={bookingForm.passengers}
-                      onChange={(e) => setBookingForm({ ...bookingForm, passengers: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
-                    >
-                      {[1, 2, 3, 4, 5, 6].map(n => (
-                        <option key={n} value={n} className="bg-luxury-black text-white">
-                          {n} {n === 1 ? 'Passenger' : 'Passengers'}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full btn-luxury py-4 text-lg"
-                >
-                  Get Quote
-                </button>
-
-                <p className="text-center text-gray-500 text-sm">
-                  Or browse our <Link href="/book/experiences" className="text-brand-accent hover:underline">scenic experiences</Link>
-                </p>
-              </form>
+          <div className="max-w-6xl mx-auto">
+            {/* Origin Badge */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="flex items-center gap-2 bg-green-500/20 border border-green-500/40 px-4 py-2 rounded-full">
+                <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                <span className="text-green-400 font-medium">Departing from La Aurora Airport (GUA)</span>
+              </div>
             </div>
 
             {/* Map */}
-            <div className="h-[400px] lg:h-[500px] rounded-soft overflow-hidden border border-white/10">
+            <div className="h-[450px] lg:h-[550px] rounded-soft overflow-hidden border border-white/10 mb-8">
               <SafeMapWrapper
-                onDepartmentClick={(dept: { destinations: string[] }) => {
-                  // Select first destination from department
-                  if (dept.destinations.length > 0) {
-                    const dest = dept.destinations[0]
-                    if (!bookingForm.from) {
-                      setBookingForm({ ...bookingForm, from: dest })
-                    } else if (!bookingForm.to) {
-                      setBookingForm({ ...bookingForm, to: dest })
-                    }
+                onDepartmentClick={(dept: Department) => {
+                  // Don't select Guatemala as destination (it's the origin)
+                  if (dept.id !== 'guatemala') {
+                    setSelectedDestination(dept.id)
                   }
                 }}
-                selectedFrom={bookingForm.from}
-                selectedTo={bookingForm.to}
-                mode="both"
+                selectedFrom="guatemala"
+                selectedTo={selectedDestination || undefined}
+                mode="to"
               />
+            </div>
+
+            {/* Pricing Table */}
+            {selectedDestination && destinationDept && routePricing ? (
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-6 sm:p-8 animate-fade-in">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                  {/* Route Info */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide">From</div>
+                        <div className="text-lg font-semibold text-white">Guatemala City</div>
+                        <div className="text-sm text-gold-400">La Aurora (GUA)</div>
+                      </div>
+                      <div className="flex-1 flex items-center justify-center">
+                        <div className="h-px bg-gradient-to-r from-green-500 via-gold-500 to-red-500 flex-1"></div>
+                        <Plane className="h-5 w-5 text-gold-400 mx-2 rotate-90" />
+                        <div className="h-px bg-gradient-to-r from-gold-500 to-red-500 flex-1"></div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide">To</div>
+                        <div className="text-lg font-semibold text-white">{destinationDept.name}</div>
+                        <div className="text-sm text-gray-400">{destinationDept.destinations[0]}</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div className="bg-white/5 rounded-soft p-3">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Distance</div>
+                        <div className="text-white font-medium">{routePricing.distance}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-soft p-3">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Flight Time</div>
+                        <div className="text-white font-medium">{routePricing.flightTime}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-soft p-3">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Aircraft</div>
+                        <div className="text-white font-medium">Bell 407</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pricing & CTA */}
+                  <div className="lg:w-72 bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-500/30 rounded-soft p-6 text-center">
+                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Roundtrip Price (2 pax)</div>
+                    <div className="flex items-center justify-center gap-1 mb-4">
+                      <DollarSign className="h-8 w-8 text-gold-400" />
+                      <span className="text-4xl font-bold text-white">{routePricing.price.toLocaleString()}</span>
+                      <span className="text-gray-400 text-sm self-end mb-1">USD</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mb-4">
+                      ${Math.round(routePricing.price / 2).toLocaleString()} per person
+                    </div>
+                    <button
+                      onClick={() => {
+                        const params = new URLSearchParams()
+                        params.set('from', 'guatemala')
+                        params.set('to', selectedDestination)
+                        params.set('passengers', '2')
+                        router.push(`/book/transport?${params.toString()}`)
+                      }}
+                      className="w-full btn-luxury py-3"
+                    >
+                      Book This Flight
+                    </button>
+                  </div>
+                </div>
+
+                {/* Destinations in this region */}
+                <div className="mt-6 pt-6 border-t border-white/10">
+                  <div className="text-sm text-gray-400 mb-3">Popular destinations in {destinationDept.name}:</div>
+                  <div className="flex flex-wrap gap-2">
+                    {destinationDept.destinations.map(dest => (
+                      <span key={dest} className="px-3 py-1 bg-white/10 rounded-full text-sm text-white">
+                        {dest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Prompt to select destination */
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-8 text-center">
+                <MapPin className="h-12 w-12 text-gold-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">Select Your Destination</h3>
+                <p className="text-gray-400 max-w-md mx-auto">
+                  Click on any point on the map above to see flight details, distance, and pricing for your journey from Guatemala City.
+                </p>
+              </div>
+            )}
+
+            {/* Quick Links */}
+            <div className="mt-8 text-center">
+              <p className="text-gray-500 text-sm">
+                Looking for a scenic experience instead?{' '}
+                <Link href="/book/experiences" className="text-gold-400 hover:underline">
+                  Browse our aerial tours →
+                </Link>
+              </p>
             </div>
           </div>
         </div>
