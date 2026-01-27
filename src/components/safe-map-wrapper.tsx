@@ -23,35 +23,31 @@ function checkWebGLSupport(): boolean {
   }
 }
 
+// Loading placeholder component
+const MapLoadingPlaceholder = () => (
+  <div className="w-full h-96 sm:h-[500px] bg-gray-100 dark:bg-luxury-black/50 flex items-center justify-center rounded-soft">
+    <div className="text-center">
+      <div className="loading-spinner mx-auto mb-2 text-gold-500"></div>
+      <p className="text-gray-500 dark:text-gray-400 text-sm">Loading map...</p>
+    </div>
+  </div>
+)
+
 // Only load the MapLibre component if we've verified WebGL works
 const GuatemalaMapLibre = dynamic(
   () => import('@/components/guatemala-maplibre'),
   {
     ssr: false,
-    loading: () => (
-      <div className="w-full h-96 sm:h-[500px] bg-gray-100 dark:bg-luxury-black/50 flex items-center justify-center rounded-soft">
-        <div className="text-center">
-          <div className="loading-spinner mx-auto mb-2 text-gold-500"></div>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Loading map...</p>
-        </div>
-      </div>
-    )
+    loading: () => <MapLoadingPlaceholder />
   }
 )
 
-// SVG map fallback - loads when WebGL is not available
-const GuatemalaSVGMap = dynamic(
-  () => import('@/components/guatemala-svg-map'),
+// Leaflet map - works without WebGL, better fallback than SVG
+const GuatemalaLeafletMap = dynamic(
+  () => import('@/components/guatemala-leaflet-map'),
   {
     ssr: false,
-    loading: () => (
-      <div className="w-full h-96 sm:h-[500px] bg-gray-100 dark:bg-luxury-black/50 flex items-center justify-center rounded-soft">
-        <div className="text-center">
-          <div className="loading-spinner mx-auto mb-2 text-gold-500"></div>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Loading map...</p>
-        </div>
-      </div>
-    )
+    loading: () => <MapLoadingPlaceholder />
   }
 )
 
@@ -75,9 +71,9 @@ export default function SafeMapWrapper(props: SafeMapWrapperProps) {
     )
   }
 
-  // WebGL not supported - show interactive SVG map fallback
+  // WebGL not supported - use Leaflet map (doesn't require WebGL)
   if (!webglSupported) {
-    return <GuatemalaSVGMap {...props} />
+    return <GuatemalaLeafletMap {...props} />
   }
 
   // WebGL supported - render MapLibre map

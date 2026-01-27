@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/lib/auth-client'
+import { ThemeToggle } from '@/components/theme-toggle'
 import {
   Plane, Calendar, Users, UserCheck, DollarSign, BarChart3,
   MapPin, Image as ImageIcon, Menu, X, LogOut, Home, ChevronLeft, ChevronRight
@@ -58,7 +59,7 @@ export function AdminLayout({
       {Object.entries(groups).map(([group, items]) => (
         <div key={group}>
           {sidebarOpen && (
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">
+            <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-3">
               {group}
             </h3>
           )}
@@ -77,16 +78,16 @@ export function AdminLayout({
                     setMobileMenuOpen(false)
                   }}
                   className={`
-                    w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-soft text-sm font-medium
                     transition-colors duration-150
                     ${isActive
-                      ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-primary-50 dark:bg-gold-500/10 text-primary-700 dark:text-gold-400 border-l-4 border-primary-500 dark:border-gold-500'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                     }
                   `}
                   title={!sidebarOpen ? item.label : undefined}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary-600' : 'text-gray-400'}`} />
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary-600 dark:text-gold-500' : 'text-gray-400 dark:text-gray-500'}`} />
                   {sidebarOpen && (
                     <>
                       <span className="flex-1 text-left">{item.label}</span>
@@ -112,24 +113,24 @@ export function AdminLayout({
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex">
       {/* Desktop Sidebar */}
       <aside
         className={`
-          hidden md:flex flex-col bg-white border-r border-gray-200 transition-all duration-300
+          hidden md:flex flex-col bg-white dark:bg-luxury-charcoal border-r border-gray-200 dark:border-gray-800 transition-all duration-300
           ${sidebarOpen ? 'w-64' : 'w-20'}
         `}
       >
         {/* Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">
           {sidebarOpen && (
             <Link href="/" className="flex items-center gap-2">
-              <span className="font-bold text-gray-900">FlyInGuate Admin</span>
+              <span className="font-bold text-gray-900 dark:text-white">FlyInGuate Admin</span>
             </Link>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-soft"
           >
             {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
           </button>
@@ -137,13 +138,19 @@ export function AdminLayout({
 
         <NavContent />
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200">
+        {/* Footer with theme toggle */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+          {sidebarOpen && (
+            <div className="flex items-center justify-between px-3 py-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Theme</span>
+              <ThemeToggle variant="compact" />
+            </div>
+          )}
           <button
             onClick={handleSignOut}
             className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium
-              text-red-600 hover:bg-red-50 transition-colors
+              w-full flex items-center gap-3 px-3 py-2.5 rounded-soft text-sm font-medium
+              text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors
             `}
           >
             <LogOut className="w-5 h-5" />
@@ -153,30 +160,33 @@ export function AdminLayout({
       </aside>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-40 flex items-center justify-between px-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-luxury-charcoal border-b border-gray-200 dark:border-gray-800 z-40 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-bold text-gray-900">FlyInGuate Admin</span>
+          <span className="font-bold text-gray-900 dark:text-white">FlyInGuate Admin</span>
         </Link>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle variant="compact" />
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-soft"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-30 bg-black/50" onClick={() => setMobileMenuOpen(false)}>
           <aside
-            className="absolute top-16 left-0 bottom-0 w-64 bg-white border-r border-gray-200"
+            className="absolute top-16 left-0 bottom-0 w-64 bg-white dark:bg-luxury-charcoal border-r border-gray-200 dark:border-gray-800"
             onClick={(e) => e.stopPropagation()}
           >
             <NavContent />
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t border-gray-200 dark:border-gray-800">
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium text-red-600 hover:bg-red-50"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-soft text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Sign Out</span>
@@ -188,7 +198,9 @@ export function AdminLayout({
 
       {/* Main Content */}
       <main className="flex-1 md:pt-0 pt-16 overflow-auto">
-        {children}
+        <div className="p-6">
+          {children}
+        </div>
       </main>
     </div>
   )
