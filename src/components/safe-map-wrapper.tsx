@@ -23,41 +23,37 @@ function checkWebGLSupport(): boolean {
   }
 }
 
-// Only load the map component if we've verified WebGL works
+// Only load the MapLibre component if we've verified WebGL works
 const GuatemalaMapLibre = dynamic(
   () => import('@/components/guatemala-maplibre'),
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-96 sm:h-[500px] bg-luxury-black/50 flex items-center justify-center rounded">
+      <div className="w-full h-96 sm:h-[500px] bg-gray-100 dark:bg-luxury-black/50 flex items-center justify-center rounded-soft">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-brand-accent border-t-transparent rounded-full mx-auto mb-2"></div>
-          <p className="text-gray-400 text-sm">Loading map...</p>
+          <div className="loading-spinner mx-auto mb-2 text-gold-500"></div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Loading map...</p>
         </div>
       </div>
     )
   }
 )
 
-// Fallback when WebGL is not available
-function MapFallback() {
-  return (
-    <div className="relative w-full">
-      <div className="rounded overflow-hidden shadow-2xl border border-luxury-slate/30 bg-gradient-to-br from-gray-800 to-gray-900">
-        <div className="w-full h-96 sm:h-[500px] flex flex-col items-center justify-center text-center p-8">
-          <div className="text-6xl mb-4">🗺️</div>
-          <h3 className="text-xl font-bold text-white mb-2">Interactive Map Unavailable</h3>
-          <p className="text-gray-400 mb-4 max-w-md">
-            Your browser does not support WebGL, which is required for the interactive map.
-          </p>
-          <p className="text-sm text-gray-500">
-            Try enabling hardware acceleration in Chrome settings, or use Safari/Firefox.
-          </p>
+// SVG map fallback - loads when WebGL is not available
+const GuatemalaSVGMap = dynamic(
+  () => import('@/components/guatemala-svg-map'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-96 sm:h-[500px] bg-gray-100 dark:bg-luxury-black/50 flex items-center justify-center rounded-soft">
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-2 text-gold-500"></div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Loading map...</p>
         </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
+)
 
 export default function SafeMapWrapper(props: SafeMapWrapperProps) {
   const [webglSupported, setWebglSupported] = useState<boolean | null>(null)
@@ -70,20 +66,20 @@ export default function SafeMapWrapper(props: SafeMapWrapperProps) {
   // Still checking
   if (webglSupported === null) {
     return (
-      <div className="w-full h-96 sm:h-[500px] bg-luxury-black/50 flex items-center justify-center rounded">
+      <div className="w-full h-96 sm:h-[500px] bg-gray-100 dark:bg-luxury-black/50 flex items-center justify-center rounded-soft">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-brand-accent border-t-transparent rounded-full mx-auto mb-2"></div>
-          <p className="text-gray-400 text-sm">Checking compatibility...</p>
+          <div className="loading-spinner mx-auto mb-2 text-gold-500"></div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Checking compatibility...</p>
         </div>
       </div>
     )
   }
 
-  // WebGL not supported - show fallback
+  // WebGL not supported - show interactive SVG map fallback
   if (!webglSupported) {
-    return <MapFallback />
+    return <GuatemalaSVGMap {...props} />
   }
 
-  // WebGL supported - render actual map
+  // WebGL supported - render MapLibre map
   return <GuatemalaMapLibre {...props} />
 }

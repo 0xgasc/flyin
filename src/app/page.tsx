@@ -195,7 +195,7 @@ export default function HomePage() {
 
           <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
             {/* Booking Form */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-none p-6 sm:p-8">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-6 sm:p-8">
               <form onSubmit={handleQuickBook} className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
@@ -206,7 +206,7 @@ export default function HomePage() {
                     <select
                       value={bookingForm.from}
                       onChange={(e) => setBookingForm({ ...bookingForm, from: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     >
                       {DESTINATIONS.map(d => (
                         <option key={d.value} value={d.value} className="bg-luxury-black text-white">
@@ -224,7 +224,7 @@ export default function HomePage() {
                     <select
                       value={bookingForm.to}
                       onChange={(e) => setBookingForm({ ...bookingForm, to: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     >
                       {DESTINATIONS.map(d => (
                         <option key={d.value} value={d.value} className="bg-luxury-black text-white">
@@ -245,7 +245,7 @@ export default function HomePage() {
                       type="date"
                       value={bookingForm.date}
                       onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     />
                   </div>
 
@@ -257,7 +257,7 @@ export default function HomePage() {
                     <select
                       value={bookingForm.passengers}
                       onChange={(e) => setBookingForm({ ...bookingForm, passengers: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-none text-white focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-soft text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     >
                       {[1, 2, 3, 4, 5, 6].map(n => (
                         <option key={n} value={n} className="bg-luxury-black text-white">
@@ -282,7 +282,7 @@ export default function HomePage() {
             </div>
 
             {/* Map */}
-            <div className="h-[400px] lg:h-[500px] rounded-none overflow-hidden border border-white/10">
+            <div className="h-[400px] lg:h-[500px] rounded-soft overflow-hidden border border-white/10">
               <SafeMapWrapper
                 onDepartmentClick={(dept: { destinations: string[] }) => {
                   // Select first destination from department
@@ -305,73 +305,73 @@ export default function HomePage() {
       </div>
 
       {/* Services Section */}
-      <div className="bg-white py-16 lg:py-24">
+      <div className="bg-white dark:bg-luxury-charcoal py-16 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-luxury-black mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-luxury-black dark:text-white mb-4">
               Our Services
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               From executive transport to unforgettable aerial experiences
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Transport */}
-            <div className="group bg-gray-50 rounded-none p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <h3 className="text-2xl font-bold text-luxury-black mb-4">
+            <div className="card-feature">
+              <h3 className="text-2xl font-bold text-luxury-black dark:text-white mb-4">
                 {t('services.transport.title')}
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {t('services.transport.description')}
               </p>
-              <ul className="space-y-3 mb-8 text-gray-600">
+              <ul className="space-y-3 mb-8 text-gray-600 dark:text-gray-400">
                 <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Guatemala City to any destination
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Inter-city business transfers
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Up to 5 passengers per flight
                 </li>
               </ul>
               <Link
                 href="/book/transport"
-                className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-primary-600 dark:text-gold-400 font-semibold hover:gap-3 transition-all"
               >
                 Book Transport <span>&rarr;</span>
               </Link>
             </div>
 
             {/* Experiences */}
-            <div className="group bg-gray-50 rounded-none p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <h3 className="text-2xl font-bold text-luxury-black mb-4">
+            <div className="card-feature">
+              <h3 className="text-2xl font-bold text-luxury-black dark:text-white mb-4">
                 {t('services.experiences.title')}
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {t('services.experiences.description')}
               </p>
-              <ul className="space-y-3 mb-8 text-gray-600">
+              <ul className="space-y-3 mb-8 text-gray-600 dark:text-gray-400">
                 <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Lake Atitlan scenic tours
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Tikal archaeological flights
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-brand-accent rounded-full"></span>
+                  <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Volcano discovery expeditions
                 </li>
               </ul>
               <Link
                 href="/book/experiences"
-                className="inline-flex items-center gap-2 text-brand-accent font-semibold hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-primary-600 dark:text-gold-400 font-semibold hover:gap-3 transition-all"
               >
                 Explore Experiences <span>&rarr;</span>
               </Link>
@@ -401,7 +401,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/book/experiences"
-              className="border border-white/30 text-white px-10 py-4 rounded-none hover:bg-white/10 transition-colors text-lg"
+              className="btn-ghost-dark text-lg px-10 py-4"
             >
               View Experiences
             </Link>

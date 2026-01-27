@@ -122,10 +122,10 @@ export default function DashboardPage() {
   // Show loading while auth is loading
   if (authLoading || !profile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your dashboard...</p>
+          <div className="loading-spinner-lg mx-auto mb-4 text-primary-600 dark:text-gold-500"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading your dashboard...</p>
         </div>
       </div>
     )
@@ -378,7 +378,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
           <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -386,15 +386,15 @@ export default function DashboardPage() {
           </Link>
           <div className="flex items-center space-x-6">
             <div className="text-sm">
-              Balance: <span className="font-bold text-luxury-gold">${profile?.accountBalance?.toFixed(2) || '0.00'}</span>
+              Balance: <span className="font-bold text-gold-400">${profile?.accountBalance?.toFixed(2) || '0.00'}</span>
             </div>
             <LanguageSwitcher />
             {profile?.role === 'admin' && (
-              <Link href="/admin" className="text-sm hover:text-luxury-gold transition-colors">
+              <Link href="/admin" className="text-sm hover:text-gold-400 transition-colors">
                 Admin Panel
               </Link>
             )}
-            <Link href="/dashboard" className="text-sm hover:text-luxury-gold transition-colors">
+            <Link href="/dashboard" className="text-sm hover:text-gold-400 transition-colors">
               {profile?.fullName || profile?.email}
             </Link>
             <button
@@ -402,7 +402,7 @@ export default function DashboardPage() {
                 await logout()
                 window.location.href = '/'
               }}
-              className="text-sm hover:text-luxury-gold"
+              className="text-sm hover:text-gold-400"
             >
               Sign Out
             </button>
@@ -415,30 +415,30 @@ export default function DashboardPage() {
         <div className="flex space-x-1 mb-8">
           <button
             onClick={() => setActiveTab('bookings')}
-            className={`px-6 py-3 rounded-none font-medium ${
+            className={`px-6 py-3 rounded-t-soft font-medium transition-colors ${
               activeTab === 'bookings'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-white dark:bg-luxury-charcoal text-primary-700 dark:text-gold-400 border-b-2 border-primary-600 dark:border-gold-500'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             My Bookings
           </button>
           <button
             onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 rounded-none font-medium ${
+            className={`px-6 py-3 rounded-t-soft font-medium transition-colors ${
               activeTab === 'profile'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-white dark:bg-luxury-charcoal text-primary-700 dark:text-gold-400 border-b-2 border-primary-600 dark:border-gold-500'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             Profile & Settings
           </button>
           <button
             onClick={() => setActiveTab('payments')}
-            className={`px-6 py-3 rounded-none font-medium ${
+            className={`px-6 py-3 rounded-t-soft font-medium transition-colors ${
               activeTab === 'payments'
-                ? 'bg-white text-primary-700 border-b-2 border-primary-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-white dark:bg-luxury-charcoal text-primary-700 dark:text-gold-400 border-b-2 border-primary-600 dark:border-gold-500'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             Payments & Top-up
@@ -449,7 +449,7 @@ export default function DashboardPage() {
         {activeTab === 'bookings' && (
           <div>
             <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
+              <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">My Bookings</h1>
               <div className="space-x-4">
                 <Link href="/book/transport" className="btn-primary inline-flex items-center">
                   <Plus className="h-5 w-5 mr-2" />
@@ -464,13 +464,13 @@ export default function DashboardPage() {
 
             {bookingsLoading ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-12 w-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto"></div>
+                <div className="loading-spinner-lg mx-auto text-primary-600 dark:text-gold-500"></div>
               </div>
             ) : bookings.length === 0 ? (
               <div className="card-luxury text-center py-12">
-                <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">No bookings yet</h3>
-                <p className="text-gray-500">Start your journey by booking a flight or experience</p>
+                <Calendar className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No bookings yet</h3>
+                <p className="text-gray-500 dark:text-gray-400">Start your journey by booking a flight or experience</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -490,24 +490,24 @@ export default function DashboardPage() {
                           </span>
                         </div>
 
-                        <div className="grid md:grid-cols-4 gap-4 text-sm text-gray-600">
+                        <div className="grid md:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2 text-primary-600" />
+                            <Calendar className="h-4 w-4 mr-2 text-primary-600 dark:text-gold-500" />
                             {format(new Date(booking.scheduledDate), 'MMM dd, yyyy')}
                           </div>
                           <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-2 text-primary-600" />
+                            <Clock className="h-4 w-4 mr-2 text-primary-600 dark:text-gold-500" />
                             {booking.scheduledTime}
                           </div>
                           <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-2 text-primary-600" />
+                            <MapPin className="h-4 w-4 mr-2 text-primary-600 dark:text-gold-500" />
                             {booking.bookingType === 'transport'
                               ? 'Direct Transport'
                               : booking.experience?.location
                             }
                           </div>
                           <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-2 text-primary-600" />
+                            <DollarSign className="h-4 w-4 mr-2 text-primary-600 dark:text-gold-500" />
                             ${booking.totalPrice}
                           </div>
                         </div>
@@ -515,7 +515,7 @@ export default function DashboardPage() {
 
                       <div className="ml-4 flex flex-col space-y-2">
                         {booking.status === 'pending' && (
-                          <button className="text-red-600 hover:text-red-700 text-sm px-3 py-1 border border-red-300 rounded-none hover:bg-red-50">
+                          <button className="text-red-600 dark:text-red-400 hover:text-red-700 text-sm px-3 py-1 border border-red-300 dark:border-red-700 rounded-soft hover:bg-red-50 dark:hover:bg-red-900/30">
                             Cancel
                           </button>
                         )}
@@ -524,11 +524,11 @@ export default function DashboardPage() {
                           <>
                             <button
                               onClick={() => openPaymentModal(booking)}
-                              className="bg-green-600 text-white text-sm px-4 py-2 rounded-none hover:bg-green-700 flex items-center"
+                              className="bg-green-600 text-white text-sm px-4 py-2 rounded-soft hover:bg-green-700 flex items-center"
                             >
                               Choose Payment
                             </button>
-                            <p className="text-xs text-gray-500 text-center">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                               {booking.status === 'approved' ? 'Flight approved!' : 'Flight Assigned!'}
                               <br/>Ready for payment
                             </p>
@@ -536,22 +536,22 @@ export default function DashboardPage() {
                         )}
 
                         {booking.status === 'assigned' && booking.paymentStatus === 'paid' && (
-                          <div className="bg-green-50 border border-green-200 rounded-none p-2">
-                            <p className="text-xs text-green-800 font-medium text-center">
+                          <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-soft p-2">
+                            <p className="text-xs text-green-800 dark:text-green-400 font-medium text-center">
                               Ready to Fly!
                             </p>
-                            <p className="text-xs text-green-600 text-center">
+                            <p className="text-xs text-green-600 dark:text-green-500 text-center">
                               All confirmed
                             </p>
                           </div>
                         )}
 
                         {booking.status === 'completed' && (
-                          <div className="bg-green-50 border border-green-200 rounded-none p-2">
-                            <p className="text-xs text-green-800 font-medium text-center">
+                          <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-soft p-2">
+                            <p className="text-xs text-green-800 dark:text-green-400 font-medium text-center">
                               Completed
                             </p>
-                            <button className="text-xs text-green-600 hover:text-green-700 underline">
+                            <button className="text-xs text-green-600 dark:text-green-500 hover:text-green-700 underline">
                               Leave Review
                             </button>
                           </div>
@@ -567,23 +567,23 @@ export default function DashboardPage() {
 
         {activeTab === 'profile' && (
           <div className="max-w-2xl">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile & Settings</h1>
-            
+            <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-8">Profile & Settings</h1>
+
             {profileError && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-none mb-6">
+              <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-soft mb-6">
                 {profileError}
               </div>
             )}
-            
+
             {profileSuccess && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-none mb-6">
+              <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-800 text-green-700 dark:text-green-400 px-4 py-3 rounded-soft mb-6">
                 {profileSuccess}
               </div>
             )}
 
             <form onSubmit={handleProfileUpdate} className="card-luxury space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Mail className="w-4 h-4 inline mr-2" />
                   {t('profile.email')}
                 </label>
@@ -591,13 +591,13 @@ export default function DashboardPage() {
                   type="email"
                   value={profileData.email}
                   disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none bg-gray-50 text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-soft bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
                 />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <User className="w-4 h-4 inline mr-2" />
                   {t('profile.fullName')}
                 </label>
@@ -605,13 +605,13 @@ export default function DashboardPage() {
                   type="text"
                   value={profileData.fullName}
                   onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-soft bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-gold-500 focus:border-transparent"
                   placeholder="Enter your full name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Phone className="w-4 h-4 inline mr-2" />
                   {t('profile.phone')}
                 </label>
@@ -619,7 +619,7 @@ export default function DashboardPage() {
                   type="tel"
                   value={profileData.phone}
                   onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-soft bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-gold-500 focus:border-transparent"
                   placeholder="+502 1234 5678"
                 />
               </div>
@@ -627,7 +627,7 @@ export default function DashboardPage() {
               <button
                 type="submit"
                 disabled={profileLoading}
-                className="w-full flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700 disabled:opacity-50"
+                className="w-full btn-primary"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {profileLoading ? t('common.loading') : t('profile.update')}
@@ -639,7 +639,7 @@ export default function DashboardPage() {
         {activeTab === 'payments' && (
           <div>
             <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">Payments & Top-up</h1>
+              <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">Payments & Top-up</h1>
               <button
                 onClick={() => setShowTopUpModal(true)}
                 className="btn-primary inline-flex items-center"
@@ -651,35 +651,35 @@ export default function DashboardPage() {
 
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="card-luxury text-center">
-                <Wallet className="h-12 w-12 text-primary-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Account Balance</h3>
-                <p className="text-3xl font-bold text-primary-900">
+                <Wallet className="h-12 w-12 text-primary-600 dark:text-gold-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Account Balance</h3>
+                <p className="text-3xl font-bold text-primary-900 dark:text-gold-400">
                   ${profile?.accountBalance?.toFixed(2) || '0.00'}
                 </p>
               </div>
             </div>
 
             <div className="card-luxury">
-              <h2 className="text-xl font-semibold mb-4">Transaction History</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Transaction History</h2>
               {paymentProofs.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No transactions yet</p>
+                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No transactions yet</p>
               ) : (
                 <div className="space-y-4">
                   {paymentProofs.map((proof) => (
-                    <div key={proof.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-none">
+                    <div key={proof.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-soft">
                       <div>
-                        <p className="font-medium">
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {proof.type === 'deposit' ? 'Top-up' : 'Payment'} - ${Math.abs(proof.amount)}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           {format(new Date(proof.createdAt), 'MMM dd, yyyy HH:mm')}
                         </p>
-                        <p className="text-sm text-gray-600">{proof.reference || ''}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{proof.reference || ''}</p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        proof.status === 'approved' || proof.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        proof.status === 'rejected' || proof.status === 'failed' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        proof.status === 'approved' || proof.status === 'completed' ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400' :
+                        proof.status === 'rejected' || proof.status === 'failed' ? 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-400' :
+                        'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400'
                       }`}>
                         {proof.status.charAt(0).toUpperCase() + proof.status.slice(1)}
                       </span>
@@ -708,13 +708,13 @@ export default function DashboardPage() {
 
       {/* Top-up Modal */}
       {showTopUpModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-none p-6 max-w-md w-full max-h-screen overflow-y-auto">
+        <div className="modal-overlay">
+          <div className="modal-content p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Top Up Balance</h2>
+              <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Top Up Balance</h2>
               <button
                 onClick={() => setShowTopUpModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -722,7 +722,7 @@ export default function DashboardPage() {
 
             <form onSubmit={handleTopUpSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Amount (USD)
                 </label>
                 <input
@@ -730,40 +730,40 @@ export default function DashboardPage() {
                   step="0.01"
                   value={topUpData.amount}
                   onChange={(e) => setTopUpData({...topUpData, amount: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-soft bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-gold-500 focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Payment Reference
                 </label>
                 <input
                   type="text"
                   value={topUpData.reference}
                   onChange={(e) => setTopUpData({...topUpData, reference: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-soft bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 dark:focus:ring-gold-500 focus:border-transparent"
                   placeholder="Transaction ID or reference"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Payment Proof
                 </label>
                 <input
                   type="file"
                   accept="image/*,.pdf"
                   onChange={(e) => setTopUpData({...topUpData, proof_image: e.target.files?.[0] || null})}
-                  className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary-100 file:text-primary-700 hover:file:bg-primary-200"
+                  className="w-full text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-soft file:border-0 file:bg-primary-100 dark:file:bg-primary-900 file:text-primary-700 dark:file:text-primary-300 hover:file:bg-primary-200 dark:hover:file:bg-primary-800"
                 />
               </div>
 
-              <div className="p-4 bg-blue-50 rounded-none border border-blue-200">
-                <h4 className="font-semibold text-blue-900 mb-2">Bank Transfer Details</h4>
-                <div className="text-sm text-blue-800 space-y-1">
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-soft border border-blue-200 dark:border-blue-800">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Bank Transfer Details</h4>
+                <div className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
                   <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
                   <p><strong>Account Number:</strong> 1234567890</p>
                   <p><strong>Bank:</strong> Banco Industrial</p>
@@ -774,14 +774,14 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowTopUpModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50"
+                  className="flex-1 btn-ghost"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-none hover:bg-primary-700 disabled:opacity-50"
+                  className="flex-1 btn-primary"
                 >
                   {profileLoading ? 'Submitting...' : 'Submit Request'}
                 </button>
@@ -827,30 +827,30 @@ function PaymentModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
+    <div className="modal-overlay">
+      <div className="modal-content p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Choose Payment Method</h2>
+          <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Choose Payment Method</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             disabled={loading}
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="mb-6 p-4 bg-gray-50 rounded">
-          <h3 className="font-semibold text-gray-900">
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-soft">
+          <h3 className="font-semibold text-gray-900 dark:text-white">
             {booking.bookingType === 'transport'
               ? `${booking.fromLocation} → ${booking.toLocation}`
               : booking.experience?.name
             }
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {new Date(booking.scheduledDate).toLocaleDateString()} at {booking.scheduledTime}
           </p>
-          <p className="text-xl font-bold text-primary-900 mt-2">
+          <p className="text-xl font-bold text-primary-900 dark:text-gold-400 mt-2">
             ${booking.totalPrice}
           </p>
         </div>
@@ -859,20 +859,20 @@ function PaymentModal({
           {/* Account Balance */}
           <button
             onClick={() => setSelectedPaymentMethod('balance')}
-            className={`w-full p-4 rounded-none border-2 transition-colors ${
+            className={`w-full p-4 rounded-soft border-2 transition-colors ${
               selectedPaymentMethod === 'balance'
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-primary-500 dark:border-gold-500 bg-primary-50 dark:bg-gold-500/10'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             <div className="flex items-center">
-              <DollarSign className="w-6 h-6 text-primary-600 mr-3" />
+              <DollarSign className="w-6 h-6 text-primary-600 dark:text-gold-500 mr-3" />
               <div className="text-left">
-                <div className="font-semibold">Account Balance</div>
-                <div className="text-sm text-gray-600">
+                <div className="font-semibold text-gray-900 dark:text-white">Account Balance</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                   Current: ${profile?.accountBalance?.toFixed(2) || '0.00'}
                   {(!profile?.accountBalance || profile.accountBalance < booking.totalPrice) && (
-                    <span className="text-red-600 ml-1">(Insufficient)</span>
+                    <span className="text-red-600 dark:text-red-400 ml-1">(Insufficient)</span>
                   )}
                 </div>
               </div>
@@ -882,17 +882,17 @@ function PaymentModal({
           {/* Bank Deposit */}
           <button
             onClick={() => setSelectedPaymentMethod('bank')}
-            className={`w-full p-4 rounded-none border-2 transition-colors ${
+            className={`w-full p-4 rounded-soft border-2 transition-colors ${
               selectedPaymentMethod === 'bank'
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-primary-500 dark:border-gold-500 bg-primary-50 dark:bg-gold-500/10'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             <div className="flex items-center">
-              <Building2 className="w-6 h-6 text-blue-600 mr-3" />
+              <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" />
               <div className="text-left">
-                <div className="font-semibold">Bank Deposit</div>
-                <div className="text-sm text-gray-600">Transfer to our account</div>
+                <div className="font-semibold text-gray-900 dark:text-white">Bank Deposit</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Transfer to our account</div>
               </div>
             </div>
           </button>
@@ -901,25 +901,25 @@ function PaymentModal({
 
         {/* Coming Soon Payment Methods - Collapsible */}
         <details className="mb-4">
-          <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 py-2">
+          <summary className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 py-2">
             More payment options coming soon...
           </summary>
           <div className="mt-2 space-y-2 opacity-60">
-            <div className="p-3 rounded border border-gray-200 bg-gray-50">
+            <div className="p-3 rounded-soft border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center">
                 <CreditCard className="w-5 h-5 text-gray-400 mr-3" />
                 <div>
-                  <div className="font-medium text-gray-600">Credit Card</div>
-                  <div className="text-xs text-gray-400">Coming Soon</div>
+                  <div className="font-medium text-gray-600 dark:text-gray-400">Credit Card</div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500">Coming Soon</div>
                 </div>
               </div>
             </div>
-            <div className="p-3 rounded border border-gray-200 bg-gray-50">
+            <div className="p-3 rounded-soft border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center">
                 <Coins className="w-5 h-5 text-gray-400 mr-3" />
                 <div>
-                  <div className="font-medium text-gray-600">Cryptocurrency</div>
-                  <div className="text-xs text-gray-400">USDC, USDT via StablePay - Coming Soon</div>
+                  <div className="font-medium text-gray-600 dark:text-gray-400">Cryptocurrency</div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500">USDC, USDT via StablePay - Coming Soon</div>
                 </div>
               </div>
             </div>
@@ -928,28 +928,28 @@ function PaymentModal({
 
         {/* Bank Deposit Details */}
         {selectedPaymentMethod === 'bank' && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-none border border-blue-200">
-            <h4 className="font-semibold text-blue-900 mb-3">Bank Transfer Instructions</h4>
-            <div className="text-sm text-blue-800 space-y-1">
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-soft border border-blue-200 dark:border-blue-800">
+            <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3">Bank Transfer Instructions</h4>
+            <div className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
               <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
               <p><strong>Account Number:</strong> 1234567890</p>
               <p><strong>Bank:</strong> Banco Industrial</p>
               <p><strong>Amount:</strong> ${booking.totalPrice}</p>
               <p><strong>Reference:</strong> Booking {booking.id.slice(0, 8)}</p>
             </div>
-            
+
             <div className="mt-4">
-              <label className="block text-sm font-medium text-blue-900 mb-2">
+              <label className="block text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
                 Upload Payment Proof
               </label>
               <input
                 type="file"
                 accept="image/*,.pdf"
                 onChange={(e) => setProofFile(e.target.files?.[0] || null)}
-                className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                className="w-full text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-soft file:border-0 file:bg-blue-100 dark:file:bg-blue-900 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-200 dark:hover:file:bg-blue-800"
               />
               {proofFile && (
-                <p className="text-xs text-green-600 mt-1">{proofFile.name}</p>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">{proofFile.name}</p>
               )}
             </div>
           </div>
@@ -960,11 +960,11 @@ function PaymentModal({
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-none hover:bg-gray-50 disabled:opacity-50"
+            className="flex-1 btn-ghost"
           >
             Cancel
           </button>
-          
+
           <button
             onClick={() => {
               if (selectedPaymentMethod === 'balance') {
@@ -974,7 +974,7 @@ function PaymentModal({
               }
             }}
             disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.accountBalance || profile.accountBalance < booking.totalPrice))}
-            className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-none hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 btn-primary"
           >
             {loading ? 'Processing...' :
              selectedPaymentMethod === 'balance' ? 'Pay Now' : 'Submit Proof'

@@ -1,10 +1,24 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Outfit, Cormorant_Garamond } from 'next/font/google'
 import { AuthProvider } from '@/components/auth-provider'
+import { ThemeProvider } from '@/lib/theme-context'
 import { ToastContainer } from '@/components/ui/Toast'
 import '../styles/globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+// Primary sans-serif font for body text and UI
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
+// Display serif font for headings and luxury emphasis
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-display',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'FlyInGuate - Luxury Helicopter Transport',
@@ -14,7 +28,6 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  // Removed maximumScale: 1 to allow user zoom (accessibility)
 }
 
 export default function RootLayout({
@@ -23,12 +36,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          {children}
-          <ToastContainer />
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${outfit.variable} ${cormorant.variable} font-sans antialiased`}>
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+            <ToastContainer />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

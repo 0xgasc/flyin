@@ -8,6 +8,7 @@ import { Menu, X, Home, User, Calendar, Settings, LogOut, Globe, Briefcase, Help
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { useI18n } from '@/lib/i18n'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
@@ -131,15 +132,16 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-sm hover:text-luxury-gold transition-colors"
+                    className="text-sm hover:text-gold-400 transition-colors"
                   >
                     {item.label}
                   </Link>
                 ))}
+                <ThemeToggle variant="compact" className="text-white hover:text-gold-400" />
                 {profile && (
                   <button
                     onClick={handleSignOut}
-                    className="text-sm hover:text-luxury-gold transition-colors"
+                    className="text-sm hover:text-gold-400 transition-colors"
                   >
                     Sign Out
                   </button>
@@ -168,12 +170,18 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                   setLocale(locale === 'en' ? 'es' : 'en')
                   setIsOpen(false)
                 }}
-                className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded transition-colors w-full text-left"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-soft transition-colors w-full text-left"
               >
                 <Globe className="h-5 w-5" />
                 <span>Language: {locale === 'en' ? 'English' : 'Español'}</span>
               </button>
-              
+
+              {/* Theme switcher */}
+              <div className="flex items-center justify-between p-3">
+                <span className="text-sm text-gray-400">Theme</span>
+                <ThemeToggle />
+              </div>
+
               <div className="border-t border-gray-700 pt-2"></div>
               
               {/* Main navigation items for logged in users */}

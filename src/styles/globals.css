@@ -3,31 +3,226 @@
 @tailwind utilities;
 
 @layer base {
+  /* CSS Custom Properties for theming */
+  :root {
+    --background: 250 250 250;
+    --foreground: 17 24 39;
+    --card: 255 255 255;
+    --card-foreground: 17 24 39;
+    --primary: 69 90 100;
+    --primary-foreground: 255 255 255;
+    --muted: 107 114 128;
+    --muted-foreground: 156 163 175;
+    --border: 229 231 235;
+    --input: 229 231 235;
+    --ring: 69 90 100;
+    --gold: 212 175 55;
+  }
+
+  .dark {
+    --background: 10 10 10;
+    --foreground: 247 247 247;
+    --card: 20 20 20;
+    --card-foreground: 247 247 247;
+    --primary: 212 175 55;
+    --primary-foreground: 10 10 10;
+    --muted: 107 114 128;
+    --muted-foreground: 145 145 145;
+    --border: 55 65 81;
+    --input: 55 65 81;
+    --ring: 212 175 55;
+    --gold: 212 175 55;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-[rgb(var(--background))] text-[rgb(var(--foreground))];
+    @apply font-sans antialiased;
+  }
+
+  /* Custom selection color */
+  ::selection {
+    @apply bg-gold-500/20 text-inherit;
+  }
+
+  .dark ::selection {
+    @apply bg-gold-500/30;
   }
 }
 
 @layer components {
+  /* ========================================
+     BUTTON SYSTEM
+     ======================================== */
+
+  /* Base button - all buttons extend this */
+  .btn {
+    @apply inline-flex items-center justify-center font-medium transition-all duration-200;
+    @apply min-h-[44px] px-6 py-3 text-base;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Primary - Main CTA */
   .btn-primary {
-    @apply bg-primary-600 text-white px-6 py-3 sm:py-3 py-4 rounded-none font-medium hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl min-h-[44px] text-base;
+    @apply btn bg-primary-600 text-white rounded-soft;
+    @apply hover:bg-primary-700 hover:shadow-elevated;
+    @apply focus:ring-primary-500;
+    @apply dark:bg-gold-500 dark:text-luxury-black dark:hover:bg-gold-400;
   }
 
+  /* Luxury - High-impact CTA */
   .btn-luxury {
-    @apply bg-luxury-black text-brand-text px-6 sm:px-8 py-4 rounded-none font-semibold hover:bg-luxury-charcoal transition-all duration-300 shadow-xl hover:shadow-2xl tracking-wider uppercase min-h-[44px] text-base border border-brand-accent/30;
+    @apply btn bg-luxury-black text-gold-400 rounded-soft;
+    @apply border border-gold-500/30 tracking-wider uppercase font-semibold;
+    @apply hover:bg-luxury-charcoal hover:border-gold-500/50 hover:shadow-gold-glow;
+    @apply focus:ring-gold-500;
+    @apply dark:bg-gold-500 dark:text-luxury-black dark:border-gold-600;
+    @apply dark:hover:bg-gold-400;
   }
 
+  /* Ghost - Secondary actions */
+  .btn-ghost {
+    @apply btn bg-transparent text-gray-700 rounded-soft;
+    @apply border border-gray-300;
+    @apply hover:bg-gray-50 hover:border-gray-400;
+    @apply focus:ring-gray-400;
+    @apply dark:text-gray-300 dark:border-gray-600;
+    @apply dark:hover:bg-gray-800 dark:hover:border-gray-500;
+  }
+
+  /* Ghost Dark - For dark backgrounds */
+  .btn-ghost-dark {
+    @apply btn bg-transparent text-white rounded-soft;
+    @apply border border-white/30;
+    @apply hover:bg-white/10 hover:border-white/50;
+    @apply focus:ring-white/50;
+  }
+
+  /* Soft - Subtle emphasis */
+  .btn-soft {
+    @apply btn bg-primary-50 text-primary-700 rounded-soft;
+    @apply hover:bg-primary-100;
+    @apply focus:ring-primary-500;
+    @apply dark:bg-primary-900/50 dark:text-primary-300;
+    @apply dark:hover:bg-primary-900;
+  }
+
+  /* Link style button */
+  .btn-link {
+    @apply text-primary-600 font-medium underline-offset-4;
+    @apply hover:underline hover:text-primary-700;
+    @apply focus:outline-none focus:ring-0;
+    @apply dark:text-gold-400 dark:hover:text-gold-300;
+  }
+
+  /* Icon button */
+  .btn-icon {
+    @apply inline-flex items-center justify-center;
+    @apply w-10 h-10 rounded-soft;
+    @apply text-gray-600 hover:bg-gray-100 transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500;
+    @apply dark:text-gray-400 dark:hover:bg-gray-800;
+  }
+
+  /* Size variants */
+  .btn-sm { @apply min-h-[36px] px-4 py-2 text-sm; }
+  .btn-lg { @apply min-h-[52px] px-8 py-4 text-lg; }
+
+  /* ========================================
+     CARD SYSTEM
+     ======================================== */
+
+  /* Base card */
+  .card {
+    @apply bg-white rounded-soft shadow-card;
+    @apply p-6 transition-shadow duration-300;
+    @apply dark:bg-luxury-charcoal dark:border dark:border-gray-800;
+  }
+
+  /* Elevated card - hover state */
+  .card-elevated {
+    @apply card hover:shadow-luxury;
+  }
+
+  /* Bordered card */
+  .card-bordered {
+    @apply card border border-gray-100;
+    @apply dark:border-gray-700;
+  }
+
+  /* Luxury card - main style */
   .card-luxury {
-    @apply bg-white rounded-none shadow-xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300;
+    @apply bg-white rounded-soft shadow-luxury;
+    @apply p-4 sm:p-6 lg:p-8;
+    @apply border border-gray-100;
+    @apply hover:shadow-xl transition-all duration-300;
+    @apply dark:bg-luxury-charcoal dark:border-gray-800;
   }
 
-  /* Mobile-optimized form inputs */
+  /* Glass card - for overlays on images */
+  .card-glass {
+    @apply bg-white/10 backdrop-blur-md;
+    @apply rounded-soft border border-white/20;
+    @apply p-6;
+  }
+
+  /* Feature card - services section */
+  .card-feature {
+    @apply card-bordered;
+    @apply hover:border-primary-200 hover:shadow-elevated;
+    @apply cursor-pointer;
+    @apply dark:hover:border-gold-500/30;
+  }
+
+  /* ========================================
+     FORM ELEMENTS
+     ======================================== */
+
+  /* Form inputs */
   input[type="text"], input[type="email"], input[type="password"], input[type="tel"],
   input[type="number"], input[type="date"], input[type="time"], select, textarea {
-    @apply min-h-[44px] text-base rounded-none;
+    @apply min-h-[44px] text-base rounded-soft;
+    @apply border border-gray-300 bg-white;
+    @apply focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply dark:bg-gray-900 dark:border-gray-700 dark:text-white;
+    @apply dark:focus:ring-gold-500;
   }
 
-  /* Consistent loading spinner - keep rounded-full for circular animation */
+  /* ========================================
+     MODAL SYSTEM
+     ======================================== */
+
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50;
+    @apply flex items-center justify-center p-4;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto;
+    @apply dark:bg-luxury-charcoal dark:border dark:border-gray-800;
+  }
+
+  .modal-content-lg {
+    @apply bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto;
+    @apply dark:bg-luxury-charcoal dark:border dark:border-gray-800;
+  }
+
+  /* ========================================
+     STATUS BADGES
+     ======================================== */
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* ========================================
+     LOADING STATES
+     ======================================== */
+
   .loading-spinner {
     @apply w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin;
   }
@@ -35,22 +230,72 @@
     @apply w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
   }
   .loading-spinner-lg {
-    @apply w-8 h-8 border-3 border-current border-t-transparent rounded-full animate-spin;
+    @apply w-8 h-8 border-[3px] border-current border-t-transparent rounded-full animate-spin;
   }
 
-  /* Modal base classes */
-  .modal-overlay {
-    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4;
-  }
-  .modal-content {
-    @apply bg-white rounded-none shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto;
-  }
-  .modal-content-lg {
-    @apply bg-white rounded-none shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto;
+  /* ========================================
+     NAVIGATION
+     ======================================== */
+
+  .nav-link {
+    @apply text-gray-600 hover:text-gray-900 transition-colors;
+    @apply dark:text-gray-400 dark:hover:text-white;
   }
 
-  /* Status badge classes */
-  .status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium;
+  .nav-link-active {
+    @apply text-primary-600 font-medium;
+    @apply dark:text-gold-400;
+  }
+}
+
+@layer utilities {
+  /* ========================================
+     ANIMATIONS & INTERACTIONS
+     ======================================== */
+
+  /* Subtle lift on hover */
+  .hover-lift {
+    @apply transition-transform duration-200;
+  }
+  .hover-lift:hover {
+    @apply -translate-y-0.5;
+  }
+
+  /* Scale on hover */
+  .hover-scale {
+    @apply transition-transform duration-200;
+  }
+  .hover-scale:hover {
+    @apply scale-[1.02];
+  }
+
+  /* Gold shimmer effect */
+  .gold-shimmer {
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(212, 175, 55, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Text gradient */
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600;
+    @apply bg-clip-text text-transparent;
+  }
+
+  /* ========================================
+     DARK MODE SPECIFIC
+     ======================================== */
+
+  .dark-card-bg {
+    @apply bg-luxury-charcoal;
+  }
+
+  .dark-elevated {
+    @apply dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)];
   }
 }
