@@ -9,7 +9,7 @@ import { logout } from '@/lib/auth-client'
 import {
   Plane, Calendar, MapPin, Clock, Users, CheckCircle,
   AlertCircle, XCircle, DollarSign, BarChart3, UserCheck,
-  Plus, Edit, Trash2, Upload, Image as ImageIcon, Eye, GripVertical
+  Plus, Edit, Trash2, Upload, Download, Image as ImageIcon, Eye, GripVertical
 } from 'lucide-react'
 import IrysUpload from '@/components/IrysUpload'
 import { AdminLayout } from './components/AdminLayout'
@@ -1011,6 +1011,62 @@ const SortableExperienceRow = ({ experience, onDelete, onToggleActive, onImageUp
 const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) => {
     const [showImageUpload, setShowImageUpload] = useState(false)
     const [selectedExperienceId, setSelectedExperienceId] = useState<string | null>(null)
+    const [importing, setImporting] = useState(false)
+    const [exporting, setExporting] = useState(false)
+
+    const handleExport = async (format: 'xlsx' | 'csv' = 'xlsx') => {
+      setExporting(true)
+      try {
+        const response = await fetch(`/api/experiences/bulk-export?format=${format}`, {
+          credentials: 'include'
+        })
+        if (!response.ok) throw new Error('Export failed')
+
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `experiences-export.${format}`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      } catch (error) {
+        console.error('Export error:', error)
+        alert('Failed to export experiences')
+      } finally {
+        setExporting(false)
+      }
+    }
+
+    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+
+      setImporting(true)
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const response = await fetch('/api/experiences/bulk-import', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        })
+
+        const result = await response.json()
+        if (!response.ok) throw new Error(result.error || 'Import failed')
+
+        alert(`Import completed!\nCreated: ${result.results.created}\nUpdated: ${result.results.updated}\nDeleted: ${result.results.deleted}${result.results.errors.length > 0 ? '\nErrors: ' + result.results.errors.join(', ') : ''}`)
+        await fetchExperiences()
+      } catch (error: any) {
+        console.error('Import error:', error)
+        alert('Failed to import: ' + error.message)
+      } finally {
+        setImporting(false)
+        e.target.value = '' // Reset file input
+      }
+    }
     
     const sensors = useSensors(
       useSensor(PointerSensor, {
@@ -1143,19 +1199,31 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Experience Management</h1>
           <div className="flex gap-3">
+            <button
+              onClick={() => handleExport('xlsx')}
+              disabled={exporting}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-none font-semibold flex items-center space-x-2 disabled:opacity-50"
+            >
+              <Download className="w-5 h-5" />
+              <span>{exporting ? 'Exporting...' : 'Download XLSX'}</span>
+            </button>
+            <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-none font-semibold flex items-center space-x-2 cursor-pointer">
+              <Upload className="w-5 h-5" />
+              <span>{importing ? 'Importing...' : 'Upload XLSX/CSV'}</span>
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                onChange={handleImport}
+                disabled={importing}
+                className="hidden"
+              />
+            </label>
             <Link
               href="/admin/experiences/new"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
               <span>New Experience</span>
-            </Link>
-            <Link
-              href="/admin/experiences/import"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
-            >
-              <Upload className="w-5 h-5" />
-              <span>Bulk Import</span>
             </Link>
           </div>
         </div>
@@ -1365,6 +1433,62 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
   const DestinationsManagement = ({ destinations, fetchDestinations, loading }: any) => {
     const [showImageUpload, setShowImageUpload] = useState(false)
     const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null)
+    const [importing, setImporting] = useState(false)
+    const [exporting, setExporting] = useState(false)
+
+    const handleExport = async (format: 'xlsx' | 'csv' = 'xlsx') => {
+      setExporting(true)
+      try {
+        const response = await fetch(`/api/destinations/bulk-export?format=${format}`, {
+          credentials: 'include'
+        })
+        if (!response.ok) throw new Error('Export failed')
+
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `destinations-export.${format}`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      } catch (error) {
+        console.error('Export error:', error)
+        alert('Failed to export destinations')
+      } finally {
+        setExporting(false)
+      }
+    }
+
+    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+
+      setImporting(true)
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const response = await fetch('/api/destinations/bulk-import', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        })
+
+        const result = await response.json()
+        if (!response.ok) throw new Error(result.error || 'Import failed')
+
+        alert(`Import completed!\nCreated: ${result.results.created}\nUpdated: ${result.results.updated}\nDeleted: ${result.results.deleted}${result.results.errors.length > 0 ? '\nErrors: ' + result.results.errors.join(', ') : ''}`)
+        await fetchDestinations()
+      } catch (error: any) {
+        console.error('Import error:', error)
+        alert('Failed to import: ' + error.message)
+      } finally {
+        setImporting(false)
+        e.target.value = '' // Reset file input
+      }
+    }
     
     const sensors = useSensors(
       useSensor(PointerSensor, {
@@ -1495,19 +1619,31 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Destination Management</h1>
           <div className="flex gap-3">
+            <button
+              onClick={() => handleExport('xlsx')}
+              disabled={exporting}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-none font-semibold flex items-center space-x-2 disabled:opacity-50"
+            >
+              <Download className="w-5 h-5" />
+              <span>{exporting ? 'Exporting...' : 'Download XLSX'}</span>
+            </button>
+            <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-none font-semibold flex items-center space-x-2 cursor-pointer">
+              <Upload className="w-5 h-5" />
+              <span>{importing ? 'Importing...' : 'Upload XLSX/CSV'}</span>
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                onChange={handleImport}
+                disabled={importing}
+                className="hidden"
+              />
+            </label>
             <Link
               href="/admin/destinations/new"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
               <span>New Destination</span>
-            </Link>
-            <Link
-              href="/admin/destinations/import"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
-            >
-              <Upload className="w-5 h-5" />
-              <span>Bulk Import</span>
             </Link>
           </div>
         </div>

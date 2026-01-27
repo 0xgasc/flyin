@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { Sparkles, Calendar, Users, Clock, MapPin, CheckCircle, ArrowLeft } from 'lucide-react'
+import { Calendar, Users, Clock, MapPin, CheckCircle, ArrowLeft, Plane } from 'lucide-react'
 import { format } from 'date-fns'
+
+const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
 interface Experience {
   id: string
@@ -197,9 +200,14 @@ export default function BookExperiencesPage() {
       {/* Navigation */}
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Sparkles className="h-8 w-8 text-luxury-gold" />
-            <span className="text-2xl font-bold">FlyInGuate</span>
+          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <Image
+              src={LOGO_URL}
+              alt="FlyInGuate"
+              width={150}
+              height={50}
+              className="h-10 w-auto"
+            />
           </Link>
           <div className="flex items-center space-x-6">
             <LanguageSwitcher />
@@ -305,7 +313,7 @@ export default function BookExperiencesPage() {
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary-100 to-primary-200">
-                          <Sparkles className="h-12 w-12 text-primary-600" />
+                          <Plane className="h-12 w-12 text-primary-600" />
                         </div>
                       )
                     })()}

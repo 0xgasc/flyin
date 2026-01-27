@@ -12,6 +12,20 @@ interface GuatemalaMapLibreProps {
   mode?: 'from' | 'to' | 'both'
 }
 
+// Check if WebGL is supported
+function isWebGLSupported(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    const canvas = document.createElement('canvas')
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    )
+  } catch {
+    return false
+  }
+}
+
 // Guatemala destination coordinates (lat, lng)
 const destinations: Array<{
   name: string
@@ -42,16 +56,23 @@ export default function GuatemalaMapLibre({
   onDepartmentClick,
   selectedFrom,
   selectedTo,
-  mode = 'both'
 }: GuatemalaMapLibreProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
   const markers = useRef<maplibregl.Marker[]>([])
   const [hoveredDestination, setHoveredDestination] = useState<string | null>(null)
+  const [mapError, setMapError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return
 
+    // Check WebGL support before initializing
+    if (!isWebGLSupported()) {
+      setMapError('WebGL is not supported in your browser. Please try a different browser.')
+      return
+    }
+
+    try {
     // Initialize map with free OpenStreetMap tiles
     map.current = new maplibregl.Map({
       container: mapContainer.current,
@@ -92,6 +113,17 @@ export default function GuatemalaMapLibre({
     map.current.on('load', () => {
       addMarkers()
     })
+
+    // Handle map errors
+    map.current.on('error', (e) => {
+      console.error('Map error:', e)
+      setMapError('Failed to load map. Please try again.')
+    })
+
+    } catch (error) {
+      console.error('Failed to initialize map:', error)
+      setMapError('Failed to initialize map. WebGL may not be available.')
+    }
 
     return () => {
       markers.current.forEach(marker => marker.remove())
@@ -238,6 +270,22 @@ export default function GuatemalaMapLibre({
         })
       }
     }
+  }
+
+  // Show fallback if map fails to load
+  if (mapError) {
+    return (
+      <div className="relative w-full">
+        <div className="rounded overflow-hidden shadow-2xl border border-luxury-slate/30 bg-gradient-to-br from-gray-800 to-gray-900 p-8">
+          <div className="w-full h-96 sm:h-[500px] flex flex-col items-center justify-center text-center">
+            <div className="text-6xl mb-4">🗺️</div>
+            <h3 className="text-xl font-bold text-white mb-2">Interactive Map Unavailable</h3>
+            <p className="text-gray-400 mb-4 max-w-md">{mapError}</p>
+            <p className="text-sm text-gray-500">You can still browse and book experiences below.</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -25,6 +25,7 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
   const translations: Record<string, Record<'en' | 'es', string>> = {
     // Navigation
     'nav.home': { en: 'Home', es: 'Inicio' },
+    'nav.dashboard': { en: 'Dashboard', es: 'Panel' },
     'nav.experiences': { en: 'Experiences', es: 'Experiencias' },
     'nav.transport': { en: 'Transport', es: 'Transporte' },
     'nav.pilot_opportunities': { en: 'Pilot Opportunities', es: 'Oportunidades para Pilotos' },

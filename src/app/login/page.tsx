@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { login, getCurrentUser } from '@/lib/auth-client'
+import { useSearchParams } from 'next/navigation'
+import { login } from '@/lib/auth-client'
 import { Mail, Lock } from 'lucide-react'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
@@ -20,7 +20,6 @@ const getSafeRedirect = (redirect: string | null): string => {
 }
 
 function LoginContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = getSafeRedirect(searchParams.get('redirect'))
   const [email, setEmail] = useState('')
@@ -28,17 +27,9 @@ function LoginContent() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Check if already logged in
-  useEffect(() => {
-    const checkSession = async () => {
-      const user = await getCurrentUser()
-      if (user) {
-        console.log('Already logged in, redirecting...')
-        window.location.href = redirect
-      }
-    }
-    checkSession()
-  }, [redirect])
+  // Note: Middleware already redirects logged-in users away from /login
+  // We don't check getCurrentUser() here to avoid redirect loops when
+  // localStorage token exists but cookie is missing/expired
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

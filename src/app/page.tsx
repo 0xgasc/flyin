@@ -15,8 +15,8 @@ import dynamic from 'next/dynamic'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
-// Dynamically import MapLibre to avoid SSR issues
-const GuatemalaMapLibre = dynamic(() => import('@/components/guatemala-maplibre'), {
+// Dynamically import SafeMapWrapper which checks WebGL before loading MapLibre
+const SafeMapWrapper = dynamic(() => import('@/components/safe-map-wrapper'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-luxury-black/50 flex items-center justify-center">
@@ -283,8 +283,8 @@ export default function HomePage() {
 
             {/* Map */}
             <div className="h-[400px] lg:h-[500px] rounded-none overflow-hidden border border-white/10">
-              <GuatemalaMapLibre
-                onDepartmentClick={(dept) => {
+              <SafeMapWrapper
+                onDepartmentClick={(dept: { destinations: string[] }) => {
                   // Select first destination from department
                   if (dept.destinations.length > 0) {
                     const dest = dept.destinations[0]

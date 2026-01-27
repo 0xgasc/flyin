@@ -12,8 +12,8 @@ import { format } from 'date-fns'
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
 import dynamic from 'next/dynamic'
 
-// Dynamically import MapLibre to avoid SSR issues
-const GuatemalaMapLibre = dynamic(() => import('@/components/guatemala-maplibre'), {
+// Dynamically import SafeMapWrapper which checks WebGL before loading MapLibre
+const SafeMapWrapper = dynamic(() => import('@/components/safe-map-wrapper'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-96 sm:h-[500px] bg-luxury-black/50 flex items-center justify-center rounded">
@@ -431,7 +431,7 @@ export default function BookTransportPage() {
                   </p>
                 </div>
 
-                <GuatemalaMapLibre
+                <SafeMapWrapper
                   onDepartmentClick={handleDepartmentClick}
                   selectedFrom={formData.fromLocation}
                   selectedTo={formData.toLocation}
