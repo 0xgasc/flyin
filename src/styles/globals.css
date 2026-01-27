@@ -3,22 +3,23 @@
 @tailwind utilities;
 
 @layer base {
-  /* CSS Custom Properties for theming */
+  /* CSS Custom Properties - Luxury Dark Palette (always active) */
   :root {
-    --background: 250 250 250;
-    --foreground: 17 24 39;
-    --card: 255 255 255;
-    --card-foreground: 17 24 39;
-    --primary: 69 90 100;
-    --primary-foreground: 255 255 255;
+    --background: 10 10 10;
+    --foreground: 247 247 247;
+    --card: 20 20 20;
+    --card-foreground: 247 247 247;
+    --primary: 212 175 55;
+    --primary-foreground: 10 10 10;
     --muted: 107 114 128;
-    --muted-foreground: 156 163 175;
-    --border: 229 231 235;
-    --input: 229 231 235;
-    --ring: 69 90 100;
+    --muted-foreground: 145 145 145;
+    --border: 55 65 81;
+    --input: 55 65 81;
+    --ring: 212 175 55;
     --gold: 212 175 55;
   }
 
+  /* Keep .dark class for compatibility with existing dark: variants */
   .dark {
     --background: 10 10 10;
     --foreground: 247 247 247;

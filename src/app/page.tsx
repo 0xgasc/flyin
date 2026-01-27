@@ -29,30 +29,44 @@ const SafeMapWrapper = dynamic(() => import('@/components/safe-map-wrapper'), {
   )
 })
 
-// Estimated pricing data (per 2 passengers, roundtrip)
-// Pricing is based on distance and flight time estimates
-const ROUTE_PRICING: Record<string, { flightTime: string; price: number; distance: string }> = {
-  'guatemala-sacatepequez': { flightTime: '15 min', price: 850, distance: '25 km' },
-  'guatemala-solola': { flightTime: '35 min', price: 1650, distance: '95 km' },
-  'guatemala-peten': { flightTime: '55 min', price: 2800, distance: '280 km' },
-  'guatemala-izabal': { flightTime: '45 min', price: 2200, distance: '180 km' },
-  'guatemala-quetzaltenango': { flightTime: '40 min', price: 1900, distance: '120 km' },
-  'guatemala-retalhuleu': { flightTime: '35 min', price: 1700, distance: '130 km' },
-  'guatemala-alta-verapaz': { flightTime: '40 min', price: 1850, distance: '140 km' },
-  'guatemala-huehuetenango': { flightTime: '50 min', price: 2400, distance: '200 km' },
-  'guatemala-escuintla': { flightTime: '20 min', price: 950, distance: '45 km' },
-  'guatemala-san-marcos': { flightTime: '55 min', price: 2600, distance: '220 km' },
-  'guatemala-chimaltenango': { flightTime: '18 min', price: 900, distance: '35 km' },
-  'guatemala-zacapa': { flightTime: '35 min', price: 1600, distance: '110 km' },
-  'guatemala-chiquimula': { flightTime: '40 min', price: 1800, distance: '130 km' },
-  'guatemala-jalapa': { flightTime: '30 min', price: 1400, distance: '85 km' },
-  'guatemala-santa-rosa': { flightTime: '25 min', price: 1200, distance: '60 km' },
-  'guatemala-baja-verapaz': { flightTime: '35 min', price: 1550, distance: '100 km' },
-  'guatemala-jutiapa': { flightTime: '35 min', price: 1500, distance: '100 km' },
-  'guatemala-el-progreso': { flightTime: '25 min', price: 1100, distance: '55 km' },
-  'guatemala-totonicapan': { flightTime: '45 min', price: 2100, distance: '150 km' },
-  'guatemala-quiche': { flightTime: '45 min', price: 2050, distance: '145 km' },
-  'guatemala-suchitepequez': { flightTime: '35 min', price: 1650, distance: '115 km' },
+
+// Base pricing per km for dynamic route calculation
+const BASE_PRICE_PER_KM = 12 // USD per km
+const MINIMUM_FLIGHT_PRICE = 750
+
+function calculateRoutePrice(fromId: string, toId: string): { price: number; distance: string; flightTime: string } | null {
+  const fromDept = guatemalaDepartments.find(d => d.id === fromId)
+  const toDept = guatemalaDepartments.find(d => d.id === toId)
+
+  if (!fromDept || !toDept || fromId === toId) return null
+
+  // Calculate distance using coordinates (simple Haversine approximation)
+  const lat1 = fromDept.coordinates[0]
+  const lon1 = fromDept.coordinates[1]
+  const lat2 = toDept.coordinates[0]
+  const lon2 = toDept.coordinates[1]
+
+  const R = 6371 // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  const distance = R * c
+
+  // Estimate flight time (average helicopter speed ~200 km/h)
+  const flightMinutes = Math.round((distance / 200) * 60) + 5 // Add 5 min for takeoff/landing
+
+  // Calculate price
+  const rawPrice = distance * BASE_PRICE_PER_KM
+  const price = Math.max(MINIMUM_FLIGHT_PRICE, Math.round(rawPrice / 50) * 50) // Round to nearest 50
+
+  return {
+    price,
+    distance: `${Math.round(distance)} km`,
+    flightTime: `${flightMinutes} min`
+  }
 }
 
 export default function HomePage() {
@@ -60,21 +74,35 @@ export default function HomePage() {
   const { profile } = useAuthStore()
   const router = useRouter()
 
-  // Default origin is Guatemala City (Aurora Airport)
+  // Selection state - both origin and destination are now selectable
+  const [selectedOrigin, setSelectedOrigin] = useState<string>('guatemala')
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null)
+  const [passengerCount, setPassengerCount] = useState(2)
+  const [selectMode, setSelectMode] = useState<'from' | 'to'>('to') // Which point are we selecting?
 
-  // Get selected destination department
+  // Get selected departments
+  const originDept = useMemo(() => {
+    return guatemalaDepartments.find(d => d.id === selectedOrigin)
+  }, [selectedOrigin])
+
   const destinationDept = useMemo(() => {
     if (!selectedDestination) return null
     return guatemalaDepartments.find(d => d.id === selectedDestination)
   }, [selectedDestination])
 
-  // Get route pricing
+  // Get route pricing dynamically
   const routePricing = useMemo(() => {
-    if (!selectedDestination || selectedDestination === 'guatemala') return null
-    const key = `guatemala-${selectedDestination}`
-    return ROUTE_PRICING[key] || null
-  }, [selectedDestination])
+    if (!selectedOrigin || !selectedDestination) return null
+    return calculateRoutePrice(selectedOrigin, selectedDestination)
+  }, [selectedOrigin, selectedDestination])
+
+  // Calculate price based on passenger count
+  const adjustedPrice = useMemo(() => {
+    if (!routePricing) return 0
+    // Base is for 2 passengers, adjust for additional passengers
+    const additionalPassengers = Math.max(0, passengerCount - 2)
+    return routePricing.price + (additionalPassengers * Math.round(routePricing.price * 0.25))
+  }, [routePricing, passengerCount])
 
   const handleSignOut = async () => {
     await logout()
@@ -102,7 +130,7 @@ export default function HomePage() {
         <div className="relative z-10">
           <MobileNav
             customActions={
-              <div className="hidden md:flex items-center space-x-6">
+              <div className="hidden md:flex items-center space-x-4">
                 <LanguageSwitcher />
                 {!profile && (
                   <Link href="/pilot/join" className="hover:text-luxury-gold transition-colors text-sm">
@@ -200,10 +228,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 py-16 lg:py-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Where Would You Like to Fly?
+              Plan Your Flight
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Click on any destination on the map to see flight details and pricing from Guatemala City
+              Select your origin and destination on the map to see flight details and pricing
             </p>
           </div>
 
@@ -211,123 +239,156 @@ export default function HomePage() {
             <div className="grid lg:grid-cols-5 gap-6 items-start">
               {/* Left Panel - Pricing/Selection */}
               <div className="lg:col-span-2 order-2 lg:order-1">
-                {selectedDestination && destinationDept && routePricing ? (
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-5 animate-fade-in">
-                    {/* Route Header */}
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                          <span className="text-xs text-gray-500 uppercase tracking-wide">From</span>
-                        </div>
-                        <div className="text-white font-semibold">Guatemala City</div>
-                        <div className="text-sm text-gold-400">La Aurora (GUA)</div>
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-5">
+                  {/* Route Display */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide">From</span>
                       </div>
-                      <Plane className="h-5 w-5 text-gold-400 rotate-90" />
-                      <div className="flex-1 text-right">
-                        <div className="flex items-center justify-end gap-2 mb-1">
-                          <span className="text-xs text-gray-500 uppercase tracking-wide">To</span>
-                          <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                        </div>
-                        <div className="text-white font-semibold">{destinationDept.name}</div>
+                      <div className="text-white font-semibold">{originDept?.name || 'Select origin'}</div>
+                      {originDept?.airports?.[0] && (
+                        <div className="text-sm text-gold-400">{originDept.airports[0].code}</div>
+                      )}
+                    </div>
+                    <Plane className="h-5 w-5 text-gold-400 rotate-90" />
+                    <div className="flex-1 text-right">
+                      <div className="flex items-center justify-end gap-2 mb-1">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide">To</span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                      </div>
+                      <div className="text-white font-semibold">{destinationDept?.name || 'Select destination'}</div>
+                      {destinationDept?.destinations?.[0] && (
                         <div className="text-sm text-gray-400">{destinationDept.destinations[0]}</div>
-                      </div>
+                      )}
                     </div>
+                  </div>
 
-                    {/* Flight Details */}
-                    <div className="grid grid-cols-3 gap-3 mb-5">
-                      <div className="bg-white/5 rounded-soft p-3 text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Distance</div>
-                        <div className="text-white font-medium">{routePricing.distance}</div>
-                      </div>
-                      <div className="bg-white/5 rounded-soft p-3 text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Flight</div>
-                        <div className="text-white font-medium">{routePricing.flightTime}</div>
-                      </div>
-                      <div className="bg-white/5 rounded-soft p-3 text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Aircraft</div>
-                        <div className="text-white font-medium">Bell 407</div>
-                      </div>
-                    </div>
-
-                    {/* Price Card */}
-                    <div className="bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-500/30 rounded-soft p-5 text-center mb-5">
-                      <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Roundtrip (2 passengers)</div>
-                      <div className="flex items-center justify-center gap-1 mb-2">
-                        <DollarSign className="h-7 w-7 text-gold-400" />
-                        <span className="text-3xl font-bold text-white">{routePricing.price.toLocaleString()}</span>
-                        <span className="text-gray-400 text-sm self-end mb-1">USD</span>
-                      </div>
-                      <div className="text-xs text-gray-500 mb-4">
-                        ${Math.round(routePricing.price / 2).toLocaleString()} per person
+                  {/* Passenger Count Selector */}
+                  <div className="mb-5">
+                    <label className="text-xs text-gray-500 uppercase tracking-wide block mb-2">Passengers</label>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setPassengerCount(Math.max(1, passengerCount - 1))}
+                        className="w-10 h-10 rounded-soft bg-white/10 hover:bg-white/20 text-white font-bold transition-colors"
+                      >
+                        -
+                      </button>
+                      <div className="flex-1 text-center">
+                        <span className="text-2xl font-bold text-white">{passengerCount}</span>
+                        <span className="text-gray-400 text-sm ml-1">passenger{passengerCount !== 1 ? 's' : ''}</span>
                       </div>
                       <button
-                        onClick={() => {
-                          const params = new URLSearchParams()
-                          params.set('from', 'guatemala')
-                          params.set('to', selectedDestination)
-                          params.set('passengers', '2')
-                          router.push(`/book/transport?${params.toString()}`)
-                        }}
-                        className="w-full btn-luxury py-3"
+                        onClick={() => setPassengerCount(Math.min(5, passengerCount + 1))}
+                        className="w-10 h-10 rounded-soft bg-white/10 hover:bg-white/20 text-white font-bold transition-colors"
                       >
-                        Book This Flight
+                        +
                       </button>
                     </div>
+                    <p className="text-xs text-gray-500 text-center mt-1">Max 5 passengers per flight</p>
+                  </div>
 
-                    {/* Destinations */}
-                    <div>
-                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Destinations in {destinationDept.name}</div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {destinationDept.destinations.map(dest => (
-                          <span key={dest} className="px-2.5 py-1 bg-white/10 rounded-full text-xs text-white">
-                            {dest}
-                          </span>
-                        ))}
+                  {/* Flight Details & Pricing (if route selected) */}
+                  {routePricing ? (
+                    <>
+                      {/* Flight Details */}
+                      <div className="grid grid-cols-3 gap-3 mb-5">
+                        <div className="bg-white/5 rounded-soft p-3 text-center">
+                          <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Distance</div>
+                          <div className="text-white font-medium">{routePricing.distance}</div>
+                        </div>
+                        <div className="bg-white/5 rounded-soft p-3 text-center">
+                          <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Flight</div>
+                          <div className="text-white font-medium">{routePricing.flightTime}</div>
+                        </div>
+                        <div className="bg-white/5 rounded-soft p-3 text-center">
+                          <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Aircraft</div>
+                          <div className="text-white font-medium">Bell 407</div>
+                        </div>
+                      </div>
+
+                      {/* Price Card */}
+                      <div className="bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-500/30 rounded-soft p-5 text-center mb-5">
+                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Roundtrip ({passengerCount} passenger{passengerCount !== 1 ? 's' : ''})</div>
+                        <div className="flex items-center justify-center gap-1 mb-2">
+                          <DollarSign className="h-7 w-7 text-gold-400" />
+                          <span className="text-3xl font-bold text-white">{adjustedPrice.toLocaleString()}</span>
+                          <span className="text-gray-400 text-sm self-end mb-1">USD</span>
+                        </div>
+                        <div className="text-xs text-gray-500 mb-4">
+                          ${Math.round(adjustedPrice / passengerCount).toLocaleString()} per person
+                        </div>
+                        <button
+                          onClick={() => {
+                            const params = new URLSearchParams()
+                            params.set('from', selectedOrigin)
+                            params.set('to', selectedDestination!)
+                            params.set('passengers', passengerCount.toString())
+                            router.push(`/book/transport?${params.toString()}`)
+                          }}
+                          className="w-full btn-luxury py-3"
+                        >
+                          Book This Flight
+                        </button>
+                      </div>
+
+                      {/* Destinations in area */}
+                      {destinationDept && (
+                        <div>
+                          <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Destinations in {destinationDept.name}</div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {destinationDept.destinations.map(dest => (
+                              <span key={dest} className="px-2.5 py-1 bg-white/10 rounded-full text-xs text-white">
+                                {dest}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    /* Prompt to complete selection */
+                    <div className="text-center py-4">
+                      <MapPin className="h-10 w-10 text-gold-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-white mb-2">
+                        {!selectedOrigin && !selectedDestination
+                          ? 'Select Your Route'
+                          : !selectedDestination
+                            ? 'Now Select Destination'
+                            : 'Select Origin Point'}
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Click on the map to set your {selectMode === 'from' ? 'origin' : 'destination'} point
+                      </p>
+
+                      {/* Quick destination list */}
+                      <div className="mt-5 pt-5 border-t border-white/10 text-left">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-3">Popular Destinations</div>
+                        <div className="space-y-2">
+                          {['sacatepequez', 'solola', 'peten', 'alta-verapaz'].map(id => {
+                            const dept = guatemalaDepartments.find(d => d.id === id)
+                            const pricing = calculateRoutePrice(selectedOrigin, id)
+                            if (!dept || !pricing) return null
+                            return (
+                              <button
+                                key={id}
+                                onClick={() => setSelectedDestination(id)}
+                                className="w-full flex items-center justify-between p-2.5 bg-white/5 hover:bg-white/10 rounded-soft transition-colors text-left"
+                              >
+                                <div>
+                                  <div className="text-white text-sm font-medium">{dept.name}</div>
+                                  <div className="text-gray-500 text-xs">{pricing.flightTime} • {pricing.distance}</div>
+                                </div>
+                                <div className="text-gold-400 font-semibold">${pricing.price}</div>
+                              </button>
+                            )
+                          })}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  /* Prompt to select destination */
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-6">
-                    {/* Origin Badge */}
-                    <div className="flex items-center gap-2 bg-green-500/20 border border-green-500/40 px-3 py-2 rounded-full mb-5 w-fit">
-                      <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                      <span className="text-green-400 text-sm font-medium">Departing from La Aurora (GUA)</span>
-                    </div>
-
-                    <MapPin className="h-10 w-10 text-gold-400 mb-4" />
-                    <h3 className="text-lg font-semibold text-white mb-2">Select Your Destination</h3>
-                    <p className="text-gray-400 text-sm">
-                      Click on any point on the map to see flight details, distance, and pricing.
-                    </p>
-
-                    {/* Quick destination list */}
-                    <div className="mt-5 pt-5 border-t border-white/10">
-                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-3">Popular Routes</div>
-                      <div className="space-y-2">
-                        {['sacatepequez', 'solola', 'peten', 'alta-verapaz'].map(id => {
-                          const dept = guatemalaDepartments.find(d => d.id === id)
-                          const pricing = ROUTE_PRICING[`guatemala-${id}`]
-                          if (!dept || !pricing) return null
-                          return (
-                            <button
-                              key={id}
-                              onClick={() => setSelectedDestination(id)}
-                              className="w-full flex items-center justify-between p-2.5 bg-white/5 hover:bg-white/10 rounded-soft transition-colors text-left"
-                            >
-                              <div>
-                                <div className="text-white text-sm font-medium">{dept.name}</div>
-                                <div className="text-gray-500 text-xs">{pricing.flightTime} • {pricing.distance}</div>
-                              </div>
-                              <div className="text-gold-400 font-semibold">${pricing.price}</div>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Quick Links */}
                 <div className="mt-4 text-center">
@@ -342,17 +403,50 @@ export default function HomePage() {
 
               {/* Right Panel - Map */}
               <div className="lg:col-span-3 order-1 lg:order-2">
-                <div className="h-[400px] lg:h-[550px] rounded-soft overflow-hidden border border-white/10">
+                <div className="relative h-[400px] lg:h-[550px] rounded-soft overflow-hidden border border-white/10">
                   <SafeMapWrapper
                     onDepartmentClick={(dept: Department) => {
-                      if (dept.id !== 'guatemala') {
-                        setSelectedDestination(dept.id)
+                      if (selectMode === 'from') {
+                        if (dept.id !== selectedDestination) {
+                          setSelectedOrigin(dept.id)
+                          setSelectMode('to') // Auto-switch to destination mode
+                        }
+                      } else {
+                        if (dept.id !== selectedOrigin) {
+                          setSelectedDestination(dept.id)
+                        }
                       }
                     }}
-                    selectedFrom="guatemala"
+                    selectedFrom={selectedOrigin}
                     selectedTo={selectedDestination || undefined}
-                    mode="to"
+                    mode={selectMode === 'from' ? 'from' : 'to'}
                   />
+
+                  {/* Selection Mode Toggle - Overlaid on Map */}
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex gap-1 bg-luxury-charcoal rounded-full p-1 shadow-lg border border-gray-700">
+                    <button
+                      onClick={() => setSelectMode('from')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                        selectMode === 'from'
+                          ? 'bg-green-500 text-white'
+                          : 'text-gray-300 hover:bg-gray-700'
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                      Origin
+                    </button>
+                    <button
+                      onClick={() => setSelectMode('to')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                        selectMode === 'to'
+                          ? 'bg-red-500 text-white'
+                          : 'text-gray-300 hover:bg-gray-700'
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                      Destination
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -361,13 +455,13 @@ export default function HomePage() {
       </div>
 
       {/* Services Section */}
-      <div className="bg-white dark:bg-luxury-charcoal py-16 lg:py-24">
+      <div className="bg-luxury-charcoal py-16 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-display font-bold text-luxury-black dark:text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mb-4">
               Our Services
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto">
               From executive transport to unforgettable aerial experiences
             </p>
           </div>
@@ -375,13 +469,13 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Transport */}
             <div className="card-feature">
-              <h3 className="text-2xl font-bold text-luxury-black dark:text-white mb-4">
+              <h3 className="text-2xl font-bold text-white mb-4">
                 {t('services.transport.title')}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-400 mb-6">
                 {t('services.transport.description')}
               </p>
-              <ul className="space-y-3 mb-8 text-gray-600 dark:text-gray-400">
+              <ul className="space-y-3 mb-8 text-gray-400">
                 <li className="flex items-center gap-3">
                   <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Guatemala City to any destination
@@ -397,7 +491,7 @@ export default function HomePage() {
               </ul>
               <Link
                 href="/book/transport"
-                className="inline-flex items-center gap-2 text-primary-600 dark:text-gold-400 font-semibold hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-gold-400 font-semibold hover:gap-3 transition-all"
               >
                 Book Transport <span>&rarr;</span>
               </Link>
@@ -405,13 +499,13 @@ export default function HomePage() {
 
             {/* Experiences */}
             <div className="card-feature">
-              <h3 className="text-2xl font-bold text-luxury-black dark:text-white mb-4">
+              <h3 className="text-2xl font-bold text-white mb-4">
                 {t('services.experiences.title')}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-400 mb-6">
                 {t('services.experiences.description')}
               </p>
-              <ul className="space-y-3 mb-8 text-gray-600 dark:text-gray-400">
+              <ul className="space-y-3 mb-8 text-gray-400">
                 <li className="flex items-center gap-3">
                   <span className="w-2 h-2 bg-gold-500 rounded-full"></span>
                   Lake Atitlan scenic tours
@@ -427,7 +521,7 @@ export default function HomePage() {
               </ul>
               <Link
                 href="/book/experiences"
-                className="inline-flex items-center gap-2 text-primary-600 dark:text-gold-400 font-semibold hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-gold-400 font-semibold hover:gap-3 transition-all"
               >
                 Explore Experiences <span>&rarr;</span>
               </Link>

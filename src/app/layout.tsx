@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Outfit, Cormorant_Garamond } from 'next/font/google'
 import { AuthProvider } from '@/components/auth-provider'
-import { ThemeProvider } from '@/lib/theme-context'
 import { ToastContainer } from '@/components/ui/Toast'
 import '../styles/globals.css'
 
@@ -36,14 +35,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark">
       <body className={`${outfit.variable} ${cormorant.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <AuthProvider>
-            {children}
-            <ToastContainer />
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          {children}
+          <ToastContainer />
+        </AuthProvider>
       </body>
     </html>
   )

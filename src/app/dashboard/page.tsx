@@ -122,10 +122,10 @@ export default function DashboardPage() {
   // Show loading while auth is loading
   if (authLoading || !profile) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
+      <div className="min-h-screen bg-luxury-black flex items-center justify-center">
         <div className="text-center">
-          <div className="loading-spinner-lg mx-auto mb-4 text-primary-600 dark:text-gold-500"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading your dashboard...</p>
+          <div className="loading-spinner-lg mx-auto mb-4 text-gold-500"></div>
+          <p className="text-gray-400">Loading your dashboard...</p>
         </div>
       </div>
     )
@@ -378,7 +378,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
+    <div className="min-h-screen bg-luxury-black">
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
           <Link href="/" className="hover:opacity-80 transition-opacity">

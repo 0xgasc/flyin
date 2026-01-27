@@ -119,26 +119,26 @@ export default function ExperiencesPage() {
   const categories = ['all', 'helitour', 'sobrevuelo', 'day-flight', 'traslado', 'evento-especial']
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-luxury-black p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Experience Management</h1>
-              <p className="text-gray-600">Manage helitours and experiences</p>
+              <h1 className="text-3xl font-bold text-white">Experience Management</h1>
+              <p className="text-gray-400">Manage helitours and experiences</p>
             </div>
             <div className="flex gap-3">
               <Link
                 href="/admin/experiences/new"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded font-semibold flex items-center space-x-2 transition-colors"
+                className="bg-gold-500 hover:bg-gold-400 text-luxury-black px-6 py-3 rounded-soft font-semibold flex items-center space-x-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 <span>New Experience</span>
               </Link>
               <Link
                 href="/admin/experiences/import"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold flex items-center space-x-2 transition-colors"
+                className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-soft font-semibold flex items-center space-x-2 transition-colors"
               >
                 <Upload className="w-5 h-5" />
                 <span>Bulk Import</span>
@@ -148,17 +148,17 @@ export default function ExperiencesPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded shadow-sm p-6 mb-6">
+        <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search experiences..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function ExperiencesPage() {
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-700 rounded-soft bg-luxury-black text-white focus:ring-2 focus:ring-gold-500 focus:border-transparent"
               >
                 {categories.map(cat => (
                   <option key={cat} value={cat}>
@@ -180,53 +180,53 @@ export default function ExperiencesPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded shadow-sm p-6">
+          <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6">
             <div className="flex items-center">
-              <div className="bg-blue-100 p-3 rounded-full">
-                <MapPin className="w-6 h-6 text-blue-600" />
+              <div className="bg-blue-900/50 p-3 rounded-full">
+                <MapPin className="w-6 h-6 text-blue-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Experiences</p>
-                <p className="text-2xl font-bold text-gray-900">{experiences.length}</p>
+                <p className="text-sm font-medium text-gray-400">Total Experiences</p>
+                <p className="text-2xl font-bold text-white">{experiences.length}</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded shadow-sm p-6">
+          <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6">
             <div className="flex items-center">
-              <div className="bg-green-100 p-3 rounded-full">
-                <Eye className="w-6 h-6 text-green-600" />
+              <div className="bg-green-900/50 p-3 rounded-full">
+                <Eye className="w-6 h-6 text-green-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-medium text-gray-400">Active</p>
+                <p className="text-2xl font-bold text-white">
                   {experiences.filter(e => e.is_active).length}
                 </p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded shadow-sm p-6">
+          <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6">
             <div className="flex items-center">
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <DollarSign className="w-6 h-6 text-yellow-600" />
+              <div className="bg-gold-500/20 p-3 rounded-full">
+                <DollarSign className="w-6 h-6 text-gold-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Avg Price</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${experiences.length > 0 
+                <p className="text-sm font-medium text-gray-400">Avg Price</p>
+                <p className="text-2xl font-bold text-gold-400">
+                  ${experiences.length > 0
                     ? Math.round(experiences.reduce((sum, e) => sum + (e.base_price || 0), 0) / experiences.length)
                     : 0}
                 </p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded shadow-sm p-6">
+          <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6">
             <div className="flex items-center">
-              <div className="bg-purple-100 p-3 rounded-full">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="bg-purple-900/50 p-3 rounded-full">
+                <Users className="w-6 h-6 text-purple-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Capacity</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-medium text-gray-400">Total Capacity</p>
+                <p className="text-2xl font-bold text-white">
                   {experiences.reduce((sum, e) => sum + (e.max_passengers || 0), 0)}
                 </p>
               </div>
@@ -235,46 +235,46 @@ export default function ExperiencesPage() {
         </div>
 
         {/* Experiences Table */}
-        <div className="bg-white rounded shadow-sm overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-luxury-charcoal border border-gray-800 rounded-soft overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-800">
+            <thead className="bg-luxury-black">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Experience
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Location
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Duration
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-luxury-charcoal divide-y divide-gray-800">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-400">
                     Loading experiences...
                   </td>
                 </tr>
               ) : filteredExperiences.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-400">
                     No experiences found
                   </td>
                 </tr>
               ) : (
                 filteredExperiences.map((experience) => (
-                  <tr key={experience.id}>
+                  <tr key={experience.id} className="hover:bg-gray-800/50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {experience.image_url ? (
@@ -284,38 +284,38 @@ export default function ExperiencesPage() {
                             alt={experience.name}
                           />
                         ) : (
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <ImageIcon className="w-5 h-5 text-gray-400" />
+                          <div className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center">
+                            <ImageIcon className="w-5 h-5 text-gray-500" />
                           </div>
                         )}
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{experience.name}</div>
+                          <div className="text-sm font-medium text-white">{experience.name}</div>
                           <div className="text-sm text-gray-500">{experience.category || 'helitour'}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+                      <div className="flex items-center text-sm text-gray-300">
+                        <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                         {experience.location}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <Clock className="w-4 h-4 mr-1 text-gray-400" />
+                      <div className="flex items-center text-sm text-gray-300">
+                        <Clock className="w-4 h-4 mr-1 text-gray-500" />
                         {experience.duration_hours}h
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">${experience.base_price}</div>
+                      <div className="text-sm text-gold-400 font-medium">${experience.base_price}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         onClick={() => handleToggleActive(experience.id, experience.is_active)}
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           experience.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-900/50 text-green-400'
+                            : 'bg-gray-800 text-gray-400'
                         }`}
                       >
                         {experience.is_active ? 'Active' : 'Inactive'}
@@ -328,19 +328,19 @@ export default function ExperiencesPage() {
                             setSelectedExperienceId(experience.id)
                             setShowImageUpload(true)
                           }}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-400 hover:text-blue-300"
                         >
                           <ImageIcon className="w-4 h-4" />
                         </button>
                         <Link
                           href={`/admin/experiences/${experience.id}/edit`}
-                          className="text-indigo-600 hover:text-indigo-900"
+                          className="text-gold-400 hover:text-gold-300"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(experience.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-400 hover:text-red-300"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

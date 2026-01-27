@@ -212,10 +212,10 @@ export default function AdminDashboard() {
   // Don't render anything if not properly authenticated
   if (profile === null) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-luxury-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin panel...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading admin panel...</p>
         </div>
       </div>
     )
@@ -223,13 +223,13 @@ export default function AdminDashboard() {
 
   if (!profile || profile.role !== 'admin') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-luxury-black flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You need admin permissions to access this page.</p>
+          <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+          <p className="text-gray-400 mb-4">You need admin permissions to access this page.</p>
           <button
             onClick={() => router.push('/')}
-            className="bg-blue-600 text-white px-4 py-2 rounded-none hover:bg-blue-700"
+            className="bg-gold-500 text-luxury-black font-semibold px-4 py-2 rounded-soft hover:bg-gold-400"
           >
             Return Home
           </button>

@@ -42,11 +42,11 @@ export function TransactionsTab({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400'
       case 'approved':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400'
       default:
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-400'
     }
   }
 
@@ -54,8 +54,8 @@ export function TransactionsTab({
     <div>
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">Top-up Approval System</h1>
-        <div className="flex flex-wrap gap-4 text-sm">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Top-up Approval System</h1>
+        <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-yellow-400 rounded"></div>
             <span>Pending Review</span>
@@ -73,38 +73,38 @@ export function TransactionsTab({
 
       {/* Summary Cards */}
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
-        <div className="card-luxury bg-yellow-50 border-yellow-200">
+        <div className="card-luxury bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-yellow-800 text-sm font-medium">Pending Reviews</p>
-              <p className="text-2xl font-bold text-yellow-900">{pendingCount}</p>
+              <p className="text-yellow-800 dark:text-yellow-400 text-sm font-medium">Pending Reviews</p>
+              <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-300">{pendingCount}</p>
             </div>
-            <DollarSign className="h-8 w-8 text-yellow-600" />
+            <DollarSign className="h-8 w-8 text-yellow-600 dark:text-yellow-500" />
           </div>
-          <div className="mt-2 text-sm text-yellow-700">
+          <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-500">
             Total: ${pendingTotal}
           </div>
         </div>
 
-        <div className="card-luxury bg-green-50 border-green-200">
+        <div className="card-luxury bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-800 text-sm font-medium">Approved Today</p>
-              <p className="text-2xl font-bold text-green-900">{approvedTodayCount}</p>
+              <p className="text-green-800 dark:text-green-400 text-sm font-medium">Approved Today</p>
+              <p className="text-2xl font-bold text-green-900 dark:text-green-300">{approvedTodayCount}</p>
             </div>
-            <CheckCircle className="h-8 w-8 text-green-600" />
+            <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-500" />
           </div>
         </div>
 
-        <div className="card-luxury bg-blue-50 border-blue-200">
+        <div className="card-luxury bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-800 text-sm font-medium">Payment Methods</p>
-              <p className="text-sm text-blue-700">
+              <p className="text-blue-800 dark:text-blue-400 text-sm font-medium">Payment Methods</p>
+              <p className="text-sm text-blue-700 dark:text-blue-400">
                 Bank: {bankCount} | Crypto: {cryptoCount}
               </p>
             </div>
-            <BarChart3 className="h-8 w-8 text-blue-600" />
+            <BarChart3 className="h-8 w-8 text-blue-600 dark:text-blue-500" />
           </div>
         </div>
       </div>
@@ -116,9 +116,9 @@ export function TransactionsTab({
         </div>
       ) : transactions.length === 0 ? (
         <div className="card-luxury text-center py-12">
-          <DollarSign className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No transactions found</h3>
-          <p className="text-gray-500">Top-up requests will appear here for approval</p>
+          <DollarSign className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No transactions found</h3>
+          <p className="text-gray-500 dark:text-gray-400">Top-up requests will appear here for approval</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -162,21 +162,21 @@ function TransactionCard({
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               ${transaction.amount} Top-up Request
             </h3>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(transaction.status)}`}>
               {transaction.status.toUpperCase()}
             </span>
             {transaction.payment_method === 'cryptocurrency' && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-400 text-xs rounded">
                 🪙 Stablecoin Ready
               </span>
             )}
           </div>
 
           {/* Details Grid */}
-          <div className="grid sm:grid-cols-3 gap-4 text-sm text-gray-600 mb-4">
+          <div className="grid sm:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
             <div className="space-y-1">
               <p><span className="font-medium">Client:</span> {transaction.user?.full_name}</p>
               <p><span className="font-medium">{t('form.email')}:</span> {transaction.user?.email}</p>
@@ -199,12 +199,12 @@ function TransactionCard({
 
           {/* Payment Proof */}
           {transaction.payment_proof_url && (
-            <div className="bg-gray-50 rounded p-3">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded p-3">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Payment Proof Submitted:</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Proof Submitted:</span>
                 <button
                   onClick={() => onViewProof(transaction)}
-                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
                 >
                   🔍 View Full Size
                 </button>
@@ -213,10 +213,10 @@ function TransactionCard({
                 <img
                   src={transaction.payment_proof_url}
                   alt="Payment proof"
-                  className="w-24 h-32 object-cover rounded border border-gray-200 cursor-pointer hover:opacity-80"
+                  className="w-24 h-32 object-cover rounded border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80"
                   onClick={() => onViewProof(transaction)}
                 />
-                <div className="flex-1 text-xs text-gray-600 space-y-1">
+                <div className="flex-1 text-xs text-gray-600 dark:text-gray-400 space-y-1">
                   <p>📄 Payment verification document</p>
                   <p>Uploaded with transaction</p>
                   <p>🔍 Click to enlarge and verify details</p>
@@ -254,16 +254,16 @@ function TransactionCard({
           )}
 
           {transaction.status === 'approved' && (
-            <div className="text-center p-3 bg-green-50 rounded border border-green-200">
-              <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-1" />
-              <p className="text-xs text-green-800 font-medium">Funds Added</p>
+            <div className="text-center p-3 bg-green-50 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-500 mx-auto mb-1" />
+              <p className="text-xs text-green-800 dark:text-green-400 font-medium">Funds Added</p>
             </div>
           )}
 
           {transaction.status === 'rejected' && (
-            <div className="text-center p-3 bg-red-50 rounded border border-red-200">
-              <XCircle className="h-6 w-6 text-red-600 mx-auto mb-1" />
-              <p className="text-xs text-red-800 font-medium">Request Denied</p>
+            <div className="text-center p-3 bg-red-50 dark:bg-red-900/30 rounded border border-red-200 dark:border-red-800">
+              <XCircle className="h-6 w-6 text-red-600 dark:text-red-500 mx-auto mb-1" />
+              <p className="text-xs text-red-800 dark:text-red-400 font-medium">Request Denied</p>
             </div>
           )}
         </div>

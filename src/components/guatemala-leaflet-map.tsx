@@ -212,40 +212,23 @@ export default function GuatemalaLeafletMap({
         style={{ background: '#f8fafc' }}
       />
 
-      {/* Legend */}
-      <div className="absolute bottom-4 right-4 bg-white dark:bg-luxury-charcoal rounded-soft shadow-card p-3 text-sm z-[1000]">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="w-3 h-3 rounded-full bg-green-500"></span>
-          <span className="text-gray-700 dark:text-gray-300">From</span>
-        </div>
-        <div className="flex items-center gap-2 mb-2">
-          <span className="w-3 h-3 rounded-full bg-red-500"></span>
-          <span className="text-gray-700 dark:text-gray-300">To</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-gold-500" style={{ outline: '2px solid #d4af37', outlineOffset: '2px' }}></span>
-          <span className="text-gray-700 dark:text-gray-300">Airport</span>
+      {/* Legend - minimal, just shows marker meanings */}
+      <div className="absolute bottom-4 right-4 bg-white dark:bg-luxury-charcoal rounded-soft shadow-card px-3 py-2 text-xs z-[1000]">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+            <span className="text-gray-600 dark:text-gray-400">Origin</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+            <span className="text-gray-600 dark:text-gray-400">Dest</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-gold-500" style={{ outline: '1.5px solid #d4af37', outlineOffset: '1px' }}></span>
+            <span className="text-gray-600 dark:text-gray-400">Airport</span>
+          </div>
         </div>
       </div>
-
-      {/* Selection summary */}
-      {(selectedFrom || selectedTo) && (
-        <div className="absolute top-4 left-4 bg-white dark:bg-luxury-charcoal rounded-soft shadow-card p-3 text-sm z-[1000] max-w-[200px]">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-green-500"></span>
-            <span className="text-gray-700 dark:text-gray-300 truncate">
-              {selectedFrom ? departmentPositions.find(d => d.id === selectedFrom)?.name || 'Select origin' : 'Select origin'}
-            </span>
-          </div>
-          <div className="text-gold-500 text-center">↓</div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500"></span>
-            <span className="text-gray-700 dark:text-gray-300 truncate">
-              {selectedTo ? departmentPositions.find(d => d.id === selectedTo)?.name || 'Select destination' : 'Select destination'}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Custom CSS for animations */}
       <style jsx global>{`

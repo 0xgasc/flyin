@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/lib/auth-client'
-import { ThemeToggle } from '@/components/theme-toggle'
 import {
   Plane, Calendar, Users, UserCheck, DollarSign, BarChart3,
   MapPin, Image as ImageIcon, Menu, X, LogOut, Home, ChevronLeft, ChevronRight
@@ -138,14 +137,8 @@ export function AdminLayout({
 
         <NavContent />
 
-        {/* Footer with theme toggle */}
+        {/* Footer */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
-          {sidebarOpen && (
-            <div className="flex items-center justify-between px-3 py-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Theme</span>
-              <ThemeToggle variant="compact" />
-            </div>
-          )}
           <button
             onClick={handleSignOut}
             className={`
@@ -164,15 +157,12 @@ export function AdminLayout({
         <Link href="/" className="flex items-center gap-2">
           <span className="font-bold text-gray-900 dark:text-white">FlyInGuate Admin</span>
         </Link>
-        <div className="flex items-center gap-2">
-          <ThemeToggle variant="compact" />
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-soft"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-soft"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
       </div>
 
       {/* Mobile Menu Overlay */}

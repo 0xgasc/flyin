@@ -271,20 +271,20 @@ export default function EditDestinationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-luxury-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
       </div>
     )
   }
 
   if (!destination) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-luxury-black flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Destination Not Found</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Destination Not Found</h1>
           <Link
             href="/admin"
-            className="text-blue-600 hover:text-blue-800 flex items-center justify-center"
+            className="text-gold-400 hover:text-gold-300 flex items-center justify-center"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Admin
@@ -295,24 +295,24 @@ export default function EditDestinationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-luxury-black py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-8">
           <Link
             href="/admin"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="inline-flex items-center text-gold-400 hover:text-gold-300 mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Admin Panel
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Destination</h1>
-          <p className="text-gray-600 mt-2">Update destination details and manage images</p>
+          <h1 className="text-3xl font-bold text-white">Edit Destination</h1>
+          <p className="text-gray-400 mt-2">Update destination details and manage images</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
-          <div className="bg-white rounded shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-6">Destination Details</h2>
+          <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6">
+            <h2 className="text-xl font-semibold text-white mb-6">Destination Details</h2>
             
             <form onSubmit={handleSave} className="space-y-6">
               <div>

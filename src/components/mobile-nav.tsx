@@ -8,7 +8,6 @@ import { Menu, X, Home, User, Calendar, Settings, LogOut, Globe, Briefcase, Help
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { useI18n } from '@/lib/i18n'
-import { ThemeToggle } from '@/components/theme-toggle'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
@@ -137,7 +136,6 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                     {item.label}
                   </Link>
                 ))}
-                <ThemeToggle variant="compact" className="text-white hover:text-gold-400" />
                 {profile && (
                   <button
                     onClick={handleSignOut}
@@ -175,12 +173,6 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                 <Globe className="h-5 w-5" />
                 <span>Language: {locale === 'en' ? 'English' : 'Español'}</span>
               </button>
-
-              {/* Theme switcher */}
-              <div className="flex items-center justify-between p-3">
-                <span className="text-sm text-gray-400">Theme</span>
-                <ThemeToggle />
-              </div>
 
               <div className="border-t border-gray-700 pt-2"></div>
               

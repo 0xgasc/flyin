@@ -42,18 +42,18 @@ export function BookingsTab({
 
   const getPaymentStatusColor = (status: string) => {
     return status === 'paid'
-      ? 'bg-green-100 text-green-800'
-      : 'bg-red-100 text-red-800'
+      ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400'
+      : 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-400'
   }
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.booking_management')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.booking_management')}</h1>
         <select
           value={statusFilter}
           onChange={(e) => onFilterChange(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         >
           <option value="all">{t('admin.filter_by_status')} - {t('status.all')}</option>
           <option value="pending">{t('status.pending')}</option>
@@ -69,8 +69,8 @@ export function BookingsTab({
           <LoadingSpinner size="lg" />
         </div>
       ) : bookings.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded">
-          <p className="text-gray-500">{t('admin.no_bookings')}</p>
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded">
+          <p className="text-gray-500 dark:text-gray-400">{t('admin.no_bookings')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -143,7 +143,7 @@ function BookingCard({
           </div>
 
           {/* Details Grid */}
-          <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-600">
+          <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
             <div className="space-y-1">
               <p>
                 <span className="font-medium">Client:</span>{' '}
@@ -176,11 +176,11 @@ function BookingCard({
 
           {/* Add-ons if present */}
           {booking.selected_addons && booking.selected_addons.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-sm font-medium text-gray-700">Add-ons:</p>
+            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Add-ons:</p>
               <div className="flex flex-wrap gap-2 mt-1">
                 {booking.selected_addons.map((addon: any, idx: number) => (
-                  <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                  <span key={idx} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">
                     {addon.name} (+${addon.price})
                   </span>
                 ))}
@@ -218,11 +218,11 @@ function BookingCard({
           )}
 
           {booking.status === 'needs_revision' && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
-              <p className="text-xs text-yellow-800 font-medium text-center">
+            <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded p-3">
+              <p className="text-xs text-yellow-800 dark:text-yellow-400 font-medium text-center">
                 Awaiting Client Review
               </p>
-              <p className="text-xs text-yellow-600 text-center mt-1">
+              <p className="text-xs text-yellow-600 dark:text-yellow-500 text-center mt-1">
                 Changes requested
               </p>
             </div>
@@ -259,8 +259,8 @@ function BookingCard({
           )}
 
           {/* Admin Controls - Always visible */}
-          <div className="border-t border-gray-200 pt-2 mt-2 space-y-2">
-            <p className="text-xs text-gray-500 font-medium">Admin Actions:</p>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2 space-y-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Admin Actions:</p>
 
             {/* Edit Button */}
             <button
@@ -292,12 +292,12 @@ function BookingCard({
                 Delete Booking
               </button>
             ) : (
-              <div className="bg-red-50 border border-red-200 rounded p-2">
-                <p className="text-xs text-red-800 mb-2 text-center">Are you sure? This cannot be undone.</p>
+              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded p-2">
+                <p className="text-xs text-red-800 dark:text-red-400 mb-2 text-center">Are you sure? This cannot be undone.</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="flex-1 px-2 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded hover:bg-gray-300"
+                    className="flex-1 px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded hover:bg-gray-300 dark:hover:bg-gray-600"
                   >
                     Cancel
                   </button>

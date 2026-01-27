@@ -28,18 +28,18 @@ export function UsersTab({
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-400'
       case 'pilot':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-400'
       default:
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400'
     }
   }
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.user_management')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.user_management')}</h1>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={onRefresh}
@@ -61,8 +61,8 @@ export function UsersTab({
           <LoadingSpinner size="lg" />
         </div>
       ) : users.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded">
-          <p className="text-gray-500">No users found</p>
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded">
+          <p className="text-gray-500 dark:text-gray-400">No users found</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -77,14 +77,14 @@ export function UsersTab({
                       {user.role}
                     </span>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      user.kyc_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      user.kyc_verified ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400' : 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400'
                     }`}>
                       {user.kyc_verified ? 'Verified' : 'Pending KYC'}
                     </span>
                   </div>
 
                   {/* Details Grid */}
-                  <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
                     <div className="space-y-1">
                       <p>
                         <span className="font-medium">{t('form.email')}:</span> {user.email}
@@ -134,7 +134,7 @@ export function UsersTab({
                     <select
                       value={user.role}
                       onChange={(e) => onUpdateRole(user.id, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                       <option value="client">Client</option>
                       <option value="pilot">Pilot</option>

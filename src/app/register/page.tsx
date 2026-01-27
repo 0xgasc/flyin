@@ -97,7 +97,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-luxury-black to-luxury-charcoal flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
@@ -110,62 +110,62 @@ export default function RegisterPage() {
               priority
             />
           </Link>
-          <h1 className="text-2xl font-semibold text-gray-900">Create Account</h1>
-          <p className="text-gray-600 mt-2">Join FlyInGuate today</p>
+          <h1 className="text-2xl font-semibold text-white">Create Account</h1>
+          <p className="text-gray-400 mt-2">Join FlyInGuate today</p>
         </div>
 
-        <div className="card-luxury">
+        <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6 shadow-luxury">
           <form onSubmit={handleRegister} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-none text-sm">
+              <div className="bg-red-900/30 border border-red-800 text-red-400 px-4 py-3 rounded-soft text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Account Type
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, role: 'client' })}
-                  className={`p-4 rounded-none border-2 transition-all ${
+                  className={`p-4 rounded-soft border-2 transition-all ${
                     formData.role === 'client'
-                      ? 'border-primary-600 bg-primary-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-gold-500 bg-gold-500/10'
+                      : 'border-gray-700 hover:border-gray-600'
                   }`}
                 >
-                  <div className="font-medium">Client</div>
-                  <div className="text-sm text-gray-600">Book flights</div>
+                  <div className="font-medium text-white">Client</div>
+                  <div className="text-sm text-gray-400">Book flights</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, role: 'pilot' })}
-                  className={`p-4 rounded-none border-2 transition-all ${
+                  className={`p-4 rounded-soft border-2 transition-all ${
                     formData.role === 'pilot'
-                      ? 'border-primary-600 bg-primary-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-gold-500 bg-gold-500/10'
+                      : 'border-gray-700 hover:border-gray-600'
                   }`}
                 >
-                  <div className="font-medium">Pilot</div>
-                  <div className="text-sm text-gray-600">Provide services</div>
+                  <div className="font-medium text-white">Pilot</div>
+                  <div className="text-sm text-gray-400">Provide services</div>
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <input
                   id="fullName"
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="John Doe"
                   required
                 />
@@ -173,17 +173,17 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="you@example.com"
                   required
                 />
@@ -191,28 +191,28 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
                 Phone Number
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <input
                   id="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="+502 5555 5555"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <input
                   id="password"
                   type="password"
@@ -220,12 +220,12 @@ export default function RegisterPage() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   onFocus={() => setShowPasswordRequirements(true)}
                   onBlur={() => setShowPasswordRequirements(false)}
-                  className={`w-full pl-10 pr-3 py-3 border rounded-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-3 py-3 border rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent ${
                     formData.password && !passwordValidation.isValid
-                      ? 'border-amber-400'
+                      ? 'border-amber-500'
                       : formData.password && passwordValidation.isValid
-                      ? 'border-green-400'
-                      : 'border-gray-300'
+                      ? 'border-green-500'
+                      : 'border-gray-700'
                   }`}
                   placeholder="••••••••"
                   required
@@ -234,22 +234,22 @@ export default function RegisterPage() {
               </div>
               {/* Password requirements */}
               {(showPasswordRequirements || formData.password) && (
-                <div className="mt-2 p-3 bg-gray-50 rounded-none text-sm">
-                  <p className="font-medium text-gray-700 mb-2">Password must have:</p>
+                <div className="mt-2 p-3 bg-luxury-black/50 border border-gray-800 rounded-soft text-sm">
+                  <p className="font-medium text-gray-300 mb-2">Password must have:</p>
                   <ul className="space-y-1">
-                    <li className={`flex items-center ${passwordValidation.checks.length ? 'text-green-600' : 'text-gray-500'}`}>
+                    <li className={`flex items-center ${passwordValidation.checks.length ? 'text-green-400' : 'text-gray-500'}`}>
                       {passwordValidation.checks.length ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
                       At least 8 characters
                     </li>
-                    <li className={`flex items-center ${passwordValidation.checks.uppercase ? 'text-green-600' : 'text-gray-500'}`}>
+                    <li className={`flex items-center ${passwordValidation.checks.uppercase ? 'text-green-400' : 'text-gray-500'}`}>
                       {passwordValidation.checks.uppercase ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
                       One uppercase letter
                     </li>
-                    <li className={`flex items-center ${passwordValidation.checks.lowercase ? 'text-green-600' : 'text-gray-500'}`}>
+                    <li className={`flex items-center ${passwordValidation.checks.lowercase ? 'text-green-400' : 'text-gray-500'}`}>
                       {passwordValidation.checks.lowercase ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
                       One lowercase letter
                     </li>
-                    <li className={`flex items-center ${passwordValidation.checks.number ? 'text-green-600' : 'text-gray-500'}`}>
+                    <li className={`flex items-center ${passwordValidation.checks.number ? 'text-green-400' : 'text-gray-500'}`}>
                       {passwordValidation.checks.number ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
                       One number
                     </li>
@@ -261,16 +261,16 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading || !passwordValidation.isValid || !formData.email || !formData.fullName}
-              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gold-500 text-luxury-black font-semibold py-3 rounded-soft hover:bg-gold-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               Already have an account?{' '}
-              <Link href="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+              <Link href="/login" className="text-gold-400 hover:text-gold-300 font-medium">
                 Sign in
               </Link>
             </p>
