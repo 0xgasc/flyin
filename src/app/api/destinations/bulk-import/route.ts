@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx'
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value
+    const token = req.cookies.get('auth-token')?.value
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },

@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const token = req.cookies.get('token')?.value
+    const token = req.cookies.get('auth-token')?.value
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
