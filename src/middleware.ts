@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyToken as verifyJWT, type JWTPayload } from '@/lib/jwt'
+import { verifyTokenEdge } from '@/lib/jwt-edge'
 
 // Routes that require authentication
 const PROTECTED_ROUTES = ['/dashboard', '/profile', '/pilot', '/admin']
@@ -14,15 +14,7 @@ const ROLE_ROUTES: Record<string, string[]> = {
 // Routes that should redirect to dashboard if already logged in
 const AUTH_ROUTES = ['/login', '/register']
 
-function verifyToken(token: string): JWTPayload | null {
-  try {
-    return verifyJWT(token)
-  } catch {
-    return null
-  }
-}
-
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const { pathname } = req.nextUrl
 
@@ -41,8 +33,8 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get('auth-token')?.value ||
     req.headers.get('Authorization')?.replace('Bearer ', '')
 
-  // Verify token if present
-  const user = token ? verifyToken(token) : null
+  // Verify token if present (async for Edge compatibility)
+  const user = token ? await verifyTokenEdge(token) : null
 
   // Handle auth routes (login/register) - redirect to dashboard if already logged in
   if (AUTH_ROUTES.some(route => pathname.startsWith(route))) {
