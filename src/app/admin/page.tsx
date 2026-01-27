@@ -185,6 +185,30 @@ export default function AdminDashboard() {
     }
   }, [profile, router])
 
+  // Data fetching effect - MUST be before any early returns (React Rules of Hooks)
+  useEffect(() => {
+    if (profile?.id && profile.role === 'admin') {
+      if (activeTab === 'bookings') {
+        fetchBookings()
+      } else if (activeTab === 'pilots') {
+        fetchPilots()
+      } else if (activeTab === 'users') {
+        fetchUsers()
+      } else if (activeTab === 'transactions') {
+        fetchTransactions()
+      } else if (activeTab === 'aircrafts') {
+        fetchHelicopters()
+        fetchMaintenanceRecords()
+      } else if (activeTab === 'analytics') {
+        fetchFinancialData()
+      } else if (activeTab === 'experiences') {
+        fetchExperiences()
+      } else if (activeTab === 'destinations') {
+        fetchDestinations()
+      }
+    }
+  }, [profile, activeTab, statusFilter])
+
   // Don't render anything if not properly authenticated
   if (profile === null) {
     return (
@@ -213,29 +237,6 @@ export default function AdminDashboard() {
       </div>
     )
   }
-
-  useEffect(() => {
-    if (profile?.id) {
-      if (activeTab === 'bookings') {
-        fetchBookings()
-      } else if (activeTab === 'pilots') {
-        fetchPilots()
-      } else if (activeTab === 'users') {
-        fetchUsers()
-      } else if (activeTab === 'transactions') {
-        fetchTransactions()
-      } else if (activeTab === 'aircrafts') {
-        fetchHelicopters()
-        fetchMaintenanceRecords()
-      } else if (activeTab === 'analytics') {
-        fetchFinancialData()
-      } else if (activeTab === 'experiences') {
-        fetchExperiences()
-      } else if (activeTab === 'destinations') {
-        fetchDestinations()
-      }
-    }
-  }, [profile, activeTab, statusFilter])
 
   const fetchBookings = async () => {
     try {
