@@ -113,15 +113,51 @@ export default function GuatemalaLeafletMap({
         iconAnchor: [iconSize / 2, iconSize / 2],
       })
 
+      // Build rich popup content
+      const airportInfo = hasAirport
+        ? `<div style="display: flex; align-items: center; gap: 4px; margin-top: 8px; padding: 6px 8px; background: rgba(59, 130, 246, 0.1); border-radius: 4px;">
+            <span style="font-size: 12px;">✈</span>
+            <span style="color: #60a5fa; font-size: 11px;">${dept.airports.map(a => `${a.code} - ${a.name}`).join(', ')}</span>
+          </div>`
+        : ''
+
+      const experiencesTags = dept.experiences.length > 0
+        ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;">
+            ${dept.experiences.slice(0, 3).map(exp =>
+              `<span style="padding: 2px 6px; background: rgba(212, 175, 55, 0.15); color: #d4af37; font-size: 10px; border-radius: 4px;">${exp}</span>`
+            ).join('')}
+          </div>`
+        : ''
+
+      const statusText = isFrom
+        ? '<p style="color: #22c55e; font-size: 11px; margin-top: 8px; font-weight: 500;">✓ Selected as Origin</p>'
+        : isTo
+        ? '<p style="color: #ef4444; font-size: 11px; margin-top: 8px; font-weight: 500;">✓ Selected as Destination</p>'
+        : '<p style="color: #9ca3af; font-size: 11px; margin-top: 8px;">Click to select</p>'
+
       const marker = L!.marker([dept.lat, dept.lng], { icon })
         .addTo(mapInstanceRef.current!)
         .bindPopup(`
-          <div style="min-width: 150px;">
-            <h3 style="font-weight: 600; margin: 0 0 4px 0;">${dept.name}</h3>
-            ${hasAirport ? `<p style="color: #d4af37; font-size: 12px; margin: 0 0 4px 0;">✈ ${dept.airports.map(a => a.code).join(', ')}</p>` : ''}
-            <p style="color: #666; font-size: 12px; margin: 0;">${dept.destinations.slice(0, 3).join(', ')}${dept.destinations.length > 3 ? '...' : ''}</p>
+          <div class="location-preview-card" style="min-width: 200px; max-width: 260px;">
+            <div style="padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <h3 style="font-weight: 600; margin: 0; font-size: 14px;">${dept.name}</h3>
+                  <p style="color: #9ca3af; font-size: 11px; margin: 2px 0 0 0;">Guatemala</p>
+                </div>
+                ${hasAirport ? '<span style="padding: 2px 6px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 10px; border-radius: 4px;">Airport</span>' : ''}
+              </div>
+              <p style="color: #d1d5db; font-size: 12px; margin: 8px 0 0 0; line-height: 1.4;">
+                ${dept.destinations.slice(0, 4).join(' • ')}${dept.destinations.length > 4 ? ' • ...' : ''}
+              </p>
+              ${airportInfo}
+              ${experiencesTags}
+              <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #374151;">
+                ${statusText}
+              </div>
+            </div>
           </div>
-        `)
+        `, { className: 'location-preview-popup', maxWidth: 280 })
         .on('click', () => {
           if (onDepartmentClick) {
             onDepartmentClick(dept)

@@ -26,30 +26,150 @@ function isWebGLSupported(): boolean {
   }
 }
 
-// Guatemala destination coordinates (lat, lng)
-const destinations: Array<{
+// Guatemala destination coordinates with rich descriptions
+interface Destination {
   name: string
   coordinates: [number, number] // [lng, lat]
   dept: string
   isHub?: boolean
-}> = [
-  { name: 'Ciudad de Guatemala', coordinates: [-90.5069, 14.6349], dept: 'Guatemala', isHub: true },
-  { name: 'Antigua Guatemala', coordinates: [-90.7295, 14.5586], dept: 'Sacatepéquez' },
-  { name: 'Lake Atitlán', coordinates: [-91.1867, 14.6989], dept: 'Sololá' },
-  { name: 'Panajachel', coordinates: [-91.1575, 14.7427], dept: 'Sololá' },
-  { name: 'Tikal National Park', coordinates: [-89.6233, 17.2220], dept: 'Petén' },
-  { name: 'Flores', coordinates: [-89.8833, 16.9256], dept: 'Petén' },
-  { name: 'Semuc Champey', coordinates: [-89.9530, 15.5333], dept: 'Alta Verapaz' },
-  { name: 'Lanquín', coordinates: [-89.9797, 15.5781], dept: 'Alta Verapaz' },
-  { name: 'Monterrico Beach', coordinates: [-90.4830, 13.8950], dept: 'Santa Rosa' },
-  { name: 'Livingston', coordinates: [-88.7494, 15.8289], dept: 'Izabal' },
-  { name: 'Cobán', coordinates: [-90.3707, 15.4725], dept: 'Alta Verapaz' },
-  { name: 'Huehuetenango', coordinates: [-91.4711, 15.3198], dept: 'Huehuetenango' },
-  { name: 'Quetzaltenango (Xela)', coordinates: [-91.5186, 14.8347], dept: 'Quetzaltenango' },
-  { name: 'Puerto Barrios', coordinates: [-88.5942, 15.7333], dept: 'Izabal' },
-  { name: 'Río Dulce', coordinates: [-89.0333, 15.6500], dept: 'Izabal' },
-  { name: 'El Mirador', coordinates: [-89.9208, 17.7553], dept: 'Petén' },
-  { name: 'Esquipulas', coordinates: [-89.3519, 14.5672], dept: 'Chiquimula' },
+  description: string
+  airportCode?: string
+  airportName?: string
+  highlights?: string[]
+  imageUrl?: string // For future image support
+}
+
+const destinations: Destination[] = [
+  {
+    name: 'Ciudad de Guatemala',
+    coordinates: [-90.5069, 14.6349],
+    dept: 'Guatemala',
+    isHub: true,
+    description: 'Capital city and main hub. La Aurora International Airport serves as the gateway to Guatemala.',
+    airportCode: 'GUA',
+    airportName: 'La Aurora International',
+    highlights: ['International Airport', 'Business Hub', 'Central Location']
+  },
+  {
+    name: 'Antigua Guatemala',
+    coordinates: [-90.7295, 14.5586],
+    dept: 'Sacatepéquez',
+    description: 'UNESCO World Heritage colonial city surrounded by volcanoes. Famous for cobblestone streets and Spanish Baroque architecture.',
+    highlights: ['UNESCO Site', 'Colonial Architecture', 'Volcano Views']
+  },
+  {
+    name: 'Lake Atitlán',
+    coordinates: [-91.1867, 14.6989],
+    dept: 'Sololá',
+    description: 'Stunning volcanic lake surrounded by Mayan villages. Often called the most beautiful lake in the world.',
+    highlights: ['Scenic Flights', 'Mayan Culture', 'Volcano Backdrop']
+  },
+  {
+    name: 'Panajachel',
+    coordinates: [-91.1575, 14.7427],
+    dept: 'Sololá',
+    description: 'Gateway town to Lake Atitlán with vibrant markets and lakeside restaurants.',
+    highlights: ['Lake Access', 'Local Markets', 'Tourism Hub']
+  },
+  {
+    name: 'Tikal National Park',
+    coordinates: [-89.6233, 17.2220],
+    dept: 'Petén',
+    description: 'Ancient Mayan city with towering pyramids rising above the rainforest canopy. UNESCO World Heritage Site.',
+    highlights: ['Mayan Pyramids', 'Jungle Wildlife', 'Archaeological Wonder']
+  },
+  {
+    name: 'Flores',
+    coordinates: [-89.8833, 16.9256],
+    dept: 'Petén',
+    description: 'Charming island town on Lake Petén Itzá. Gateway to Tikal with colorful architecture.',
+    airportCode: 'FRS',
+    airportName: 'Mundo Maya International',
+    highlights: ['Island Town', 'Tikal Gateway', 'Lake Views']
+  },
+  {
+    name: 'Semuc Champey',
+    coordinates: [-89.9530, 15.5333],
+    dept: 'Alta Verapaz',
+    description: 'Natural limestone bridge with stunning turquoise pools cascading through the jungle.',
+    highlights: ['Natural Pools', 'Jungle Paradise', 'Adventure']
+  },
+  {
+    name: 'Lanquín',
+    coordinates: [-89.9797, 15.5781],
+    dept: 'Alta Verapaz',
+    description: 'Gateway to Semuc Champey. Famous for its cave system and bat exodus at sunset.',
+    highlights: ['Cave System', 'Semuc Access', 'Eco-Tourism']
+  },
+  {
+    name: 'Monterrico Beach',
+    coordinates: [-90.4830, 13.8950],
+    dept: 'Santa Rosa',
+    description: 'Pacific coast black sand beach. Sea turtle nesting site and mangrove ecosystem.',
+    highlights: ['Black Sand Beach', 'Sea Turtles', 'Pacific Coast']
+  },
+  {
+    name: 'Livingston',
+    coordinates: [-88.7494, 15.8289],
+    dept: 'Izabal',
+    description: 'Garifuna cultural center on the Caribbean coast. Only accessible by boat, rich in Afro-Caribbean heritage.',
+    highlights: ['Garifuna Culture', 'Caribbean Vibes', 'Unique Access']
+  },
+  {
+    name: 'Cobán',
+    coordinates: [-90.3707, 15.4725],
+    dept: 'Alta Verapaz',
+    description: 'Cloud forest capital in the highlands. Center of coffee and cardamom production.',
+    airportCode: 'CBV',
+    airportName: 'Cobán Airport',
+    highlights: ['Cloud Forest', 'Coffee Region', 'Cool Climate']
+  },
+  {
+    name: 'Huehuetenango',
+    coordinates: [-91.4711, 15.3198],
+    dept: 'Huehuetenango',
+    description: 'Gateway to the Cuchumatanes mountains, the highest non-volcanic range in Central America.',
+    airportCode: 'HUG',
+    airportName: 'Huehuetenango Airport',
+    highlights: ['Mountain Range', 'Indigenous Culture', 'High Altitude']
+  },
+  {
+    name: 'Quetzaltenango (Xela)',
+    coordinates: [-91.5186, 14.8347],
+    dept: 'Quetzaltenango',
+    description: 'Guatemala\'s second largest city. Known for hot springs, nearby volcanoes, and indigenous markets.',
+    highlights: ['Hot Springs', 'Volcano Tours', 'Highland Culture']
+  },
+  {
+    name: 'Puerto Barrios',
+    coordinates: [-88.5942, 15.7333],
+    dept: 'Izabal',
+    description: 'Caribbean port city. Gateway to boat trips along Río Dulce to Livingston.',
+    airportCode: 'PBR',
+    airportName: 'Puerto Barrios Airport',
+    highlights: ['Caribbean Port', 'Boat Access', 'Tropical Climate']
+  },
+  {
+    name: 'Río Dulce',
+    coordinates: [-89.0333, 15.6500],
+    dept: 'Izabal',
+    description: 'Scenic river connecting Lake Izabal to the Caribbean. Jungle-lined canyon with hot waterfalls.',
+    highlights: ['River Canyon', 'Hot Springs', 'Jungle Scenery']
+  },
+  {
+    name: 'El Mirador',
+    coordinates: [-89.9208, 17.7553],
+    dept: 'Petén',
+    description: 'Remote ancient Mayan city with La Danta, one of the largest pyramids by volume in the world.',
+    highlights: ['Ancient Ruins', 'Remote Location', 'Largest Pyramid']
+  },
+  {
+    name: 'Esquipulas',
+    coordinates: [-89.3519, 14.5672],
+    dept: 'Chiquimula',
+    description: 'Important pilgrimage site home to the Black Christ. Draws millions of visitors annually.',
+    highlights: ['Pilgrimage Site', 'Black Christ', 'Religious Tourism']
+  },
 ]
 
 export default function GuatemalaMapLibre({
@@ -184,16 +304,54 @@ export default function GuatemalaMapLibre({
         `
       }
 
-      // Create popup
+      // Create rich popup card
+      const airportBadge = dest.airportCode
+        ? `<div class="flex items-center gap-1 mt-2 px-2 py-1 bg-blue-900/50 rounded text-xs text-blue-300">
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+            <span>${dest.airportCode} - ${dest.airportName}</span>
+          </div>`
+        : ''
+
+      const highlightTags = dest.highlights
+        ? `<div class="flex flex-wrap gap-1 mt-2">
+            ${dest.highlights.map(h => `<span class="px-1.5 py-0.5 bg-gold-500/20 text-gold-400 text-xs rounded">${h}</span>`).join('')}
+          </div>`
+        : ''
+
       const popup = new maplibregl.Popup({
         offset: 25,
         closeButton: false,
-        className: 'custom-popup'
+        className: 'location-preview-popup',
+        maxWidth: '280px'
       }).setHTML(`
-        <div class="p-2 min-w-[120px]">
-          <h3 class="font-bold text-sm text-gray-900">${dest.name}</h3>
-          <p class="text-xs text-gray-600">${dest.dept}</p>
-          ${isSelected ? '<p class="text-xs text-emerald-600 font-medium mt-1">Selected</p>' : '<p class="text-xs text-gray-500 mt-1">Click to select</p>'}
+        <div class="location-preview-card">
+          ${dest.imageUrl
+            ? `<div class="w-full h-24 bg-cover bg-center rounded-t" style="background-image: url('${dest.imageUrl}')"></div>`
+            : `<div class="w-full h-16 bg-gradient-to-br from-gray-700 to-gray-800 rounded-t flex items-center justify-center">
+                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </div>`
+          }
+          <div class="p-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-sm text-white leading-tight">${dest.name}</h3>
+                <p class="text-xs text-gray-400 mt-0.5">${dest.dept}, Guatemala</p>
+              </div>
+              ${dest.isHub ? '<span class="px-1.5 py-0.5 bg-red-500/20 text-red-400 text-xs rounded font-medium">HUB</span>' : ''}
+            </div>
+            <p class="text-xs text-gray-300 mt-2 leading-relaxed">${dest.description}</p>
+            ${airportBadge}
+            ${highlightTags}
+            <div class="mt-3 pt-2 border-t border-gray-700">
+              ${isSelected
+                ? `<p class="text-xs font-medium ${isFromSelected ? 'text-green-400' : 'text-amber-400'}">${isFromSelected ? '✓ Selected as Origin' : '✓ Selected as Destination'}</p>`
+                : '<p class="text-xs text-gray-500">Click to select this location</p>'
+              }
+            </div>
+          </div>
         </div>
       `)
 
