@@ -181,7 +181,6 @@ export default function GuatemalaMapLibre({
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
   const markers = useRef<maplibregl.Marker[]>([])
-  const [hoveredDestination, setHoveredDestination] = useState<string | null>(null)
   const [mapError, setMapError] = useState<string | null>(null)
 
   // Fetch destinations from API
@@ -297,92 +296,52 @@ export default function GuatemalaMapLibre({
       const el = document.createElement('div')
       el.className = 'marker-container'
 
+      // Build tooltip HTML with data attributes for JS positioning
+      const tooltipId = `tooltip-${dest.name.replace(/\s+/g, '-').toLowerCase()}`
+      const tooltipHtml = `
+        <div class="marker-tooltip" id="${tooltipId}">
+          <div class="tooltip-card">
+            <div class="tooltip-header">
+              <strong>${dest.name}</strong>
+              ${dest.isHub ? '<span class="tooltip-hub">HUB</span>' : ''}
+            </div>
+            <div class="tooltip-body">${dest.description}</div>
+            ${dest.airportCode ? `<div class="tooltip-airport">✈ ${dest.airportCode}</div>` : ''}
+          </div>
+        </div>
+      `
+
       if (dest.isHub) {
         // Guatemala City hub - larger red marker
         el.innerHTML = `
-          <div class="relative cursor-pointer group">
+          <div class="marker-wrapper">
             <div class="absolute -inset-2 bg-red-500 rounded-full animate-ping opacity-40"></div>
-            <div class="relative w-6 h-6 bg-red-600 border-2 border-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-125">
-              <div class="w-2 h-2 bg-white rounded-full"></div>
-            </div>
+            <div class="marker-dot hub"></div>
+            ${tooltipHtml}
           </div>
         `
       } else if (isSelected) {
         // Selected destination - emerald marker
         el.innerHTML = `
-          <div class="relative cursor-pointer group">
+          <div class="marker-wrapper">
             <div class="absolute -inset-1 bg-emerald-500 rounded-full animate-pulse opacity-60"></div>
-            <div class="relative w-5 h-5 ${isFromSelected ? 'bg-emerald-500' : 'bg-amber-500'} border-2 border-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-125">
-              <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
-            </div>
+            <div class="marker-dot ${isFromSelected ? 'selected-from' : 'selected-to'}"></div>
+            ${tooltipHtml}
           </div>
         `
       } else {
         // Regular destination - navy marker
         el.innerHTML = `
-          <div class="relative cursor-pointer group">
-            <div class="relative w-4 h-4 bg-blue-600 border-2 border-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-125">
-              <div class="w-1 h-1 bg-white rounded-full"></div>
-            </div>
+          <div class="marker-wrapper">
+            <div class="marker-dot regular"></div>
+            ${tooltipHtml}
           </div>
         `
       }
 
-      // Create rich popup card
-      const airportBadge = dest.airportCode
-        ? `<div class="flex items-center gap-1 mt-2 px-2 py-1 bg-blue-900/50 rounded text-xs text-blue-300">
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
-            <span>${dest.airportCode} - ${dest.airportName}</span>
-          </div>`
-        : ''
-
-      const highlightTags = dest.highlights
-        ? `<div class="flex flex-wrap gap-1 mt-2">
-            ${dest.highlights.map(h => `<span class="px-1.5 py-0.5 bg-gold-500/20 text-gold-400 text-xs rounded">${h}</span>`).join('')}
-          </div>`
-        : ''
-
-      const popup = new maplibregl.Popup({
-        offset: 25,
-        closeButton: false,
-        className: 'location-preview-popup',
-        maxWidth: '280px'
-      }).setHTML(`
-        <div class="location-preview-card">
-          ${dest.imageUrl
-            ? `<div class="w-full h-24 bg-cover bg-center rounded-t" style="background-image: url('${dest.imageUrl}')"></div>`
-            : `<div class="w-full h-16 bg-gradient-to-br from-gray-700 to-gray-800 rounded-t flex items-center justify-center">
-                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-              </div>`
-          }
-          <div class="p-3">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <h3 class="font-bold text-sm text-white leading-tight">${dest.name}</h3>
-                <p class="text-xs text-gray-400 mt-0.5">${dest.dept}, Guatemala</p>
-              </div>
-              ${dest.isHub ? '<span class="px-1.5 py-0.5 bg-red-500/20 text-red-400 text-xs rounded font-medium">HUB</span>' : ''}
-            </div>
-            <p class="text-xs text-gray-300 mt-2 leading-relaxed">${dest.description}</p>
-            ${airportBadge}
-            ${highlightTags}
-            <div class="mt-3 pt-2 border-t border-gray-700">
-              ${isSelected
-                ? `<p class="text-xs font-medium ${isFromSelected ? 'text-green-400' : 'text-amber-400'}">${isFromSelected ? '✓ Selected as Origin' : '✓ Selected as Destination'}</p>`
-                : '<p class="text-xs text-gray-500">Click to select this location</p>'
-              }
-            </div>
-          </div>
-        </div>
-      `)
-
       // Create and add marker
       const marker = new maplibregl.Marker({ element: el })
         .setLngLat(dest.coordinates)
-        .setPopup(popup)
         .addTo(map.current!)
 
       // Handle click
@@ -396,15 +355,23 @@ export default function GuatemalaMapLibre({
         }
       })
 
-      // Show popup on hover
-      el.addEventListener('mouseenter', () => {
-        marker.togglePopup()
-        setHoveredDestination(dest.name)
-      })
-      el.addEventListener('mouseleave', () => {
-        marker.togglePopup()
-        setHoveredDestination(null)
-      })
+      // Handle hover for fixed-position tooltip
+      const tooltip = el.querySelector('.marker-tooltip') as HTMLElement | null
+      if (tooltip) {
+        el.addEventListener('mouseenter', () => {
+          const rect = el.getBoundingClientRect()
+          // Position tooltip below the marker
+          tooltip.style.left = `${rect.left + rect.width / 2}px`
+          tooltip.style.top = `${rect.bottom + 8}px`
+          tooltip.style.opacity = '1'
+          tooltip.style.visibility = 'visible'
+        })
+
+        el.addEventListener('mouseleave', () => {
+          tooltip.style.opacity = '0'
+          tooltip.style.visibility = 'hidden'
+        })
+      }
 
       markers.current.push(marker)
     })
@@ -472,11 +439,12 @@ export default function GuatemalaMapLibre({
 
   return (
     <div className="relative w-full">
-      <div className="rounded overflow-hidden shadow-2xl border border-luxury-slate/30">
+      <div className="rounded shadow-2xl border border-luxury-slate/30 relative" style={{ overflow: 'visible' }}>
         {/* Map Container */}
         <div
           ref={mapContainer}
-          className="w-full h-96 sm:h-[500px]"
+          className="w-full h-96 sm:h-[500px] rounded"
+          style={{ overflow: 'hidden' }}
         />
 
         {/* Branding overlay */}
