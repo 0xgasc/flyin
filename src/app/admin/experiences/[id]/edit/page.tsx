@@ -550,7 +550,7 @@ export default function EditExperiencePage() {
                   <div className="space-y-3">
                     <p className="text-sm font-medium text-gray-600">Additional Price Brackets:</p>
                     {formData.pricing_tiers.map((tier) => (
-                      <div key={tier.id} className="p-4 bg-white border-2 border-slate-200 rounded">
+                      <div key={tier.id} className="p-4 bg-white dark:bg-gray-900 border-2 border-slate-200 dark:border-gray-700 rounded">
                         <div className="grid grid-cols-3 gap-4">
                           <div>
                             <label className="block text-xs text-gray-600 mb-1">Min Pass.</label>
@@ -643,7 +643,7 @@ export default function EditExperiencePage() {
                       </button>
                     </div>
                     {showIncludesDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white dark:bg-luxury-charcoal border-2 border-navy-200 dark:border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
                         {INCLUDES_PRESETS.filter(preset =>
                           !formData.includes.includes(preset) &&
                           preset.toLowerCase().includes(newInclude.toLowerCase())
@@ -712,7 +712,7 @@ export default function EditExperiencePage() {
                       </button>
                     </div>
                     {showHighlightsDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white dark:bg-luxury-charcoal border-2 border-navy-200 dark:border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
                         {HIGHLIGHTS_PRESETS.filter(preset =>
                           !formData.highlights.includes(preset) &&
                           preset.toLowerCase().includes(newHighlight.toLowerCase())
@@ -793,7 +793,7 @@ export default function EditExperiencePage() {
                     style={{ borderColor: '#93c5fd' }}
                   />
                   {showMeetingPointDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border-2 border-navy-200 rounded shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-luxury-charcoal border-2 border-navy-200 dark:border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
                       {MEETING_POINT_PRESETS.filter(preset =>
                         preset.toLowerCase().includes(formData.meeting_point.toLowerCase())
                       ).map((preset, idx) => (
@@ -841,7 +841,7 @@ export default function EditExperiencePage() {
           </div>
 
           {/* Images Section */}
-          <div className="bg-white rounded shadow-lg border border-slate-200 p-8">
+          <div className="bg-white dark:bg-luxury-charcoal rounded shadow-lg border border-slate-200 dark:border-gray-800 p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-navy-900" style={{ color: '#1e3a8a' }}>Experience Gallery</h2>
               <button

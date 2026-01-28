@@ -81,23 +81,23 @@ export function Modal({
         ref={modalRef}
         tabIndex={-1}
         className={`
-          bg-white rounded-none shadow-2xl w-full max-h-[90vh] overflow-y-auto
+          bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none shadow-2xl w-full max-h-[90vh] overflow-y-auto
           ${sizeClasses[size]}
           ${className}
         `}
         onClick={(e) => e.stopPropagation()}
       >
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
             {title && (
-              <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
+              <h2 id="modal-title" className="text-lg font-semibold text-gray-900 dark:text-white">
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-none transition-colors ml-auto"
+                className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none transition-colors ml-auto"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
@@ -145,12 +145,12 @@ export function ConfirmModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
-      <p className="text-gray-600 mb-6">{message}</p>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">{message}</p>
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
           disabled={isLoading}
-          className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-none font-medium transition-colors disabled:opacity-50"
+          className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-none font-medium transition-colors disabled:opacity-50"
         >
           {cancelText}
         </button>

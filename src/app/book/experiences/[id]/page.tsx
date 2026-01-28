@@ -319,8 +319,8 @@ export default function ExperienceDetailPage() {
           {/* Experience Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{displayName}</h1>
-              <div className="flex items-center space-x-4 text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{displayName}</h1>
+              <div className="flex items-center space-x-4 text-gray-600 dark:text-gray-400">
                 <div className="flex items-center">
                   <MapPin className="w-4 h-4 mr-1" />
                   {experience.location}
@@ -335,23 +335,23 @@ export default function ExperienceDetailPage() {
             <p className="text-gray-700 leading-relaxed">{displayDescription}</p>
 
             {/* Key Details */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded shadow-sm">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded shadow-sm">
               <div className="text-center">
-                <DollarSign className="w-6 h-6 text-primary-600 mx-auto mb-1" />
-                <div className="text-2xl font-bold text-gray-900">${experience.base_price}</div>
-                <div className="text-sm text-gray-600">From</div>
+                <DollarSign className="w-6 h-6 text-primary-600 dark:text-gold-400 mx-auto mb-1" />
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">${experience.base_price}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">From</div>
               </div>
               <div className="text-center">
-                <Users className="w-6 h-6 text-primary-600 mx-auto mb-1" />
-                <div className="text-2xl font-bold text-gray-900">{experience.min_passengers}-{experience.max_passengers}</div>
-                <div className="text-sm text-gray-600">Passengers</div>
+                <Users className="w-6 h-6 text-primary-600 dark:text-gold-400 mx-auto mb-1" />
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{experience.min_passengers}-{experience.max_passengers}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Passengers</div>
               </div>
             </div>
 
             {/* What's Included */}
             {displayIncludes && displayIncludes.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">What's Included</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">What's Included</h3>
                 <div className="space-y-2">
                   {displayIncludes.map((item, index) => (
                     <div key={index} className="flex items-center">
@@ -366,7 +366,7 @@ export default function ExperienceDetailPage() {
             {/* Route Waypoints */}
             {experience.route_waypoints && experience.route_waypoints.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Route Highlights</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Route Highlights</h3>
                 <div className="space-y-2">
                   {experience.route_waypoints.map((waypoint, index) => (
                     <div key={index} className="flex items-center">
@@ -381,7 +381,7 @@ export default function ExperienceDetailPage() {
             {/* Requirements */}
             {experience.requirements && experience.requirements.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Requirements</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Requirements</h3>
                 <div className="space-y-2">
                   {experience.requirements.map((requirement, index) => (
                     <div key={index} className="flex items-start">
@@ -396,7 +396,7 @@ export default function ExperienceDetailPage() {
             {/* Meeting Point */}
             {experience.meeting_point && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Meeting Point</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Meeting Point</h3>
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-700">{experience.meeting_point}</p>
@@ -418,8 +418,8 @@ export default function ExperienceDetailPage() {
       {/* Booking Modal */}
       {showBookingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Book {displayName}</h2>
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Book {displayName}</h2>
             
             <form onSubmit={handleBooking} className="space-y-4">
               <div>

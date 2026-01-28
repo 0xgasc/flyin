@@ -154,17 +154,17 @@ export default function FAQPage() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white rounded-none shadow-md overflow-hidden border border-gray-200"
+                className="bg-white dark:bg-luxury-charcoal rounded-none shadow-md overflow-hidden border border-gray-200 dark:border-gray-800"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <div className="text-brand-accent">
                       {faq.icon}
                     </div>
-                    <h3 className="text-lg font-semibold text-luxury-black">
+                    <h3 className="text-lg font-semibold text-luxury-black dark:text-white">
                       {faq.question}
                     </h3>
                   </div>
@@ -176,7 +176,7 @@ export default function FAQPage() {
                 </button>
                 {openIndex === index && (
                   <div className="px-6 pb-6 pt-2">
-                    <div className="pl-10 text-gray-700 whitespace-pre-line leading-relaxed">
+                    <div className="pl-10 text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
                       {faq.answer}
                     </div>
                   </div>

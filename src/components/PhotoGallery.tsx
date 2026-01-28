@@ -126,14 +126,14 @@ export function PhotoGallery() {
               {/* Hover preview - larger showing full image */}
               {hoveredIndex === index && (
                 <div className="absolute inset-0 pointer-events-none z-30">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250%] max-w-[500px] bg-white rounded-none shadow-2xl overflow-hidden border-4 border-white">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250%] max-w-[500px] bg-white dark:bg-luxury-charcoal rounded-none shadow-2xl overflow-hidden border-4 border-white dark:border-gray-700">
                     <img
                       src={image.image_url}
                       alt={image.caption || 'FlyInGuate experience'}
-                      className="w-full h-auto max-h-[400px] object-contain bg-gray-50"
+                      className="w-full h-auto max-h-[400px] object-contain bg-gray-50 dark:bg-gray-900"
                     />
                     {image.caption && (
-                      <p className="text-center text-gray-700 text-sm py-2 px-3 bg-white">
+                      <p className="text-center text-gray-700 dark:text-gray-300 text-sm py-2 px-3 bg-white dark:bg-luxury-charcoal">
                         {image.caption}
                       </p>
                     )}

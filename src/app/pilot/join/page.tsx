@@ -54,7 +54,7 @@ export default function PilotJoinPage() {
       </section>
 
       {/* Earnings Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-luxury-charcoal">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Premium Earnings</h2>
@@ -181,7 +181,7 @@ export default function PilotJoinPage() {
       </section>
 
       {/* Requirements Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-luxury-charcoal">
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Simple Requirements</h2>

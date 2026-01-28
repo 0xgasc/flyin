@@ -654,9 +654,9 @@ export default function EditDestinationPage() {
           </div>
 
           {/* Images Section */}
-          <div className="bg-white rounded shadow-sm p-6">
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded shadow-sm p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Destination Images</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Destination Images</h2>
               <button
                 onClick={() => setShowImageUpload(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center space-x-2"

@@ -1229,27 +1229,27 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           </div>
         </div>
 
-        <div className="bg-white rounded-none shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Experience
                   </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Location
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Duration
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -1259,7 +1259,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
             >
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-luxury-charcoal divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
@@ -1649,24 +1649,24 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           </div>
         </div>
 
-        <div className="bg-white rounded-none shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Destination
                   </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Location
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Features
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -1676,7 +1676,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
             >
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-luxury-charcoal divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
@@ -1800,7 +1800,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                           </span>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <div>
                             <p><span className="font-medium">Client:</span> {booking.client?.full_name || 'N/A'} ({booking.client?.email || 'N/A'})</p>
                             <p><span className="font-medium">Date:</span> {format(new Date(booking.scheduled_date), 'MMM dd, yyyy')} at {booking.scheduled_time}</p>
@@ -2164,7 +2164,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             {user.kyc_verified ? 'Verified' : 'Pending KYC'}
                           </span>
                         </div>
-                        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <div>
                             <p><span className="font-medium">{t('form.email')}:</span> {user.email}</p>
                             <p><span className="font-medium">{t('form.phone')}:</span> {user.phone || 'N/A'}</p>
@@ -2337,9 +2337,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
                         {/* Payment Proof Section */}
                         {transaction.payment_proof_url && (
-                          <div className="bg-gray-50 rounded-none p-3 mb-4">
+                          <div className="bg-gray-50 dark:bg-gray-900 rounded-none p-3 mb-4">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-700">Payment Proof Submitted:</span>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Proof Submitted:</span>
                               <button
                                 onClick={() => setSelectedTransaction(transaction)}
                                 className="text-sm text-blue-600 hover:text-blue-800 underline"
@@ -2891,25 +2891,25 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Pilot Assignment Modal */}
       {selectedBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-6 flex items-center">
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-6 flex items-center text-gray-900 dark:text-white">
               <Plane className="h-6 w-6 mr-2 text-primary-600" />
               {t('admin.assign_flight_crew')}
             </h3>
             
             {/* Booking Details */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
-              <h4 className="font-semibold mb-2">Booking Details:</h4>
-              <p className="text-sm text-gray-600">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-none p-4 mb-6">
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">Booking Details:</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {selectedBooking.booking_type === 'transport' 
                   ? `${selectedBooking.from_location} → ${selectedBooking.to_location}`
                   : selectedBooking.experiences?.name
                 }
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Date: {format(new Date(selectedBooking.scheduled_date), 'MMM dd, yyyy')} at {selectedBooking.scheduled_time}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Passengers: {selectedBooking.passenger_count} | Base Price: ${selectedBooking.total_price - (selectedBooking.addon_total_price || 0)}
                 {(selectedBooking.addon_total_price || 0) > 0 && (
                   <span> | Add-ons: ${selectedBooking.addon_total_price} | Total: ${selectedBooking.total_price}</span>
@@ -2922,7 +2922,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <h5 className="font-medium text-sm mb-2">Passenger Information:</h5>
                   <div className="space-y-2">
                     {selectedBooking.passenger_details.map((passenger: any, index: number) => (
-                      <div key={index} className="text-xs bg-white rounded-none p-2">
+                      <div key={index} className="text-xs bg-white dark:bg-gray-800 rounded-none p-2 text-gray-900 dark:text-white">
                         <div className="font-medium">{passenger.name} (Age: {passenger.age})</div>
                         {passenger.passport && <div>ID: {passenger.passport}</div>}
                         {passenger.emergency_contact && <div>Emergency: {passenger.emergency_contact}</div>}
@@ -2940,7 +2940,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <h5 className="font-medium text-sm mb-2">Selected Add-ons:</h5>
                   <div className="space-y-1">
                     {selectedBooking.selected_addons.map((addon: any, index: number) => (
-                      <div key={index} className="text-xs flex justify-between bg-white rounded-none p-2">
+                      <div key={index} className="text-xs flex justify-between bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-none p-2">
                         <span>{addon.addon_id} × {addon.quantity}</span>
                         <span>${(addon.quantity * addon.unit_price).toFixed(2)}</span>
                       </div>
@@ -3049,15 +3049,15 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Create User Modal */}
       {showCreateUserModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold mb-6 flex items-center">
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold mb-6 flex items-center text-gray-900 dark:text-white">
               <Users className="h-6 w-6 mr-2 text-green-600" />
               Create New User
             </h3>
             
             <form onSubmit={(e) => { e.preventDefault(); createNewUser(); }} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('form.email')} *
                 </label>
                 <input
@@ -3071,7 +3071,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('form.password')} *
                 </label>
                 <input
@@ -3086,7 +3086,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('form.full_name')} *
                 </label>
                 <input
@@ -3100,7 +3100,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('form.phone')}
                 </label>
                 <input
@@ -3113,7 +3113,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('form.role')} *
                 </label>
                 <select
@@ -3175,23 +3175,23 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Payment Proof Viewer Modal */}
       {selectedTransaction && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold flex items-center">
+              <h3 className="text-xl font-bold flex items-center text-gray-900 dark:text-white">
                 <DollarSign className="h-6 w-6 mr-2 text-green-600" />
                 Payment Proof Review - ${selectedTransaction.amount}
               </h3>
               <button
                 onClick={() => setSelectedTransaction(null)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
               >
                 ×
               </button>
             </div>
             
             {/* Transaction Details */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
-              <h4 className="font-semibold mb-3">Transaction Details:</h4>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-none p-4 mb-6">
+              <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Transaction Details:</h4>
               <div className="grid md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p><span className="font-medium">Client:</span> {selectedTransaction.user?.full_name}</p>
@@ -3284,9 +3284,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Edit User/Pilot Modal */}
       {showEditUserModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold flex items-center">
+              <h3 className="text-xl font-bold flex items-center text-gray-900 dark:text-white">
                 <Users className="h-6 w-6 mr-2 text-blue-600" />
                 Edit {selectedUser.role === 'pilot' ? 'Pilot' : 'User'} Profile
               </h3>
@@ -3295,16 +3295,16 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   setShowEditUserModal(false)
                   setSelectedUser(null)
                 }}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
               >
                 ×
               </button>
             </div>
             
             {/* User Details Summary */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
-              <h4 className="font-semibold mb-2">Current Profile:</h4>
-              <div className="text-sm text-gray-600">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-none p-4 mb-6">
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">Current Profile:</h4>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
                 <p><span className="font-medium">User ID:</span> {selectedUser.id}</p>
                 <p><span className="font-medium">Created:</span> {new Date(selectedUser.created_at).toLocaleDateString()}</p>
                 <p><span className="font-medium">Current Role:</span> {selectedUser.role}</p>
@@ -3314,7 +3314,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             <form onSubmit={(e) => { e.preventDefault(); updateUserProfile(); }} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('form.full_name')} *
                   </label>
                   <input
@@ -3327,7 +3327,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email Address
                   </label>
                   <input
@@ -3342,7 +3342,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('form.phone')}
                   </label>
                   <input
@@ -3355,7 +3355,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Role *
                   </label>
                   <select
@@ -3373,7 +3373,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Account Balance (USD)
                   </label>
                   <input
@@ -3388,7 +3388,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Verification Status
                   </label>
                   <div className="flex items-center space-x-4 pt-2">
@@ -3417,7 +3417,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Admin Notes
                 </label>
                 <textarea
@@ -3465,9 +3465,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Edit Booking Modal */}
       {showEditBookingModal && selectedBookingForEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold flex items-center">
+              <h3 className="text-xl font-bold flex items-center text-gray-900 dark:text-white">
                 <Calendar className="h-6 w-6 mr-2 text-blue-600" />
                 Review & Edit Booking
               </h3>
@@ -3476,7 +3476,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   setShowEditBookingModal(false)
                   setSelectedBookingForEdit(null)
                 }}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
               >
                 ×
               </button>
@@ -3485,7 +3485,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             {/* Current Booking Details */}
             <div className="bg-gray-50 rounded-none p-4 mb-6">
               <h4 className="font-semibold mb-3">Original Booking:</h4>
-              <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+              <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div>
                   <p><span className="font-medium">Client:</span> {selectedBookingForEdit.client?.full_name}</p>
                   <p><span className="font-medium">Route:</span> {selectedBookingForEdit.from_location} → {selectedBookingForEdit.to_location}</p>
@@ -3503,7 +3503,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               {/* Route */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     From Location
                   </label>
                   <input
@@ -3516,7 +3516,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     To Location
                   </label>
                   <input
@@ -3532,7 +3532,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               {/* Date and Time */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Departure Date
                   </label>
                   <input
@@ -3545,7 +3545,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Departure Time
                   </label>
                   <input
@@ -3580,7 +3580,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               {editBookingData.is_round_trip && (
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Return Date
                     </label>
                     <input
@@ -3593,7 +3593,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Return Time
                     </label>
                     <input
@@ -3609,7 +3609,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               {/* Passengers */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Number of Passengers
                 </label>
                 <select
@@ -3627,7 +3627,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Booking Notes
                 </label>
                 <textarea
@@ -3641,7 +3641,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               {/* Revision Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Revision Notes (Required) *
                 </label>
                 <textarea
@@ -3687,8 +3687,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Add Helicopter Modal */}
       {showAddHelicopterModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-6">Add New Helicopter</h3>
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Add New Helicopter</h3>
             
             <form onSubmit={async (e) => {
               e.preventDefault()
@@ -3727,7 +3727,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             }} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
                   <input
                     type="text"
                     value={newHelicopterData.name}
@@ -3737,7 +3737,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
                   <input
                     type="text"
                     value={newHelicopterData.model}
@@ -3747,7 +3747,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Manufacturer</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Manufacturer</label>
                   <input
                     type="text"
                     value={newHelicopterData.manufacturer}
@@ -3757,7 +3757,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registration Number</label>
                   <input
                     type="text"
                     value={newHelicopterData.registration_number}
@@ -3767,7 +3767,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
                   <input
                     type="number"
                     value={newHelicopterData.year_manufactured}
@@ -3777,7 +3777,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Capacity</label>
                   <input
                     type="number"
                     value={newHelicopterData.capacity}
@@ -3787,7 +3787,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hourly Rate ($)</label>
                   <input
                     type="number"
                     value={newHelicopterData.hourly_rate}
@@ -3797,7 +3797,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Range (km)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Range (km)</label>
                   <input
                     type="number"
                     value={newHelicopterData.max_range_km}
@@ -3806,7 +3806,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
                   <input
                     type="text"
                     value={newHelicopterData.location}
@@ -3817,7 +3817,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                 <textarea
                   value={newHelicopterData.notes}
                   onChange={(e) => setNewHelicopterData({ ...newHelicopterData, notes: e.target.value })}
@@ -3849,8 +3849,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Edit Helicopter Modal */}
       {showEditHelicopterModal && selectedHelicopterForEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-6">Edit Helicopter</h3>
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Edit Helicopter</h3>
             
             <form onSubmit={async (e) => {
               e.preventDefault()
@@ -3892,7 +3892,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             }} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
                   <input
                     type="text"
                     value={selectedHelicopterForEdit.name}
@@ -3902,7 +3902,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
                   <input
                     type="text"
                     value={selectedHelicopterForEdit.model}
@@ -3912,7 +3912,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                   <select
                     value={selectedHelicopterForEdit.status}
                     onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, status: e.target.value })}
@@ -3925,7 +3925,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hourly Rate ($)</label>
                   <input
                     type="number"
                     value={selectedHelicopterForEdit.hourly_rate}
@@ -3935,7 +3935,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Total Flight Hours</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Flight Hours</label>
                   <input
                     type="number"
                     step="0.1"
@@ -3945,7 +3945,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
                   <input
                     type="text"
                     value={selectedHelicopterForEdit.location}
@@ -3954,7 +3954,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Next Maintenance Due</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Next Maintenance Due</label>
                   <input
                     type="date"
                     value={selectedHelicopterForEdit.next_maintenance_due || ''}
@@ -3963,7 +3963,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Insurance Expiry</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Insurance Expiry</label>
                   <input
                     type="date"
                     value={selectedHelicopterForEdit.insurance_expiry || ''}
@@ -3974,7 +3974,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                 <textarea
                   value={selectedHelicopterForEdit.notes || ''}
                   onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, notes: e.target.value })}
@@ -4006,8 +4006,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       {/* Maintenance Modal */}
       {showMaintenanceModal && selectedHelicopterForEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-none p-6 max-w-lg w-full">
-            <h3 className="text-xl font-bold mb-6">Schedule Maintenance</h3>
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none p-6 max-w-lg w-full">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Schedule Maintenance</h3>
             
             <form onSubmit={async (e) => {
               e.preventDefault()
@@ -4053,7 +4053,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               }
             }} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Maintenance Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Maintenance Type</label>
                 <select
                   name="maintenance_type"
                   className="w-full px-3 py-2 border border-gray-300 rounded-none"
@@ -4067,7 +4067,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                 <textarea
                   name="description"
                   className="w-full px-3 py-2 border border-gray-300 rounded-none"
@@ -4078,7 +4078,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
                 <input
                   type="date"
                   name="start_date"
@@ -4088,7 +4088,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Performed By</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Performed By</label>
                 <input
                   type="text"
                   name="performed_by"
@@ -4098,7 +4098,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Cost ($)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estimated Cost ($)</label>
                 <input
                   type="number"
                   name="cost"
@@ -4109,7 +4109,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                 <textarea
                   name="notes"
                   className="w-full px-3 py-2 border border-gray-300 rounded-none"

@@ -206,14 +206,14 @@ export default function PilotDashboard() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Assignments</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Assignments</h1>
           <div className="flex space-x-2">
             <button
               onClick={() => setFilter('active')}
               className={`px-4 py-2 rounded ${
                 filter === 'active' 
                   ? 'bg-primary-600 text-white' 
-                  : 'bg-white text-gray-700 border border-gray-300'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
               }`}
             >
               Active Missions
@@ -223,7 +223,7 @@ export default function PilotDashboard() {
               className={`px-4 py-2 rounded ${
                 filter === 'completed' 
                   ? 'bg-primary-600 text-white' 
-                  : 'bg-white text-gray-700 border border-gray-300'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
               }`}
             >
               Completed
@@ -233,7 +233,7 @@ export default function PilotDashboard() {
               className={`px-4 py-2 rounded ${
                 filter === 'all' 
                   ? 'bg-primary-600 text-white' 
-                  : 'bg-white text-gray-700 border border-gray-300'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
               }`}
             >
               All

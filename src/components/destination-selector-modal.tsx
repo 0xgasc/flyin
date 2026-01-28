@@ -32,7 +32,7 @@ export default function DestinationSelectorModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center p-0 md:p-4 z-50">
-      <div className="bg-white rounded-none md:rounded-none shadow-xl w-full md:max-w-md max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+      <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none md:rounded-none shadow-xl w-full md:max-w-md max-h-[90vh] md:max-h-[80vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4">
           <div className="flex justify-between items-center">
@@ -53,8 +53,8 @@ export default function DestinationSelectorModal({
           {/* Airports Section */}
           {department.airports.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3 flex items-center">
-                <Plane className="h-5 w-5 mr-2 text-primary-600" />
+              <h3 className="text-lg font-semibold mb-3 flex items-center text-gray-900 dark:text-white">
+                <Plane className="h-5 w-5 mr-2 text-primary-600 dark:text-gold-400" />
                 Airports
               </h3>
               <div className="space-y-2">
@@ -64,18 +64,18 @@ export default function DestinationSelectorModal({
                     onClick={() => setSelectedDestination(airport.name)}
                     className={`w-full text-left p-3 rounded-none border-2 transition-all touch-manipulation ${
                       selectedDestination === airport.name
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-200 hover:border-gray-300 active:border-primary-300'
+                        ? 'border-primary-500 dark:border-gold-500 bg-primary-50 dark:bg-gold-500/10'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 active:border-primary-300'
                     }`}
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-medium">{airport.name}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-medium text-gray-900 dark:text-white">{airport.name}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           {airport.code} • {airport.type.charAt(0).toUpperCase() + airport.type.slice(1)}
                         </p>
                       </div>
-                      <Plane className="h-5 w-5 text-gray-400" />
+                      <Plane className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                     </div>
                   </button>
                 ))}
@@ -85,8 +85,8 @@ export default function DestinationSelectorModal({
 
           {/* Cities/Destinations Section */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <MapPin className="h-5 w-5 mr-2 text-primary-600" />
+            <h3 className="text-lg font-semibold mb-3 flex items-center text-gray-900 dark:text-white">
+              <MapPin className="h-5 w-5 mr-2 text-primary-600 dark:text-gold-400" />
               Cities & Destinations
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -96,11 +96,11 @@ export default function DestinationSelectorModal({
                   onClick={() => setSelectedDestination(destination)}
                   className={`p-3 rounded-none border-2 transition-all touch-manipulation ${
                     selectedDestination === destination
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 hover:border-gray-300 active:border-primary-300'
+                      ? 'border-primary-500 dark:border-gold-500 bg-primary-50 dark:bg-gold-500/10'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 active:border-primary-300'
                   }`}
                 >
-                  <p className="font-medium text-sm">{destination}</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">{destination}</p>
                 </button>
               ))}
             </div>
@@ -109,14 +109,14 @@ export default function DestinationSelectorModal({
           {/* Experiences Available */}
           {department.experiences.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold mb-3 flex items-center">
-                <Mountain className="h-5 w-5 mr-2 text-primary-600" />
+              <h3 className="text-lg font-semibold mb-3 flex items-center text-gray-900 dark:text-white">
+                <Mountain className="h-5 w-5 mr-2 text-primary-600 dark:text-gold-400" />
                 Available Experiences
               </h3>
-              <div className="bg-blue-50 rounded-none p-3">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-none p-3">
                 <ul className="space-y-1">
                   {department.experiences.map((experience, idx) => (
-                    <li key={idx} className="text-sm text-gray-700">
+                    <li key={idx} className="text-sm text-gray-700 dark:text-gray-300">
                       • {experience}
                     </li>
                   ))}
@@ -127,11 +127,11 @@ export default function DestinationSelectorModal({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 p-4 bg-gray-50">
+        <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900">
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-none text-gray-700 hover:bg-gray-100 transition-colors"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-none text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               Cancel
             </button>

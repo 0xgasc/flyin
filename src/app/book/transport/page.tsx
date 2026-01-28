@@ -318,8 +318,8 @@ export default function BookTransportPage() {
                   onClick={() => setSelectionMode('dropdown')}
                   className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                     selectionMode === 'dropdown'
-                      ? 'bg-white text-primary-600 shadow'
-                      : 'text-gray-600 hover:text-gray-800'
+                      ? 'bg-white dark:bg-gray-800 text-primary-600 dark:text-gold-400 shadow'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                   }`}
                 >
                   <Grid className="h-4 w-4 inline mr-1" />
@@ -330,8 +330,8 @@ export default function BookTransportPage() {
                   onClick={() => setSelectionMode('map')}
                   className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                     selectionMode === 'map'
-                      ? 'bg-white text-primary-600 shadow'
-                      : 'text-gray-600 hover:text-gray-800'
+                      ? 'bg-white dark:bg-gray-800 text-primary-600 dark:text-gold-400 shadow'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                   }`}
                 >
                   <Map className="h-4 w-4 inline mr-1" />

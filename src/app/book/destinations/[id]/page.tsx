@@ -292,8 +292,8 @@ export default function DestinationDetailPage() {
           {/* Destination Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{destination.name}</h1>
-              <div className="flex items-center space-x-4 text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{destination.name}</h1>
+              <div className="flex items-center space-x-4 text-gray-600 dark:text-gray-400">
                 <div className="flex items-center">
                   <MapPin className="w-4 h-4 mr-1" />
                   {destination.location}
@@ -313,18 +313,18 @@ export default function DestinationDetailPage() {
             <p className="text-gray-700 leading-relaxed">{destination.description}</p>
 
             {/* Key Details */}
-            <div className="p-4 bg-white rounded shadow-sm">
+            <div className="p-4 bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded shadow-sm">
               <div className="text-center">
-                <DollarSign className="w-6 h-6 text-primary-600 mx-auto mb-1" />
-                <div className="text-lg font-medium text-gray-900">Custom Quote</div>
-                <div className="text-sm text-gray-600">Price varies by distance and group size</div>
+                <DollarSign className="w-6 h-6 text-primary-600 dark:text-gold-400 mx-auto mb-1" />
+                <div className="text-lg font-medium text-gray-900 dark:text-white">Custom Quote</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Price varies by distance and group size</div>
               </div>
             </div>
 
             {/* Destination Features */}
             {destination.features && destination.features.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Destination Features</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Destination Features</h3>
                 <div className="space-y-2">
                   {destination.features.map((feature, index) => (
                     <div key={index} className="flex items-center">
@@ -339,7 +339,7 @@ export default function DestinationDetailPage() {
             {/* Highlights */}
             {destination.highlights && destination.highlights.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Highlights</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Highlights</h3>
                 <div className="space-y-2">
                   {destination.highlights.map((highlight, index) => (
                     <div key={index} className="flex items-center">
@@ -354,7 +354,7 @@ export default function DestinationDetailPage() {
             {/* Requirements */}
             {destination.requirements && destination.requirements.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Requirements</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Requirements</h3>
                 <div className="space-y-2">
                   {destination.requirements.map((requirement, index) => (
                     <div key={index} className="flex items-start">
@@ -369,7 +369,7 @@ export default function DestinationDetailPage() {
             {/* Meeting Point */}
             {destination.meeting_point && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Meeting Point</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Meeting Point</h3>
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-700">{destination.meeting_point}</p>
@@ -380,7 +380,7 @@ export default function DestinationDetailPage() {
             {/* Best Time */}
             {destination.best_time && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Best Time to Visit</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Best Time to Visit</h3>
                 <div className="flex items-start">
                   <Clock className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-700">{destination.best_time}</p>
@@ -391,7 +391,7 @@ export default function DestinationDetailPage() {
             {/* Difficulty Level */}
             {destination.difficulty_level && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Difficulty Level</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Difficulty Level</h3>
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
                   {destination.difficulty_level.charAt(0).toUpperCase() + destination.difficulty_level.slice(1)}
                 </div>
@@ -401,9 +401,9 @@ export default function DestinationDetailPage() {
             {/* Coordinates Info */}
             {destination.coordinates && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Location</h3>
-                <div className="p-3 bg-white rounded shadow-sm">
-                  <div className="text-sm text-gray-600">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Location</h3>
+                <div className="p-3 bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded shadow-sm">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     Coordinates: {destination.coordinates.lat.toFixed(6)}, {destination.coordinates.lng.toFixed(6)}
                   </div>
                 </div>
@@ -424,9 +424,9 @@ export default function DestinationDetailPage() {
       {/* Booking Modal */}
       {showBookingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Request Transport</h2>
-            <p className="text-gray-600 mb-4">Transport to {destination.name}</p>
+          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Request Transport</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Transport to {destination.name}</p>
             
             <form onSubmit={handleBooking} className="space-y-4">
               <div>
