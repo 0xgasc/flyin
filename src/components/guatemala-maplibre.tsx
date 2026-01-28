@@ -183,6 +183,10 @@ export default function GuatemalaMapLibre({
   const markers = useRef<maplibregl.Marker[]>([])
   const [mapError, setMapError] = useState<string | null>(null)
 
+  // Tooltip state - managed by React for reliability
+  const [hoveredDest, setHoveredDest] = useState<Destination | null>(null)
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
+
   // Fetch destinations from API
   const { destinations: apiDestinations, loading: destinationsLoading } = useMapDestinations()
 
@@ -292,24 +296,9 @@ export default function GuatemalaMapLibre({
       const isFromSelected = selectedFrom === dest.name
       const isToSelected = selectedTo === dest.name
 
-      // Create marker element
+      // Create marker element - simple, no embedded tooltip
       const el = document.createElement('div')
       el.className = 'marker-container'
-
-      // Build tooltip HTML with data attributes for JS positioning
-      const tooltipId = `tooltip-${dest.name.replace(/\s+/g, '-').toLowerCase()}`
-      const tooltipHtml = `
-        <div class="marker-tooltip" id="${tooltipId}">
-          <div class="tooltip-card">
-            <div class="tooltip-header">
-              <strong>${dest.name}</strong>
-              ${dest.isHub ? '<span class="tooltip-hub">HUB</span>' : ''}
-            </div>
-            <div class="tooltip-body">${dest.description}</div>
-            ${dest.airportCode ? `<div class="tooltip-airport">✈ ${dest.airportCode}</div>` : ''}
-          </div>
-        </div>
-      `
 
       if (dest.isHub) {
         // Guatemala City hub - larger red marker
@@ -317,7 +306,6 @@ export default function GuatemalaMapLibre({
           <div class="marker-wrapper">
             <div class="absolute -inset-2 bg-red-500 rounded-full animate-ping opacity-40"></div>
             <div class="marker-dot hub"></div>
-            ${tooltipHtml}
           </div>
         `
       } else if (isSelected) {
@@ -326,7 +314,6 @@ export default function GuatemalaMapLibre({
           <div class="marker-wrapper">
             <div class="absolute -inset-1 bg-emerald-500 rounded-full animate-pulse opacity-60"></div>
             <div class="marker-dot ${isFromSelected ? 'selected-from' : 'selected-to'}"></div>
-            ${tooltipHtml}
           </div>
         `
       } else {
@@ -334,7 +321,6 @@ export default function GuatemalaMapLibre({
         el.innerHTML = `
           <div class="marker-wrapper">
             <div class="marker-dot regular"></div>
-            ${tooltipHtml}
           </div>
         `
       }
@@ -355,23 +341,17 @@ export default function GuatemalaMapLibre({
         }
       })
 
-      // Handle hover for fixed-position tooltip
-      const tooltip = el.querySelector('.marker-tooltip') as HTMLElement | null
-      if (tooltip) {
-        el.addEventListener('mouseenter', () => {
-          const rect = el.getBoundingClientRect()
-          // Position tooltip below the marker
-          tooltip.style.left = `${rect.left + rect.width / 2}px`
-          tooltip.style.top = `${rect.bottom + 8}px`
-          tooltip.style.opacity = '1'
-          tooltip.style.visibility = 'visible'
-        })
+      // Handle hover - update React state for tooltip
+      el.addEventListener('mouseenter', () => {
+        const rect = el.getBoundingClientRect()
+        setHoveredDest(dest)
+        setTooltipPos({ x: rect.left + rect.width / 2, y: rect.bottom + 8 })
+      })
 
-        el.addEventListener('mouseleave', () => {
-          tooltip.style.opacity = '0'
-          tooltip.style.visibility = 'hidden'
-        })
-      }
+      el.addEventListener('mouseleave', () => {
+        setHoveredDest(null)
+        setTooltipPos(null)
+      })
 
       markers.current.push(marker)
     })
@@ -453,6 +433,37 @@ export default function GuatemalaMapLibre({
           <p className="text-xs text-gray-400">Interactive Map</p>
         </div>
       </div>
+
+      {/* React-rendered tooltip - outside map container to avoid clipping */}
+      {hoveredDest && tooltipPos && (
+        <div
+          className="fixed z-[99999] pointer-events-none"
+          style={{
+            left: tooltipPos.x,
+            top: tooltipPos.y,
+            transform: 'translateX(-50%)',
+          }}
+        >
+          <div className="bg-[#141414] border border-gray-700 rounded-lg p-3 shadow-xl min-w-[200px] max-w-[260px]">
+            {/* Arrow pointing up */}
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-700" />
+            <div className="absolute -top-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[7px] border-r-[7px] border-b-[7px] border-transparent border-b-[#141414]" />
+
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="font-semibold text-white text-sm">{hoveredDest.name}</span>
+              {hoveredDest.isHub && (
+                <span className="px-1.5 py-0.5 bg-red-500/20 text-red-400 text-[10px] rounded font-medium">HUB</span>
+              )}
+            </div>
+            <p className="text-gray-300 text-xs leading-relaxed">{hoveredDest.description}</p>
+            {hoveredDest.airportCode && (
+              <div className="mt-2 px-2 py-1 bg-blue-500/15 rounded text-[11px] text-blue-300">
+                ✈ {hoveredDest.airportCode}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="mt-6 flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
