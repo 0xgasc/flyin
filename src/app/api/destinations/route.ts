@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
-import { Destination, DestinationImage } from '@/models'
+import { Destination, DestinationImage, Airport } from '@/models'
 import { extractToken, verifyToken } from '@/lib/jwt'
 
 // GET - List all active destinations (public) or all (admin)
@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const includeInactive = searchParams.get('include_inactive') === 'true'
     const includeImages = searchParams.get('include_images') === 'true'
+    const includeAirport = searchParams.get('include_airport') === 'true'
 
     // Check if admin for inactive destinations
     let isAdmin = false
@@ -27,9 +28,15 @@ export async function GET(request: NextRequest) {
       query.isActive = true
     }
 
-    const destinations = await Destination.find(query)
+    let destinationsQuery = Destination.find(query)
       .sort({ orderIndex: 1, name: 1 })
-      .lean()
+
+    // Populate airport data if requested
+    if (includeAirport) {
+      destinationsQuery = destinationsQuery.populate('airportId', 'code name city')
+    }
+
+    const destinations = await destinationsQuery.lean()
 
     // Fetch images if requested
     let imagesByDestination: { [key: string]: any[] } = {}
@@ -54,25 +61,38 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const transformedDestinations = destinations.map((d: any) => ({
-      id: d._id.toString(),
-      name: d.name,
-      description: d.description,
-      location: d.location,
-      coordinates: d.coordinates,
-      features: d.features,
-      highlights: d.highlights,
-      requirements: d.requirements,
-      meeting_point: d.meetingPoint,
-      best_time: d.bestTime,
-      difficulty_level: d.difficultyLevel,
-      metadata: d.metadata,
-      order_index: d.orderIndex,
-      is_active: d.isActive,
-      created_at: d.createdAt,
-      updated_at: d.updatedAt,
-      destination_images: includeImages ? (imagesByDestination[d._id.toString()] || []) : undefined
-    }))
+    const transformedDestinations = destinations.map((d: any) => {
+      // Extract airport data if populated
+      const airport = d.airportId && typeof d.airportId === 'object' ? {
+        id: d.airportId._id?.toString(),
+        code: d.airportId.code,
+        name: d.airportId.name,
+        city: d.airportId.city
+      } : null
+
+      return {
+        id: d._id.toString(),
+        name: d.name,
+        description: d.description,
+        location: d.location,
+        coordinates: d.coordinates,
+        features: d.features,
+        highlights: d.highlights,
+        requirements: d.requirements,
+        meeting_point: d.meetingPoint,
+        best_time: d.bestTime,
+        difficulty_level: d.difficultyLevel,
+        is_hub: d.isHub || false,
+        airport: includeAirport ? airport : undefined,
+        airport_id: d.airportId && typeof d.airportId === 'string' ? d.airportId : d.airportId?._id?.toString() || null,
+        metadata: d.metadata,
+        order_index: d.orderIndex,
+        is_active: d.isActive,
+        created_at: d.createdAt,
+        updated_at: d.updatedAt,
+        destination_images: includeImages ? (imagesByDestination[d._id.toString()] || []) : undefined
+      }
+    })
 
     // Cache public requests for 5 minutes (admin requests bypass cache)
     const headers: HeadersInit = {}
@@ -117,6 +137,8 @@ export async function POST(request: NextRequest) {
       meeting_point,
       best_time,
       difficulty_level,
+      airport_id,
+      is_hub,
       metadata,
       order_index
     } = body
@@ -139,6 +161,8 @@ export async function POST(request: NextRequest) {
       meetingPoint: meeting_point || null,
       bestTime: best_time || null,
       difficultyLevel: difficulty_level || null,
+      airportId: airport_id || null,
+      isHub: is_hub || false,
       metadata: metadata || null,
       orderIndex: order_index ?? null,
       isActive: true

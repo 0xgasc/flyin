@@ -19,8 +19,18 @@ interface Destination {
   meeting_point?: string
   best_time?: string
   difficulty_level?: string
+  is_hub?: boolean
+  airport_id?: string
+  airport?: { id: string; code: string; name: string; city: string } | null
   is_active: boolean
   metadata: any
+}
+
+interface Airport {
+  id: string
+  code: string
+  name: string
+  city: string
 }
 
 interface DestinationImage {
@@ -39,6 +49,7 @@ export default function EditDestinationPage() {
   const [saving, setSaving] = useState(false)
   const [destination, setDestination] = useState<Destination | null>(null)
   const [images, setImages] = useState<DestinationImage[]>([])
+  const [airports, setAirports] = useState<Airport[]>([])
   const [showImageUpload, setShowImageUpload] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -51,6 +62,8 @@ export default function EditDestinationPage() {
     meeting_point: '',
     best_time: '',
     difficulty_level: '',
+    is_hub: false,
+    airport_id: '',
     is_active: true
   })
 
@@ -79,6 +92,8 @@ export default function EditDestinationPage() {
           meeting_point: dest.meeting_point || '',
           best_time: dest.best_time || '',
           difficulty_level: dest.difficulty_level || '',
+          is_hub: dest.is_hub || false,
+          airport_id: dest.airport_id || '',
           is_active: dest.is_active !== false
         })
       }
@@ -103,17 +118,36 @@ export default function EditDestinationPage() {
     }
   }, [params.id])
 
+  const fetchAirports = useCallback(async () => {
+    try {
+      const response = await fetch('/api/airports', { credentials: 'include' })
+      const data = await response.json()
+
+      if (data.airports) {
+        setAirports(data.airports.map((a: any) => ({
+          id: a.id || a._id,
+          code: a.code,
+          name: a.name,
+          city: a.city
+        })))
+      }
+    } catch (error) {
+      console.error('Error fetching airports:', error)
+    }
+  }, [])
+
   useEffect(() => {
     if (!profile || profile.role !== 'admin') {
       router.push('/admin')
       return
     }
 
+    fetchAirports()
     if (params.id) {
       fetchDestination()
       fetchImages()
     }
-  }, [profile, params.id, router, fetchDestination, fetchImages])
+  }, [profile, params.id, router, fetchDestination, fetchImages, fetchAirports])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -130,6 +164,8 @@ export default function EditDestinationPage() {
         location: formData.location,
         coordinates: formData.coordinates,
         features: formData.features,
+        is_hub: formData.is_hub,
+        airport_id: formData.airport_id || null,
         is_active: formData.is_active
       }
 
@@ -553,6 +589,43 @@ export default function EditDestinationPage() {
                   <option value="challenging">Challenging</option>
                   <option value="extreme">Extreme</option>
                 </select>
+              </div>
+
+              {/* Airport Selector */}
+              <div>
+                <label htmlFor="airport_id" className="block text-sm font-medium text-gray-700 mb-2">
+                  Linked Airport (optional)
+                </label>
+                <select
+                  id="airport_id"
+                  value={formData.airport_id}
+                  onChange={(e) => setFormData(prev => ({ ...prev, airport_id: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">No airport</option>
+                  {airports.map(airport => (
+                    <option key={airport.id} value={airport.id}>
+                      {airport.code} - {airport.name} ({airport.city})
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Link this destination to an airport to show on the map
+                </p>
+              </div>
+
+              {/* Is Hub Checkbox */}
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="is_hub"
+                  checked={formData.is_hub}
+                  onChange={(e) => setFormData(prev => ({ ...prev, is_hub: e.target.checked }))}
+                  className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="is_hub" className="text-sm font-medium text-gray-700">
+                  Hub Location (main departure point like Guatemala City)
+                </label>
               </div>
 
               <div className="flex items-center space-x-3">

@@ -15,6 +15,9 @@ export interface IDestination extends Document {
   meetingPoint: string | null
   bestTime: string | null
   difficultyLevel: string | null
+  // Airport reference - optional, for destinations with airports
+  airportId: mongoose.Types.ObjectId | null
+  isHub: boolean // Primary hub location (e.g., Guatemala City)
   metadata: any
   orderIndex: number | null
   isActive: boolean
@@ -64,6 +67,17 @@ const destinationSchema = new Schema<IDestination>({
   difficultyLevel: {
     type: String,
     default: null
+  },
+  // Airport reference - optional link to Airport collection
+  airportId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Airport',
+    default: null
+  },
+  // Is this a hub location (like Guatemala City)
+  isHub: {
+    type: Boolean,
+    default: false
   },
   metadata: {
     type: Schema.Types.Mixed,

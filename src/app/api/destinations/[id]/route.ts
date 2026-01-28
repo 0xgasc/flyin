@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
-import { Destination, DestinationImage } from '@/models'
+import { Destination, DestinationImage, Airport } from '@/models'
 import { extractToken, verifyToken } from '@/lib/jwt'
 import mongoose from 'mongoose'
 
@@ -17,7 +17,9 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid destination ID' }, { status: 400 })
     }
 
-    const destination = await Destination.findById(id).lean()
+    const destination = await Destination.findById(id)
+      .populate('airportId', 'code name city')
+      .lean()
     if (!destination) {
       return NextResponse.json({ error: 'Destination not found' }, { status: 404 })
     }
@@ -28,6 +30,15 @@ export async function GET(
       .lean()
 
     const d: any = destination
+
+    // Extract airport data if populated
+    const airport = d.airportId && typeof d.airportId === 'object' ? {
+      id: d.airportId._id?.toString(),
+      code: d.airportId.code,
+      name: d.airportId.name,
+      city: d.airportId.city
+    } : null
+
     return NextResponse.json({
       success: true,
       destination: {
@@ -42,6 +53,9 @@ export async function GET(
         meeting_point: d.meetingPoint,
         best_time: d.bestTime,
         difficulty_level: d.difficultyLevel,
+        is_hub: d.isHub || false,
+        airport: airport,
+        airport_id: d.airportId?._id?.toString() || d.airportId?.toString() || null,
         metadata: d.metadata,
         order_index: d.orderIndex,
         is_active: d.isActive,
@@ -98,6 +112,8 @@ export async function PUT(
     if (body.meeting_point !== undefined) updateData.meetingPoint = body.meeting_point
     if (body.best_time !== undefined) updateData.bestTime = body.best_time
     if (body.difficulty_level !== undefined) updateData.difficultyLevel = body.difficulty_level
+    if (body.airport_id !== undefined) updateData.airportId = body.airport_id || null
+    if (body.is_hub !== undefined) updateData.isHub = body.is_hub
     if (body.metadata !== undefined) updateData.metadata = body.metadata
     if (body.order_index !== undefined) updateData.orderIndex = body.order_index
     if (body.is_active !== undefined) updateData.isActive = body.is_active

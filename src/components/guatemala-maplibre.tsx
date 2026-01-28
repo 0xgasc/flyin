@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
+import { useMapDestinations, type MapDestination } from '@/hooks/useMapDestinations'
 
 interface GuatemalaMapLibreProps {
   onDepartmentClick?: (department: Department) => void
@@ -183,6 +184,29 @@ export default function GuatemalaMapLibre({
   const [hoveredDestination, setHoveredDestination] = useState<string | null>(null)
   const [mapError, setMapError] = useState<string | null>(null)
 
+  // Fetch destinations from API
+  const { destinations: apiDestinations, loading: destinationsLoading } = useMapDestinations()
+
+  // Transform API destinations to internal format, with static fallback
+  const activeDestinations = useMemo((): Destination[] => {
+    if (apiDestinations.length === 0) {
+      // Use static fallback if no API data
+      return destinations
+    }
+
+    return apiDestinations.map((d: MapDestination): Destination => ({
+      name: d.name,
+      coordinates: [d.coordinates.lng, d.coordinates.lat] as [number, number],
+      dept: d.location,
+      isHub: d.is_hub,
+      description: d.description,
+      airportCode: d.airport?.code,
+      airportName: d.airport?.name,
+      highlights: d.highlights,
+      imageUrl: d.primary_image_url
+    }))
+  }, [apiDestinations])
+
   useEffect(() => {
     if (!mapContainer.current || map.current) return
 
@@ -252,19 +276,19 @@ export default function GuatemalaMapLibre({
     }
   }, [])
 
-  // Update markers when selection changes
+  // Update markers when selection or destinations change
   useEffect(() => {
-    if (map.current) {
+    if (map.current && !destinationsLoading) {
       markers.current.forEach(marker => marker.remove())
       markers.current = []
       addMarkers()
     }
-  }, [selectedFrom, selectedTo])
+  }, [selectedFrom, selectedTo, activeDestinations, destinationsLoading])
 
   const addMarkers = () => {
     if (!map.current) return
 
-    destinations.forEach(dest => {
+    activeDestinations.forEach(dest => {
       const isSelected = selectedFrom === dest.name || selectedTo === dest.name
       const isFromSelected = selectedFrom === dest.name
       const isToSelected = selectedTo === dest.name
@@ -387,8 +411,8 @@ export default function GuatemalaMapLibre({
 
     // Draw line between selected points
     if (selectedFrom && selectedTo) {
-      const fromDest = destinations.find(d => d.name === selectedFrom)
-      const toDest = destinations.find(d => d.name === selectedTo)
+      const fromDest = activeDestinations.find(d => d.name === selectedFrom)
+      const toDest = activeDestinations.find(d => d.name === selectedTo)
 
       if (fromDest && toDest && map.current) {
         // Remove existing route layer if present
