@@ -175,7 +175,7 @@ export default function DestinationDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -183,9 +183,9 @@ export default function DestinationDetailPage() {
 
   if (!destination) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Destination Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Destination Not Found</h1>
           <Link
             href="/book/experiences"
             className="text-primary-600 hover:text-primary-800 flex items-center justify-center"
@@ -199,7 +199,7 @@ export default function DestinationDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
       {/* Navigation */}
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
@@ -236,7 +236,7 @@ export default function DestinationDetailPage() {
           <div className="space-y-4">
             {images.length > 0 ? (
               <div className="relative">
-                <div className="relative w-full bg-gray-200 rounded overflow-hidden">
+                <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded overflow-hidden">
                   <img
                     src={images[currentImageIndex]?.image_url}
                     alt={images[currentImageIndex]?.caption || destination.name}
@@ -262,7 +262,7 @@ export default function DestinationDetailPage() {
                 )}
               </div>
             ) : (
-              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded flex items-center justify-center">
+              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center">
                 <Camera className="w-12 h-12 text-gray-400" />
               </div>
             )}
@@ -430,41 +430,41 @@ export default function DestinationDetailPage() {
             
             <form onSubmit={handleBooking} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   From Location
                 </label>
                 <input
                   type="text"
                   value={formData.fromLocation}
                   onChange={(e) => setFormData({...formData, fromLocation: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="e.g., Guatemala City, Hotel name, address..."
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Departure Date
                 </label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Departure Time
                 </label>
                 <input
                   type="time"
                   value={formData.time}
                   onChange={(e) => setFormData({...formData, time: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -477,7 +477,7 @@ export default function DestinationDetailPage() {
                   onChange={(e) => setFormData({...formData, isRoundTrip: e.target.checked})}
                   className="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
-                <label htmlFor="roundTrip" className="ml-2 text-sm font-medium text-gray-700">
+                <label htmlFor="roundTrip" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   Round trip (return flight)
                 </label>
               </div>
@@ -485,27 +485,27 @@ export default function DestinationDetailPage() {
               {formData.isRoundTrip && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Return Date
                     </label>
                     <input
                       type="date"
                       value={formData.returnDate}
                       onChange={(e) => setFormData({...formData, returnDate: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       required={formData.isRoundTrip}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Return Time
                     </label>
                     <input
                       type="time"
                       value={formData.returnTime}
                       onChange={(e) => setFormData({...formData, returnTime: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       required={formData.isRoundTrip}
                     />
                   </div>
@@ -513,13 +513,13 @@ export default function DestinationDetailPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Number of Passengers
                 </label>
                 <select
                   value={formData.passengers}
                   onChange={(e) => setFormData({...formData, passengers: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   {Array.from({length: 8}, (_, i) => i + 1).map((num) => (
                     <option key={num} value={num}>
@@ -530,14 +530,14 @@ export default function DestinationDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Special Requests or Notes
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Any special requirements, luggage details, etc..."
                 />
               </div>
@@ -546,7 +546,7 @@ export default function DestinationDetailPage() {
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   Cancel
                 </button>

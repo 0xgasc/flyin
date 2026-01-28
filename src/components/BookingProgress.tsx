@@ -40,7 +40,7 @@ export function BookingProgress({ currentStep, bookingType = 'transport' }: Book
                       ? 'bg-green-500 text-white'
                       : isCurrent
                         ? 'bg-primary-600 text-white ring-4 ring-primary-100'
-                        : 'bg-gray-200 text-gray-500'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                     }
                   `}
                 >
@@ -65,7 +65,7 @@ export function BookingProgress({ currentStep, bookingType = 'transport' }: Book
                 <div
                   className={`
                     flex-1 h-1 mx-2
-                    ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}
+                    ${isCompleted ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'}
                   `}
                 />
               )}
@@ -83,8 +83,8 @@ export function BookingProgressCompact({ currentStep }: BookingProgressProps) {
   const current = steps[currentIndex]
 
   return (
-    <div className="flex items-center justify-between py-2 px-4 bg-gray-50 rounded-lg">
-      <span className="text-sm text-gray-500">
+    <div className="flex items-center justify-between py-2 px-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <span className="text-sm text-gray-500 dark:text-gray-400">
         Step {currentIndex + 1} of {steps.length}
       </span>
       <span className="text-sm font-medium text-primary-600">

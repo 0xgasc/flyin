@@ -196,7 +196,7 @@ export default function BookExperiencesPage() {
     : experiences.filter(exp => exp.category === selectedCategory)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
       {/* Navigation */}
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
@@ -251,7 +251,7 @@ export default function BookExperiencesPage() {
           <div className="flex justify-center items-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">{t('common.loading')}</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
             </div>
           </div>
         ) : (
@@ -263,7 +263,7 @@ export default function BookExperiencesPage() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   selectedCategory === 'all'
                     ? 'bg-primary-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
                 {locale === 'es' ? 'Todas' : 'All'}
@@ -275,7 +275,7 @@ export default function BookExperiencesPage() {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedCategory === category
                       ? 'bg-primary-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
                   }`}
                 >
                   {category === 'experiences' 
@@ -291,13 +291,13 @@ export default function BookExperiencesPage() {
             {/* Experiences Grid */}
             {filteredExperiences.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600 text-lg">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredExperiences.map((experience) => (
                 <div key={experience.id} className="card-luxury hover:scale-105 transition-transform">
-                  <div className="aspect-video bg-gray-200 rounded mb-4 relative overflow-hidden">
+                  <div className="aspect-video bg-gray-200 dark:bg-gray-800 rounded mb-4 relative overflow-hidden">
                     {(() => {
                       // Get primary image from experience_images or destination_images
                       const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images

@@ -264,7 +264,7 @@ function PassengerDetailsContent() {
   // Show loading state while fetching booking
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-gray-600">Loading booking details...</p>
@@ -276,7 +276,7 @@ function PassengerDetailsContent() {
   // Show error if booking couldn't be loaded
   if (!bookingData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center p-4">
         <div className="bg-red-50 border border-red-200 rounded p-6 max-w-md text-center">
           <p className="text-red-800 font-medium mb-2">Unable to load booking</p>
           <p className="text-red-700 text-sm mb-4">{error || 'Booking not found'}</p>
@@ -289,7 +289,7 @@ function PassengerDetailsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
       <nav className="bg-luxury-black text-white p-6">
         <div className="container mx-auto flex justify-between items-center">
           <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -303,8 +303,8 @@ function PassengerDetailsContent() {
 
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Passenger Details</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Passenger Details</h1>
+          <p className="text-gray-600 dark:text-gray-400">
             Flight: {bookingData.from_location} → {bookingData.to_location} on {bookingData.date} at {bookingData.time}
           </p>
         </div>
@@ -325,35 +325,35 @@ function PassengerDetailsContent() {
 
             <div className="space-y-6">
               {passengers.map((passenger, index) => (
-                <div key={index} className="bg-gray-50 rounded p-4">
-                  <h3 className="font-medium text-gray-900 mb-4">
+                <div key={index} className="bg-gray-50 dark:bg-gray-900 rounded p-4">
+                  <h3 className="font-medium text-gray-900 dark:text-white mb-4">
                     Passenger {index + 1} {index === 0 && '(Primary)'}
                   </h3>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Full Name *
                       </label>
                       <input
                         type="text"
                         value={passenger.name}
                         onChange={(e) => updatePassenger(index, 'name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         required
                         placeholder="Enter full name"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Age *
                       </label>
                       <input
                         type="number"
                         value={passenger.age}
                         onChange={(e) => updatePassenger(index, 'age', parseInt(e.target.value) || 0)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         required
                         min="1"
                         max="120"
@@ -361,53 +361,53 @@ function PassengerDetailsContent() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Passport/ID Number
                       </label>
                       <input
                         type="text"
                         value={passenger.passport}
                         onChange={(e) => updatePassenger(index, 'passport', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         placeholder="Passport or ID number"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Emergency Contact
                       </label>
                       <input
                         type="text"
                         value={passenger.emergency_contact}
                         onChange={(e) => updatePassenger(index, 'emergency_contact', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         placeholder="Name and phone number"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Dietary Restrictions
                       </label>
                       <input
                         type="text"
                         value={passenger.dietary_restrictions}
                         onChange={(e) => updatePassenger(index, 'dietary_restrictions', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         placeholder="Allergies, vegetarian, etc."
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Special Requests
                       </label>
                       <input
                         type="text"
                         value={passenger.special_requests}
                         onChange={(e) => updatePassenger(index, 'special_requests', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         placeholder="Mobility assistance, etc."
                       />
                     </div>
@@ -427,7 +427,7 @@ function PassengerDetailsContent() {
             <div className="space-y-6">
               {Object.entries(groupedAddons).map(([category, addons]) => (
                 <div key={category}>
-                  <h3 className="font-medium text-gray-900 mb-3 capitalize">
+                  <h3 className="font-medium text-gray-900 dark:text-white mb-3 capitalize">
                     {getCategoryIcon(category)} {category} Add-ons
                   </h3>
                   
@@ -436,21 +436,21 @@ function PassengerDetailsContent() {
                       <div key={addon.id} className="bg-gray-50 rounded p-4 flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-medium text-gray-900">{addon.name}</h4>
+                            <h4 className="font-medium text-gray-900 dark:text-white">{addon.name}</h4>
                             <span className="text-lg font-bold text-primary-600">${addon.price}</span>
                           </div>
-                          <p className="text-sm text-gray-600 mb-3">{addon.description}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{addon.description}</p>
                           
                           <div className="flex items-center space-x-2">
-                            <label className="text-sm font-medium text-gray-700">Quantity:</label>
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Quantity:</label>
                             <button
                               type="button"
                               onClick={() => updateAddonQuantity(addon.id, Math.max(0, addon.quantity - 1))}
-                              className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
+                              className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600"
                             >
                               -
                             </button>
-                            <span className="w-8 text-center font-medium">{addon.quantity}</span>
+                            <span className="w-8 text-center font-medium text-gray-900 dark:text-white">{addon.quantity}</span>
                             <button
                               type="button"
                               onClick={() => updateAddonQuantity(addon.id, addon.quantity + 1)}
@@ -535,7 +535,7 @@ function PassengerDetailsContent() {
 export default function PassengerDetailsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-primary-600 border-t-transparent rounded-full"></div>
       </div>
     }>

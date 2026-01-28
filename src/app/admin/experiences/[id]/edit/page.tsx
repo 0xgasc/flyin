@@ -487,9 +487,9 @@ export default function EditExperiencePage() {
               </div>
 
               {/* Pricing Matrix */}
-              <div className="border-2 border-navy-200 rounded p-6" style={{ borderColor: '#bfdbfe' }}>
+              <div className="border-2 border-blue-200 dark:border-gray-700 rounded p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-navy-900" style={{ color: '#1e3a8a' }}>
+                  <h3 className="text-lg font-semibold text-navy-900 dark:text-white">
                     Pricing Tiers
                   </h3>
                   <button
@@ -504,42 +504,39 @@ export default function EditExperiencePage() {
                 </div>
 
                 {/* Base Price (always visible) */}
-                <div className="mb-4 p-4 bg-navy-50 rounded" style={{ backgroundColor: '#eff6ff' }}>
-                  <label className="block text-sm font-semibold text-navy-900 mb-2" style={{ color: '#1e3a8a' }}>
+                <div className="mb-4 p-4 bg-blue-50 dark:bg-gray-800 rounded">
+                  <label className="block text-sm font-semibold text-navy-900 dark:text-white mb-2">
                     Base Price (Default)
                   </label>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Min Passengers</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Min Passengers</label>
                       <input
                         type="number"
                         min="1"
                         value={formData.min_passengers || 1}
                         onChange={(e) => setFormData(prev => ({ ...prev, min_passengers: parseInt(e.target.value) }))}
-                        className="w-full px-3 py-2 border-2 border-navy-300 rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
-                        style={{ borderColor: '#93c5fd' }}
+                        className="w-full px-3 py-2 border-2 border-blue-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Max Passengers</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Max Passengers</label>
                       <input
                         type="number"
                         min="1"
                         value={formData.max_passengers}
                         onChange={(e) => setFormData(prev => ({ ...prev, max_passengers: parseInt(e.target.value) }))}
-                        className="w-full px-3 py-2 border-2 border-navy-300 rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
-                        style={{ borderColor: '#93c5fd' }}
+                        className="w-full px-3 py-2 border-2 border-blue-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Price ($)</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Price ($)</label>
                       <input
                         type="number"
                         min="0"
                         value={formData.base_price}
                         onChange={(e) => setFormData(prev => ({ ...prev, base_price: parseFloat(e.target.value) }))}
-                        className="w-full px-3 py-2 border-2 border-navy-300 rounded focus:outline-none focus:ring-2 focus:ring-navy-500 font-semibold"
-                        style={{ borderColor: '#93c5fd' }}
+                        className="w-full px-3 py-2 border-2 border-blue-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:outline-none focus:ring-2 focus:ring-navy-500 font-semibold"
                       />
                     </div>
                   </div>
@@ -548,7 +545,7 @@ export default function EditExperiencePage() {
                 {/* Additional Pricing Tiers */}
                 {formData.pricing_tiers.length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-sm font-medium text-gray-600">Additional Price Brackets:</p>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Additional Price Brackets:</p>
                     {formData.pricing_tiers.map((tier) => (
                       <div key={tier.id} className="p-4 bg-white dark:bg-gray-900 border-2 border-slate-200 dark:border-gray-700 rounded">
                         <div className="grid grid-cols-3 gap-4">
@@ -574,7 +571,7 @@ export default function EditExperiencePage() {
                           </div>
                           <div className="flex items-end space-x-2">
                             <div className="flex-1">
-                              <label className="block text-xs text-gray-600 mb-1">Price ($)</label>
+                              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Price ($)</label>
                               <input
                                 type="number"
                                 min="0"
@@ -600,17 +597,17 @@ export default function EditExperiencePage() {
 
               {/* Includes */}
               <div>
-                <label className="block text-sm font-semibold text-navy-900 mb-3" style={{ color: '#1e3a8a' }}>
+                <label className="block text-sm font-semibold text-navy-900 dark:text-white mb-3">
                   What's Included
                 </label>
                 <div className="space-y-2">
                   {formData.includes.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded border border-blue-200">{item}</span>
+                      <span className="flex-1 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-navy-800 dark:text-blue-200 rounded border border-blue-200 dark:border-blue-800">{item}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('includes', index)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -624,8 +621,7 @@ export default function EditExperiencePage() {
                         onChange={(e) => setNewInclude(e.target.value)}
                         onFocus={() => setShowIncludesDropdown(true)}
                         placeholder="Type or select from presets..."
-                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
-                        style={{ borderColor: '#93c5fd' }}
+                        className="flex-1 px-4 py-3 border-2 border-blue-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
                       />
                       <button
                         type="button"
@@ -656,7 +652,7 @@ export default function EditExperiencePage() {
                               setNewInclude('')
                               setShowIncludesDropdown(false)
                             }}
-                            className="w-full text-left px-4 py-3 hover:bg-navy-50 transition-colors border-b border-slate-100"
+                            className="w-full text-left px-4 py-3 hover:bg-navy-50 dark:hover:bg-gray-800 transition-colors border-b border-slate-100 dark:border-gray-700 dark:text-gray-200"
                           >
                             {preset}
                           </button>
@@ -669,17 +665,17 @@ export default function EditExperiencePage() {
 
               {/* Highlights */}
               <div>
-                <label className="block text-sm font-semibold text-navy-900 mb-3" style={{ color: '#1e3a8a' }}>
+                <label className="block text-sm font-semibold text-navy-900 dark:text-white mb-3">
                   Experience Highlights
                 </label>
                 <div className="space-y-2">
                   {formData.highlights.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-4 py-2 bg-blue-50 text-navy-800 rounded border border-blue-200">{item}</span>
+                      <span className="flex-1 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-navy-800 dark:text-blue-200 rounded border border-blue-200 dark:border-blue-800">{item}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('highlights', index)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -693,8 +689,7 @@ export default function EditExperiencePage() {
                         onChange={(e) => setNewHighlight(e.target.value)}
                         onFocus={() => setShowHighlightsDropdown(true)}
                         placeholder="Type or select from presets..."
-                        className="flex-1 px-4 py-3 border-2 border-navy-300 rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
-                        style={{ borderColor: '#93c5fd' }}
+                        className="flex-1 px-4 py-3 border-2 border-blue-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
                       />
                       <button
                         type="button"
@@ -725,7 +720,7 @@ export default function EditExperiencePage() {
                               setNewHighlight('')
                               setShowHighlightsDropdown(false)
                             }}
-                            className="w-full text-left px-4 py-3 hover:bg-navy-50 transition-colors border-b border-slate-100"
+                            className="w-full text-left px-4 py-3 hover:bg-navy-50 dark:hover:bg-gray-800 transition-colors border-b border-slate-100 dark:border-gray-700 dark:text-gray-200"
                           >
                             {preset}
                           </button>
@@ -738,13 +733,13 @@ export default function EditExperiencePage() {
 
               {/* Requirements */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Requirements
                 </label>
                 <div className="space-y-2">
                   {formData.requirements.map((requirement, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <span className="flex-1 px-3 py-2 bg-gray-50 rounded">{requirement}</span>
+                      <span className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-200 rounded">{requirement}</span>
                       <button
                         type="button"
                         onClick={() => removeFromArray('requirements', index)}
@@ -760,7 +755,7 @@ export default function EditExperiencePage() {
                       value={newRequirement}
                       onChange={(e) => setNewRequirement(e.target.value)}
                       placeholder="Add requirement..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
@@ -778,7 +773,7 @@ export default function EditExperiencePage() {
 
               {/* Meeting Point */}
               <div>
-                <label htmlFor="meeting_point" className="block text-sm font-semibold text-navy-900 mb-3" style={{ color: '#1e3a8a' }}>
+                <label htmlFor="meeting_point" className="block text-sm font-semibold text-navy-900 dark:text-white mb-3">
                   Meeting Point
                 </label>
                 <div className="relative">
@@ -789,8 +784,7 @@ export default function EditExperiencePage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, meeting_point: e.target.value }))}
                     onFocus={() => setShowMeetingPointDropdown(true)}
                     placeholder="Type or select from presets..."
-                    className="w-full px-4 py-3 border-2 border-navy-300 rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
-                    style={{ borderColor: '#93c5fd' }}
+                    className="w-full px-4 py-3 border-2 border-blue-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:outline-none focus:ring-2 focus:ring-navy-500"
                   />
                   {showMeetingPointDropdown && (
                     <div className="absolute z-10 w-full mt-1 bg-white dark:bg-luxury-charcoal border-2 border-navy-200 dark:border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
@@ -804,7 +798,7 @@ export default function EditExperiencePage() {
                             setFormData(prev => ({ ...prev, meeting_point: preset }))
                             setShowMeetingPointDropdown(false)
                           }}
-                          className="w-full text-left px-4 py-3 hover:bg-navy-50 transition-colors border-b border-slate-100"
+                          className="w-full text-left px-4 py-3 hover:bg-navy-50 dark:hover:bg-gray-800 transition-colors border-b border-slate-100 dark:border-gray-700 dark:text-gray-200"
                         >
                           {preset}
                         </button>
@@ -814,20 +808,20 @@ export default function EditExperiencePage() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded">
+              <div className="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-gray-800 rounded">
                 <input
                   type="checkbox"
                   id="is_active"
                   checked={formData.is_active}
                   onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-                  className="w-5 h-5 text-navy-600 focus:ring-navy-500 border-gray-300 rounded"
+                  className="w-5 h-5 text-navy-600 focus:ring-navy-500 border-gray-300 dark:border-gray-600 rounded"
                 />
-                <label htmlFor="is_active" className="text-sm font-semibold text-navy-900" style={{ color: '#1e3a8a' }}>
+                <label htmlFor="is_active" className="text-sm font-semibold text-navy-900 dark:text-gray-200">
                   Active (visible to users)
                 </label>
               </div>
 
-              <div className="flex space-x-4 pt-4 border-t-2 border-slate-200">
+              <div className="flex space-x-4 pt-4 border-t-2 border-slate-200 dark:border-gray-700">
                 <button
                   type="submit"
                   disabled={saving}
@@ -843,7 +837,7 @@ export default function EditExperiencePage() {
           {/* Images Section */}
           <div className="bg-white dark:bg-luxury-charcoal rounded shadow-lg border border-slate-200 dark:border-gray-800 p-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-navy-900" style={{ color: '#1e3a8a' }}>Experience Gallery</h2>
+              <h2 className="text-2xl font-bold text-navy-900 dark:text-white">Experience Gallery</h2>
               <button
                 onClick={() => setShowImageUpload(true)}
                 className="bg-navy-600 text-white px-5 py-3 rounded hover:bg-navy-700 flex items-center space-x-2 shadow-sm transition-colors"

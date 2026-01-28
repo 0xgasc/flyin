@@ -270,7 +270,7 @@ export default function BookTransportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
       <MobileNav 
         title={t('services.transport.cta')}
         showBackButton={true}
@@ -295,7 +295,7 @@ export default function BookTransportPage() {
       />
 
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-3xl">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">{t('booking.title.transport')}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">{t('booking.title.transport')}</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
@@ -312,7 +312,7 @@ export default function BookTransportPage() {
               </h2>
               
               {/* Selection Mode Toggle */}
-              <div className="flex items-center space-x-2 bg-gray-100 rounded p-1">
+              <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded p-1">
                 <button
                   type="button"
                   onClick={() => setSelectionMode('dropdown')}
@@ -343,13 +343,13 @@ export default function BookTransportPage() {
             {selectionMode === 'dropdown' ? (
               <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t('booking.form.from')}
                 </label>
                 <select
                   value={formData.fromLocation}
                   onChange={(e) => setFormData({ ...formData, fromLocation: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                   required
                 >
                   <option value="">Select departure</option>
@@ -375,7 +375,7 @@ export default function BookTransportPage() {
                     type="text"
                     value={formData.fromCustom}
                     onChange={(e) => setFormData({ ...formData, fromCustom: e.target.value })}
-                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                    className="w-full mt-2 px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter departure location"
                     required
                   />
@@ -383,13 +383,13 @@ export default function BookTransportPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t('booking.form.to')}
                 </label>
                 <select
                   value={formData.toLocation}
                   onChange={(e) => setFormData({ ...formData, toLocation: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                   required
                 >
                   <option value="">Select destination</option>
@@ -415,7 +415,7 @@ export default function BookTransportPage() {
                     type="text"
                     value={formData.toCustom}
                     onChange={(e) => setFormData({ ...formData, toCustom: e.target.value })}
-                    className="w-full mt-2 px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                    className="w-full mt-2 px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter destination"
                     required
                   />
@@ -472,7 +472,7 @@ export default function BookTransportPage() {
             {/* Trip Type Toggle */}
             <div className="bg-gray-50 rounded p-4">
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-700">{t('booking.form.trip_type')}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('booking.form.trip_type')}</span>
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -503,7 +503,7 @@ export default function BookTransportPage() {
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {t('booking.form.departure_date')}
                   </label>
                   <input
@@ -511,20 +511,20 @@ export default function BookTransportPage() {
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     min={format(new Date(), 'yyyy-MM-dd')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {t('booking.form.departure_time')}
                   </label>
                   <input
                     type="time"
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -537,7 +537,7 @@ export default function BookTransportPage() {
                 <h3 className="text-lg font-medium mb-3 text-gray-800">Return</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t('booking.form.return_date')}
                     </label>
                     <input
@@ -545,7 +545,7 @@ export default function BookTransportPage() {
                       value={formData.returnDate}
                       onChange={(e) => setFormData({ ...formData, returnDate: e.target.value })}
                       min={formData.date || format(new Date(), 'yyyy-MM-dd')}
-                      className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                       required
                     />
                     
@@ -575,14 +575,14 @@ export default function BookTransportPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t('booking.form.return_time')}
                     </label>
                     <input
                       type="time"
                       value={formData.returnTime}
                       onChange={(e) => setFormData({ ...formData, returnTime: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                       required
                     />
                   </div>
@@ -607,13 +607,13 @@ export default function BookTransportPage() {
             </h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('booking.form.num_passengers')}
               </label>
               <select
                 value={formData.passengers}
                 onChange={(e) => setFormData({ ...formData, passengers: parseInt(e.target.value) })}
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
               >
                 {[1, 2, 3, 4, 5, 6].map((num) => (
                   <option key={num} value={num}>
@@ -624,14 +624,14 @@ export default function BookTransportPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('booking.form.notes')}
               </label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                 placeholder={t('booking.form.special_requirements')}
               />
             </div>
