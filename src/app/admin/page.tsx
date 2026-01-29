@@ -958,17 +958,17 @@ const SortableExperienceRow = ({ experience, onDelete, onToggleActive, onImageUp
           </div>
           <div>
             <div className="text-sm font-medium text-gray-900 dark:text-white">{experience.name}</div>
-            <div className="text-sm text-gray-500 max-w-xs truncate">{experience.description}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{experience.description}</div>
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
         {experience.location}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
         {experience.duration_hours}h {experience.duration_minutes ? `${experience.duration_minutes}m` : ''}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
         ${experience.base_price}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
@@ -1262,13 +1262,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <tbody className="bg-white dark:bg-luxury-charcoal divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                       Loading experiences...
                     </td>
                   </tr>
                 ) : experiences.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                       No experiences found
                     </td>
                   </tr>
@@ -1374,7 +1374,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             </div>
             <div>
               <div className="text-sm font-medium text-gray-900 dark:text-white">{destination.name}</div>
-              <div className="text-sm text-gray-500 max-w-md truncate">{destination.description}</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400 max-w-md truncate">{destination.description}</div>
             </div>
           </div>
         </td>
@@ -1679,13 +1679,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <tbody className="bg-white dark:bg-luxury-charcoal divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                       Loading destinations...
                     </td>
                   </tr>
                 ) : destinations.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                       No destinations found
                     </td>
                   </tr>
@@ -1884,7 +1884,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
                         {/* Admin Controls - Always visible */}
                         <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2 space-y-2">
-                          <p className="text-xs text-gray-500 font-medium">Admin Actions:</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Admin Actions:</p>
 
                           {/* Edit Button */}
                           <button
@@ -1968,10 +1968,10 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <div key={helicopter.id} className="card-luxury">
                     <div className="flex items-center justify-between mb-3">
                       <div className={`w-4 h-4 rounded-full ${colors[index]}`}></div>
-                      <span className="text-xs text-gray-500">{helicopter.capacity} pax</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{helicopter.capacity} pax</span>
                     </div>
                     <h3 className="font-bold text-sm mb-1">{helicopter.name}</h3>
-                    <p className="text-xs text-gray-600 mb-3">${helicopter.hourly_rate}/hr</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">${helicopter.hourly_rate}/hr</p>
                     
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs">
@@ -1982,7 +1982,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       </div>
                       <div className="flex justify-between text-xs">
                         <span>This Week:</span>
-                        <span className="text-gray-600">{helicopterBookings.length} total</span>
+                        <span className="text-gray-600 dark:text-gray-400">{helicopterBookings.length} total</span>
                       </div>
                     </div>
                   </div>
@@ -2014,12 +2014,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               {/* Calendar Header */}
               <div className="grid grid-cols-8 gap-1 mb-2">
-                <div className="p-2 text-xs font-medium text-gray-600">Aircraft</div>
+                <div className="p-2 text-xs font-medium text-gray-600 dark:text-gray-400">Aircraft</div>
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
                   const dayDate = new Date()
                   dayDate.setDate(dayDate.getDate() + (currentWeekOffset * 7) + index)
                   return (
-                    <div key={day} className="p-2 text-xs font-medium text-gray-600 text-center border-l">
+                    <div key={day} className="p-2 text-xs font-medium text-gray-600 dark:text-gray-400 text-center border-l">
                       {day}<br/>
                       <span className="text-gray-400">{format(dayDate, 'dd')}</span>
                     </div>
@@ -2036,7 +2036,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <div key={helicopter.id} className={`grid grid-cols-8 gap-1 border-t ${bgColors[index]} border-l-4 ${colors[index]}`}>
                     <div className="p-3">
                       <div className="font-medium text-sm">{helicopter.name}</div>
-                      <div className="text-xs text-gray-600">{helicopter.model}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{helicopter.model}</div>
                     </div>
                     
                     {Array.from({ length: 7 }, (_, dayIndex) => {
@@ -2104,7 +2104,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <h3 className="font-semibold mb-2 text-sm">Conflicts to Resolve</h3>
                 <div className="text-2xl font-bold text-red-600">0</div>
-                <p className="text-xs text-gray-600">No scheduling conflicts detected</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">No scheduling conflicts detected</p>
               </div>
               
               <div className="card-luxury">
@@ -2287,8 +2287,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             ) : transactions.length === 0 ? (
               <div className="card-luxury text-center py-12">
                 <DollarSign className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">No transactions found</h3>
-                <p className="text-gray-500">Top-up requests will appear here for approval</p>
+                <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No transactions found</h3>
+                <p className="text-gray-500 dark:text-gray-400">Top-up requests will appear here for approval</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -2314,7 +2314,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                           )}
                         </div>
                         
-                        <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600 mb-4">
+                        <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
                           <div>
                             <p><span className="font-medium">Client:</span> {transaction.user?.full_name}</p>
                             <p><span className="font-medium">{t('form.email')}:</span> {transaction.user?.email}</p>
@@ -2354,7 +2354,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                                 className="w-24 h-32 object-cover rounded-none border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80"
                                 onClick={() => setSelectedTransaction(transaction)}
                               />
-                              <div className="flex-1 text-xs text-gray-600">
+                              <div className="flex-1 text-xs text-gray-600 dark:text-gray-400">
                                 <p className="mb-1">📄 Payment verification document</p>
                                 <p className="mb-1">Uploaded with transaction</p>
                                 <p>🔍 Click to enlarge and verify details</p>
@@ -2437,7 +2437,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         <AlertCircle className="h-5 w-5 text-yellow-600" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">{pilot.email}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{pilot.email}</p>
                     <div className="space-y-2">
                       <button
                         onClick={() => openEditUserModal(pilot)}
@@ -2479,7 +2479,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">Total Aircraft</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Total Aircraft</p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{helicopters.length}</p>
                   </div>
                   <Plane className="h-8 w-8 text-primary-600" />
@@ -2488,7 +2488,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">Active Fleet</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Active Fleet</p>
                     <p className="text-3xl font-bold text-green-600">
                       {helicopters.filter(h => h.status === 'active').length}
                     </p>
@@ -2499,7 +2499,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">In Maintenance</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">In Maintenance</p>
                     <p className="text-3xl font-bold text-yellow-600">
                       {helicopters.filter(h => h.status === 'maintenance').length}
                     </p>
@@ -2510,7 +2510,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">Avg. Rate</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Avg. Rate</p>
                     <p className="text-3xl font-bold text-primary-600">
                       ${helicopters.length > 0 ? Math.round(helicopters.reduce((sum, h) => sum + h.hourly_rate, 0) / helicopters.length) : 0}
                     </p>
@@ -2543,7 +2543,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         <td className="py-3 px-4">
                           <div>
                             <div className="font-medium">{helicopter.name}</div>
-                            <div className="text-sm text-gray-500">{helicopter.model}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{helicopter.model}</div>
                           </div>
                         </td>
                         <td className="py-3 px-4 font-mono text-sm">{helicopter.registration_number}</td>
@@ -2612,7 +2612,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       <tr key={record.id} className="border-b border-gray-100 dark:border-gray-700 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td className="py-3 px-4">
                           <div className="font-medium">{record.helicopter?.name}</div>
-                          <div className="text-sm text-gray-500">{record.helicopter?.registration_number}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{record.helicopter?.registration_number}</div>
                         </td>
                         <td className="py-3 px-4">
                           <span className="capitalize">{record.maintenance_type}</span>
@@ -2636,7 +2636,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     ))}
                     {maintenanceRecords.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-gray-500">
+                        <td colSpan={6} className="py-8 text-center text-gray-500 dark:text-gray-400">
                           No maintenance records found
                         </td>
                       </tr>
@@ -2722,8 +2722,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <p className="text-sm text-green-600 mt-1">Revenue minus operational costs</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-gray-600">Revenue: ${financialSummary?.total_business_revenue?.toFixed(2) || '0.00'}</p>
-                  <p className="text-xs text-gray-600">Costs: ${financialSummary?.total_operational_costs?.toFixed(2) || '0.00'}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Revenue: ${financialSummary?.total_business_revenue?.toFixed(2) || '0.00'}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Costs: ${financialSummary?.total_operational_costs?.toFixed(2) || '0.00'}</p>
                 </div>
               </div>
             </div>
@@ -2733,7 +2733,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">Total Users</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Total Users</p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{users.length}</p>
                   </div>
                   <Users className="h-8 w-8 text-primary-600" />
@@ -2742,7 +2742,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">Total Bookings</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Total Bookings</p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{bookings.length}</p>
                   </div>
                   <Calendar className="h-8 w-8 text-primary-600" />
@@ -2751,7 +2751,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">Completed Flights</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Completed Flights</p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">
                       {bookings.filter(b => b.status === 'completed').length}
                     </p>
@@ -2762,7 +2762,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm">Active Pilots</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Active Pilots</p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">
                       {pilots.filter(p => p.kyc_verified).length}
                     </p>
@@ -2779,22 +2779,22 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <h3 className="text-lg font-semibold mb-4 text-green-800">Recent Business Revenue</h3>
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {businessRevenue.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No revenue records yet</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">No revenue records yet</p>
                   ) : (
                     businessRevenue.slice(0, 10).map((revenue) => (
                       <div key={revenue.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                         <div className="flex-1">
                           <p className="text-sm font-medium">{(revenue.revenue_type || 'revenue').replace('_', ' ').toUpperCase()}</p>
-                          <p className="text-xs text-gray-600">
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
                             {revenue.booking?.from_location} → {revenue.booking?.to_location}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(revenue.created_at).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-semibold text-green-600">+${revenue.amount}</p>
-                          <p className="text-xs text-gray-500">{revenue.status}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{revenue.status}</p>
                         </div>
                       </div>
                     ))
@@ -2807,20 +2807,20 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <h3 className="text-lg font-semibold mb-4 text-red-800">Recent Operational Costs</h3>
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {operationalCosts.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No cost records yet</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">No cost records yet</p>
                   ) : (
                     operationalCosts.slice(0, 10).map((cost) => (
                       <div key={cost.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                         <div className="flex-1">
                           <p className="text-sm font-medium">{(cost.cost_type || 'cost').replace('_', ' ').toUpperCase()}</p>
-                          <p className="text-xs text-gray-600">By: {cost.pilot?.full_name || 'System'}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-600 dark:text-gray-400">By: {cost.pilot?.full_name || 'System'}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(cost.created_at).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-semibold text-red-600">-${cost.amount}</p>
-                          <p className="text-xs text-gray-500">{cost.status}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{cost.status}</p>
                         </div>
                       </div>
                     ))
@@ -2835,15 +2835,15 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <span className="text-sm">New booking from John Doe</span>
-                    <span className="text-xs text-gray-500">2 hours ago</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">2 hours ago</span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <span className="text-sm">Payment approved for Ana Rodriguez</span>
-                    <span className="text-xs text-gray-500">5 hours ago</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">5 hours ago</span>
                   </div>
                   <div className="flex items-center justify-between py-2">
                     <span className="text-sm">New pilot registered: Miguel Santos</span>
-                    <span className="text-xs text-gray-500">1 day ago</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">1 day ago</span>
                   </div>
                 </div>
               </div>
@@ -2971,7 +2971,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       <div className="flex justify-between items-start">
                         <div>
                           <h5 className="font-medium">{helicopter.name}</h5>
-                          <p className="text-xs text-gray-600">{helicopter.capacity} passengers</p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">{helicopter.capacity} passengers</p>
                         </div>
                         <span className="text-sm font-medium text-green-600">
                           ${helicopter.hourly_rate}/hr
@@ -3002,7 +3002,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       <div className="flex justify-between items-center">
                         <div>
                           <h5 className="font-medium">{pilot.full_name || 'Unnamed Pilot'}</h5>
-                          <p className="text-xs text-gray-600">{pilot.email}</p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">{pilot.email}</p>
                         </div>
                         {pilot.kyc_verified && (
                           <CheckCircle className="h-4 w-4 text-green-500" />
@@ -3126,7 +3126,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <option value="pilot">{t('form.pilot')}</option>
                   <option value="admin">{t('form.admin')}</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {newUserData.role === 'client' && 'Can book flights and manage profile'}
                   {newUserData.role === 'pilot' && 'Can access pilot dashboard and manage flights'}
                   {newUserData.role === 'admin' && 'Full access to admin panel and all features'}
@@ -3183,7 +3183,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </h3>
               <button
                 onClick={() => setSelectedTransaction(null)}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
+                className="text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl"
               >
                 ×
               </button>
@@ -3295,7 +3295,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   setShowEditUserModal(false)
                   setSelectedUser(null)
                 }}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
+                className="text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl"
               >
                 ×
               </button>
@@ -3384,7 +3384,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     onChange={(e) => setEditUserData({ ...editUserData, account_balance: parseFloat(e.target.value) || 0 })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Manually adjust user balance</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Manually adjust user balance</p>
                 </div>
                 
                 <div>
@@ -3476,7 +3476,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   setShowEditBookingModal(false)
                   setSelectedBookingForEdit(null)
                 }}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
+                className="text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl"
               >
                 ×
               </button>
