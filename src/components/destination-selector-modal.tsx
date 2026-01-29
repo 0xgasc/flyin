@@ -31,7 +31,7 @@ export default function DestinationSelectorModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center p-0 md:p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center p-0 md:p-4 z-[200]">
       <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none md:rounded-none shadow-xl w-full md:max-w-md max-h-[90vh] md:max-h-[80vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4">

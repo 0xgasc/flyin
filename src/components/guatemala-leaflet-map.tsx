@@ -133,11 +133,9 @@ export default function GuatemalaLeafletMap({
         ? '<p style="color: #22c55e; font-size: 11px; margin-top: 8px; font-weight: 500;">✓ Selected as Origin</p>'
         : isTo
         ? '<p style="color: #ef4444; font-size: 11px; margin-top: 8px; font-weight: 500;">✓ Selected as Destination</p>'
-        : '<p style="color: #9ca3af; font-size: 11px; margin-top: 8px;">Click to select</p>'
+        : ''
 
-      const marker = L!.marker([dept.lat, dept.lng], { icon })
-        .addTo(mapInstanceRef.current!)
-        .bindPopup(`
+      const popupContent = `
           <div class="location-preview-card" style="min-width: 200px; max-width: 260px;">
             <div style="padding: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: start;">
@@ -152,12 +150,20 @@ export default function GuatemalaLeafletMap({
               </p>
               ${airportInfo}
               ${experiencesTags}
-              <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #374151;">
-                ${statusText}
-              </div>
+              ${statusText ? `<div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #374151;">${statusText}</div>` : ''}
             </div>
           </div>
-        `, { className: 'location-preview-popup', maxWidth: 280 })
+        `
+
+      const marker = L!.marker([dept.lat, dept.lng], { icon })
+        .addTo(mapInstanceRef.current!)
+        .bindPopup(popupContent, { className: 'location-preview-popup', maxWidth: 280 })
+        .on('mouseover', function(this: any) {
+          this.openPopup()
+        })
+        .on('mouseout', function(this: any) {
+          this.closePopup()
+        })
         .on('click', () => {
           if (onDepartmentClick) {
             onDepartmentClick(dept)
