@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { login } from '@/lib/auth-client'
+import { useTranslation } from '@/lib/i18n'
 import { Mail, Lock } from 'lucide-react'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
@@ -22,6 +23,7 @@ const getSafeRedirect = (redirect: string | null): string => {
 function LoginContent() {
   const searchParams = useSearchParams()
   const redirect = getSafeRedirect(searchParams.get('redirect'))
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -81,8 +83,8 @@ function LoginContent() {
               priority
             />
           </Link>
-          <h1 className="text-2xl font-display font-semibold text-white">Welcome Back</h1>
-          <p className="text-gray-400 mt-2">Sign in to your account</p>
+          <h1 className="text-2xl font-display font-semibold text-white">{t('auth.welcome_back')}</h1>
+          <p className="text-gray-400 mt-2">{t('auth.sign_in_subtitle')}</p>
         </div>
 
         <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6 shadow-luxury">
@@ -95,7 +97,7 @@ function LoginContent() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
+                {t('auth.email')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
@@ -114,7 +116,7 @@ function LoginContent() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
+                {t('auth.password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
@@ -136,15 +138,15 @@ function LoginContent() {
               disabled={loading}
               className="w-full bg-gold-500 text-luxury-black font-semibold py-3 rounded-soft hover:bg-gold-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? t('auth.signing_in') : t('auth.sign_in')}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-400">
-              Don't have an account?{' '}
+              {t('auth.no_account')}{' '}
               <Link href="/register" className="text-gold-400 hover:text-gold-300 font-medium">
-                Sign up
+                {t('auth.sign_up')}
               </Link>
             </p>
           </div>

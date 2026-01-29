@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { register } from '@/lib/auth-client'
+import { useTranslation } from '@/lib/i18n'
 import { Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
@@ -26,6 +27,7 @@ const validatePassword = (password: string) => {
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -110,8 +112,8 @@ export default function RegisterPage() {
               priority
             />
           </Link>
-          <h1 className="text-2xl font-semibold text-white">Create Account</h1>
-          <p className="text-gray-400 mt-2">Join FlyInGuate today</p>
+          <h1 className="text-2xl font-semibold text-white">{t('auth.create_account')}</h1>
+          <p className="text-gray-400 mt-2">{t('auth.join_today')}</p>
         </div>
 
         <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6 shadow-luxury">
@@ -124,7 +126,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Account Type
+                {t('auth.account_type')}
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <button
@@ -136,8 +138,8 @@ export default function RegisterPage() {
                       : 'border-gray-700 hover:border-gray-600'
                   }`}
                 >
-                  <div className="font-medium text-white">Client</div>
-                  <div className="text-sm text-gray-400">Book flights</div>
+                  <div className="font-medium text-white">{t('auth.client')}</div>
+                  <div className="text-sm text-gray-400">{t('auth.book_flights')}</div>
                 </button>
                 <button
                   type="button"
@@ -148,15 +150,15 @@ export default function RegisterPage() {
                       : 'border-gray-700 hover:border-gray-600'
                   }`}
                 >
-                  <div className="font-medium text-white">Pilot</div>
-                  <div className="text-sm text-gray-400">Provide services</div>
+                  <div className="font-medium text-white">{t('auth.pilot')}</div>
+                  <div className="text-sm text-gray-400">{t('auth.provide_services')}</div>
                 </button>
               </div>
             </div>
 
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2">
-                Full Name
+                {t('auth.full_name')}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
@@ -174,7 +176,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
+                {t('auth.email')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
@@ -192,7 +194,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
-                Phone Number
+                {t('auth.phone')}
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
@@ -209,7 +211,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
+                {t('auth.password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
@@ -263,15 +265,15 @@ export default function RegisterPage() {
               disabled={loading || !passwordValidation.isValid || !formData.email || !formData.fullName}
               className="w-full bg-gold-500 text-luxury-black font-semibold py-3 rounded-soft hover:bg-gold-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading ? t('auth.creating_account') : t('auth.create_account')}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-400">
-              Already have an account?{' '}
+              {t('auth.have_account')}{' '}
               <Link href="/login" className="text-gold-400 hover:text-gold-300 font-medium">
-                Sign in
+                {t('auth.sign_in')}
               </Link>
             </p>
           </div>

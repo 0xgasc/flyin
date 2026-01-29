@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
-import { logout } from '@/lib/auth-client'
+import { useTranslation } from '@/lib/i18n'
+import { MobileNav } from '@/components/mobile-nav'
 import { Calendar, MapPin, Clock, Users, CheckCircle, AlertCircle, DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -33,8 +32,9 @@ interface Booking {
 }
 
 export default function PilotDashboard() {
-  const router = useRouter()
+
   const { profile } = useAuthStore()
+  const { t } = useTranslation()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [filter, setFilter] = useState<'active' | 'completed' | 'all'>('active')
   const [loading, setLoading] = useState(true)
@@ -168,45 +168,12 @@ export default function PilotDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-luxury-black text-white p-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="hover:opacity-80 transition-opacity">
-            <span className="text-2xl font-bold">FlyInGuate - Pilot Portal</span>
-          </Link>
-          <div className="flex items-center space-x-6">
-            <div className="text-sm">
-              {profile?.kycVerified ? (
-                <span className="flex items-center text-green-400">
-                  <CheckCircle className="h-4 w-4 mr-1" />
-                  Verified Pilot
-                </span>
-              ) : (
-                <span className="flex items-center text-yellow-400">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  Pending Verification
-                </span>
-              )}
-            </div>
-            <div className="text-sm">
-              {profile?.fullName || profile?.email}
-            </div>
-            <button
-              onClick={async () => {
-                await logout()
-                router.push('/')
-              }}
-              className="text-sm hover:text-luxury-gold"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
+      <MobileNav />
 
       <div className="container mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Assignments</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('pilot.my_assignments')}</h1>
           <div className="flex space-x-2">
             <button
               onClick={() => setFilter('active')}
@@ -216,7 +183,7 @@ export default function PilotDashboard() {
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
               }`}
             >
-              Active Missions
+              {t('pilot.active_missions')}
             </button>
             <button
               onClick={() => setFilter('completed')}
@@ -226,7 +193,7 @@ export default function PilotDashboard() {
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
               }`}
             >
-              Completed
+              {t('pilot.completed')}
             </button>
             <button
               onClick={() => setFilter('all')}
@@ -236,7 +203,7 @@ export default function PilotDashboard() {
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
               }`}
             >
-              All
+              {t('pilot.all')}
             </button>
           </div>
         </div>
@@ -246,9 +213,9 @@ export default function PilotDashboard() {
             <div className="flex items-center">
               <AlertCircle className="h-6 w-6 text-yellow-600 mr-3" />
               <div>
-                <h3 className="font-semibold text-yellow-900">Verification Required</h3>
+                <h3 className="font-semibold text-yellow-900">{t('pilot.verification_required')}</h3>
                 <p className="text-yellow-700">
-                  Please complete in-person KYC verification to start receiving flight assignments.
+                  {t('pilot.verification_desc')}
                 </p>
               </div>
             </div>
@@ -262,8 +229,8 @@ export default function PilotDashboard() {
         ) : bookings.length === 0 ? (
           <div className="card-luxury text-center py-12">
             <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No assignments</h3>
-            <p className="text-gray-500">You'll see flight assignments here once they're assigned to you</p>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('pilot.no_assignments')}</h3>
+            <p className="text-gray-500">{t('pilot.no_assignments_desc')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -281,7 +248,7 @@ export default function PilotDashboard() {
                       </h3>
                     </div>
                     <p className="text-gray-600 mt-1">
-                      Client: {booking.profiles.full_name} ({booking.profiles.email})
+                      {t('pilot.client')}: {booking.profiles.full_name} ({booking.profiles.email})
                     </p>
                   </div>
                   <span className="text-2xl font-bold text-primary-900">
@@ -308,7 +275,7 @@ export default function PilotDashboard() {
                   <div className="space-y-2">
                     {booking.profiles.phone && (
                       <div className="text-sm text-gray-600">
-                        Phone: {booking.profiles.phone}
+                        {t('pilot.phone')}: {booking.profiles.phone}
                       </div>
                     )}
                     {booking.experiences && (
@@ -323,7 +290,7 @@ export default function PilotDashboard() {
                 {booking.notes && (
                   <div className="bg-gray-50 p-3 rounded mb-4">
                     <p className="text-sm text-gray-700">
-                      <span className="font-medium">Notes:</span> {booking.notes}
+                      <span className="font-medium">{t('pilot.notes')}:</span> {booking.notes}
                     </p>
                   </div>
                 )}
@@ -333,7 +300,7 @@ export default function PilotDashboard() {
                     onClick={() => acceptMission(booking.id)}
                     className="btn-primary text-sm"
                   >
-                    Accept Mission
+                    {t('pilot.accept_mission')}
                   </button>
                 )}
                 {booking.status === 'accepted' && (
@@ -341,7 +308,7 @@ export default function PilotDashboard() {
                     onClick={() => markAsCompleted(booking.id)}
                     className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition-colors text-sm"
                   >
-                    Mark as Completed
+                    {t('pilot.mark_completed')}
                   </button>
                 )}
               </div>

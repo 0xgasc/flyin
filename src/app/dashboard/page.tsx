@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
-import { LanguageSwitcher } from '@/components/language-switcher'
-import { logout, getAuthHeaders } from '@/lib/auth-client'
+import { MobileNav } from '@/components/mobile-nav'
+import { getAuthHeaders } from '@/lib/auth-client'
 import { useToast } from '@/lib/toast-store'
 import {
   Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
@@ -379,36 +379,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-luxury-black">
-      <nav className="bg-luxury-black text-white p-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="hover:opacity-80 transition-opacity">
-            <span className="text-2xl font-bold">FlyInGuate</span>
-          </Link>
-          <div className="flex items-center space-x-6">
-            <div className="text-sm">
-              Balance: <span className="font-bold text-gold-400">${profile?.accountBalance?.toFixed(2) || '0.00'}</span>
-            </div>
-            <LanguageSwitcher />
-            {profile?.role === 'admin' && (
-              <Link href="/admin" className="text-sm hover:text-gold-400 transition-colors">
-                Admin Panel
-              </Link>
-            )}
-            <Link href="/dashboard" className="text-sm hover:text-gold-400 transition-colors">
-              {profile?.fullName || profile?.email}
-            </Link>
-            <button
-              onClick={async () => {
-                await logout()
-                window.location.href = '/'
-              }}
-              className="text-sm hover:text-gold-400"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </nav>
+      <MobileNav />
 
       <div className="container mx-auto px-6 py-8">
         {/* Tab Navigation */}

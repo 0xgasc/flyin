@@ -11,6 +11,7 @@ interface GuatemalaMapLibreProps {
   selectedFrom?: string
   selectedTo?: string
   mode?: 'from' | 'to' | 'both'
+  compact?: boolean
 }
 
 // Check if WebGL is supported
@@ -171,12 +172,20 @@ const destinations: Destination[] = [
     description: 'Important pilgrimage site home to the Black Christ. Draws millions of visitors annually.',
     highlights: ['Pilgrimage Site', 'Black Christ', 'Religious Tourism']
   },
+  {
+    name: 'El Paredon',
+    coordinates: [-91.1833, 13.9167],
+    dept: 'Escuintla',
+    description: 'Pacific coast surf town with consistent waves and sea turtle conservation. Guatemala\'s top surf destination.',
+    highlights: ['Surf Breaks', 'Sea Turtles', 'Beach Vibes']
+  },
 ]
 
 export default function GuatemalaMapLibre({
   onDepartmentClick,
   selectedFrom,
   selectedTo,
+  compact = false,
 }: GuatemalaMapLibreProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
@@ -423,15 +432,17 @@ export default function GuatemalaMapLibre({
         {/* Map Container */}
         <div
           ref={mapContainer}
-          className="w-full h-96 sm:h-[500px] rounded"
+          className={`w-full rounded ${compact ? 'h-64 sm:h-72' : 'h-96 sm:h-[500px]'}`}
           style={{ overflow: 'hidden' }}
         />
 
-        {/* Branding overlay */}
-        <div className="absolute top-4 left-4 bg-luxury-black/90 backdrop-blur-sm rounded px-3 py-2 shadow-lg z-10 border border-brand-accent/30">
-          <h3 className="font-bold text-brand-accent text-sm">FlyIn Guatemala</h3>
-          <p className="text-xs text-gray-400">Interactive Map</p>
-        </div>
+        {/* Branding overlay - hidden in compact mode */}
+        {!compact && (
+          <div className="absolute top-4 left-4 bg-luxury-black/90 backdrop-blur-sm rounded px-3 py-2 shadow-lg z-10 border border-brand-accent/30">
+            <h3 className="font-bold text-brand-accent text-sm">FlyIn Guatemala</h3>
+            <p className="text-xs text-gray-400">Interactive Map</p>
+          </div>
+        )}
       </div>
 
       {/* React-rendered tooltip - outside map container to avoid clipping */}
@@ -465,44 +476,48 @@ export default function GuatemalaMapLibre({
         </div>
       )}
 
-      {/* Legend */}
-      <div className="mt-6 flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
-        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
-          <div className="w-4 h-4 bg-red-600 rounded-full shadow-lg flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
+      {/* Legend - hidden in compact mode */}
+      {!compact && (
+        <div className="mt-6 flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
+          <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
+            <div className="w-4 h-4 bg-red-600 rounded-full shadow-lg flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full"></div>
+            </div>
+            <span className="text-gray-300">Guatemala City Hub</span>
           </div>
-          <span className="text-gray-300">Guatemala City Hub</span>
-        </div>
-        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
-          <div className="w-4 h-4 bg-blue-600 rounded-full shadow-lg flex items-center justify-center">
-            <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
+            <div className="w-4 h-4 bg-blue-600 rounded-full shadow-lg flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+            </div>
+            <span className="text-gray-300">Destinations</span>
           </div>
-          <span className="text-gray-300">Destinations</span>
-        </div>
-        <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
-          <div className="w-4 h-4 bg-emerald-500 rounded-full shadow-lg flex items-center justify-center">
-            <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+          <div className="flex items-center gap-2 bg-luxury-black/50 px-3 py-2 rounded border border-luxury-slate/30">
+            <div className="w-4 h-4 bg-emerald-500 rounded-full shadow-lg flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+            </div>
+            <span className="text-gray-300">Selected</span>
           </div>
-          <span className="text-gray-300">Selected</span>
         </div>
-      </div>
+      )}
 
-      {/* Selection Status */}
-      <div className="mt-6 text-center bg-luxury-black/30 rounded p-4 backdrop-blur-sm border border-luxury-slate/30">
-        {selectedFrom && (
-          <p className="text-sm text-gray-300 mb-1">
-            From: <span className="font-semibold text-brand-accent">{selectedFrom}</span>
-          </p>
-        )}
-        {selectedTo && (
-          <p className="text-sm text-gray-300">
-            To: <span className="font-semibold text-amber-400">{selectedTo}</span>
-          </p>
-        )}
-        {!selectedFrom && !selectedTo && (
-          <p className="text-sm text-gray-400">Click destinations to select your route</p>
-        )}
-      </div>
+      {/* Selection Status - hidden in compact mode */}
+      {!compact && (
+        <div className="mt-6 text-center bg-luxury-black/30 rounded p-4 backdrop-blur-sm border border-luxury-slate/30">
+          {selectedFrom && (
+            <p className="text-sm text-gray-300 mb-1">
+              From: <span className="font-semibold text-brand-accent">{selectedFrom}</span>
+            </p>
+          )}
+          {selectedTo && (
+            <p className="text-sm text-gray-300">
+              To: <span className="font-semibold text-amber-400">{selectedTo}</span>
+            </p>
+          )}
+          {!selectedFrom && !selectedTo && (
+            <p className="text-sm text-gray-400">Click destinations to select your route</p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

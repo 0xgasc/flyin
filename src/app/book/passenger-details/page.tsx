@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useToast } from '@/lib/toast-store'
 import { Users, Plus, Trash2, ShoppingCart, DollarSign } from 'lucide-react'
+import { MobileNav } from '@/components/mobile-nav'
+import { useTranslation } from '@/lib/i18n'
 
 interface PassengerDetails {
   name: string
@@ -36,6 +38,7 @@ function PassengerDetailsContent() {
   const searchParams = useSearchParams()
   const { profile, user } = useAuthStore()
   const toast = useToast()
+  const { t } = useTranslation()
 
   // Get booking ID from URL params
   const bookingId = searchParams.get('booking_id')
@@ -290,20 +293,11 @@ function PassengerDetailsContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
-      <nav className="bg-luxury-black text-white p-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="hover:opacity-80 transition-opacity">
-            <span className="text-2xl font-bold">FlyInGuate</span>
-          </Link>
-          <div className="text-sm">
-            Step 2 of 2: Passenger Details & Add-ons
-          </div>
-        </div>
-      </nav>
+      <MobileNav />
 
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Passenger Details</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('passenger.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400">
             Flight: {bookingData.from_location} → {bookingData.to_location} on {bookingData.date} at {bookingData.time}
           </p>
@@ -333,7 +327,7 @@ function PassengerDetailsContent() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Full Name *
+                        {t('passenger.name')} *
                       </label>
                       <input
                         type="text"
@@ -347,7 +341,7 @@ function PassengerDetailsContent() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Age *
+                        {t('passenger.age')} *
                       </label>
                       <input
                         type="number"
@@ -362,7 +356,7 @@ function PassengerDetailsContent() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Passport/ID Number
+                        {t('passenger.passport')}
                       </label>
                       <input
                         type="text"
@@ -375,7 +369,7 @@ function PassengerDetailsContent() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Emergency Contact
+                        {t('passenger.emergency_contact')}
                       </label>
                       <input
                         type="text"
@@ -388,7 +382,7 @@ function PassengerDetailsContent() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Dietary Restrictions
+                        {t('passenger.dietary')}
                       </label>
                       <input
                         type="text"
@@ -401,7 +395,7 @@ function PassengerDetailsContent() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Special Requests
+                        {t('passenger.special_requests')}
                       </label>
                       <input
                         type="text"
@@ -516,14 +510,14 @@ function PassengerDetailsContent() {
               disabled={submitting}
               className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:opacity-50"
             >
-              Back
+              {t('passenger.back')}
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="flex-1 btn-luxury disabled:opacity-50"
             >
-              {submitting ? 'Saving...' : 'Continue to Payment'}
+              {submitting ? t('common.loading') : t('passenger.continue')}
             </button>
           </div>
         </form>

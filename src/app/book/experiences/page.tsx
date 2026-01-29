@@ -3,14 +3,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
-import { useAuthStore } from '@/lib/auth-store'
+
 import { useTranslation } from '@/lib/i18n'
-import { LanguageSwitcher } from '@/components/language-switcher'
+import { MobileNav } from '@/components/mobile-nav'
 import { Calendar, Users, Clock, MapPin, CheckCircle, ArrowLeft, Plane } from 'lucide-react'
 import { format } from 'date-fns'
 
-const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
 interface Experience {
   id: string
@@ -52,7 +50,7 @@ interface Experience {
 
 export default function BookExperiencesPage() {
   const router = useRouter()
-  const { profile } = useAuthStore()
+
   const { t, locale } = useTranslation()
   const [experiences, setExperiences] = useState<Experience[]>([])
   const [loading, setLoading] = useState(true)
@@ -197,32 +195,7 @@ export default function BookExperiencesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
-      {/* Navigation */}
-      <nav className="bg-luxury-black text-white p-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <Image
-              src={LOGO_URL}
-              alt="FlyInGuate"
-              width={150}
-              height={50}
-              className="h-10 w-auto"
-            />
-          </Link>
-          <div className="flex items-center space-x-6">
-            <LanguageSwitcher />
-            {profile ? (
-              <Link href="/dashboard" className="hover:opacity-80">
-                {t('nav.dashboard')}
-              </Link>
-            ) : (
-              <Link href="/login" className="hover:opacity-80">
-                {t('nav.login')}
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      <MobileNav />
 
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16">

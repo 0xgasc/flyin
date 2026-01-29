@@ -927,7 +927,7 @@ export default function AdminDashboard() {
       case 'revision_pending': return 'bg-amber-100 text-amber-800'
       case 'completed': return 'bg-green-100 text-green-800'
       case 'cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      default: return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
     }
   }
 
@@ -950,7 +950,7 @@ const SortableExperienceRow = ({ experience, onDelete, onToggleActive, onImageUp
   };
 
   return (
-    <tr ref={setNodeRef} style={style} className={isDragging ? 'bg-gray-50' : ''}>
+    <tr ref={setNodeRef} style={style} className={isDragging ? 'bg-gray-50 dark:bg-gray-800' : ''}>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mr-3">
@@ -1361,14 +1361,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
       <tr
         ref={setNodeRef}
         style={style}
-        className={`hover:bg-gray-50 ${isDragging ? 'z-50' : ''}`}
+        className={`hover:bg-gray-50 dark:hover:bg-gray-800 ${isDragging ? 'z-50' : ''}`}
       >
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex items-center">
             <div
               {...attributes}
               {...listeners}
-              className="cursor-grab active:cursor-grabbing mr-3 p-1 hover:bg-gray-100 rounded-none"
+              className="cursor-grab active:cursor-grabbing mr-3 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
             >
               <GripVertical className="w-4 h-4 text-gray-400" />
             </div>
@@ -1392,7 +1392,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </span>
             ))}
             {destination.features?.length > 3 && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                 +{destination.features.length - 3}
               </span>
             )}
@@ -1883,7 +1883,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         )}
 
                         {/* Admin Controls - Always visible */}
-                        <div className="border-t border-gray-200 pt-2 mt-2 space-y-2">
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2 space-y-2">
                           <p className="text-xs text-gray-500 font-medium">Admin Actions:</p>
 
                           {/* Edit Button */}
@@ -1928,27 +1928,27 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'calendar' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">Flight Calendar & Aircraft Scheduling</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Flight Calendar & Aircraft Scheduling</h1>
               <div className="flex space-x-2">
                 <button 
                   onClick={() => setCurrentWeekOffset(0)}
                   className={`px-4 py-2 rounded-none transition-colors ${
                     currentWeekOffset === 0 
                       ? 'bg-primary-600 text-white' 
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
                   }`}
                 >
                   This Week
                 </button>
                 <button 
                   onClick={() => setCurrentWeekOffset(currentWeekOffset - 1)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none hover:bg-gray-300"
                 >
                   ← Previous Week
                 </button>
                 <button 
                   onClick={() => setCurrentWeekOffset(currentWeekOffset + 1)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none hover:bg-gray-300"
                 >
                   Next Week →
                 </button>
@@ -2048,7 +2048,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       )
                       
                       return (
-                        <div key={dayIndex} className="p-1 min-h-[80px] border-l border-gray-200 relative">
+                        <div key={dayIndex} className="p-1 min-h-[80px] border-l border-gray-200 dark:border-gray-700 relative">
                           {dayBookings.map((booking, bookingIndex) => {
                             const statusColors = {
                               'pending': 'bg-yellow-400',
@@ -2351,7 +2351,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                               <img
                                 src={transaction.payment_proof_url}
                                 alt="Payment proof"
-                                className="w-24 h-32 object-cover rounded-none border border-gray-200 cursor-pointer hover:opacity-80"
+                                className="w-24 h-32 object-cover rounded-none border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80"
                                 onClick={() => setSelectedTransaction(transaction)}
                               />
                               <div className="flex-1 text-xs text-gray-600">
@@ -2526,7 +2526,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-200">
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
                       <th className="text-left py-3 px-4">Aircraft</th>
                       <th className="text-left py-3 px-4">Registration</th>
                       <th className="text-left py-3 px-4">Capacity</th>
@@ -2539,7 +2539,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   </thead>
                   <tbody>
                     {helicopters.map((helicopter) => (
-                      <tr key={helicopter.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <tr key={helicopter.id} className="border-b border-gray-100 dark:border-gray-700 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td className="py-3 px-4">
                           <div>
                             <div className="font-medium">{helicopter.name}</div>
@@ -2598,7 +2598,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-200">
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
                       <th className="text-left py-3 px-4">Aircraft</th>
                       <th className="text-left py-3 px-4">Type</th>
                       <th className="text-left py-3 px-4">Description</th>
@@ -2609,7 +2609,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   </thead>
                   <tbody>
                     {maintenanceRecords.slice(0, 10).map((record) => (
-                      <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <tr key={record.id} className="border-b border-gray-100 dark:border-gray-700 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td className="py-3 px-4">
                           <div className="font-medium">{record.helicopter?.name}</div>
                           <div className="text-sm text-gray-500">{record.helicopter?.registration_number}</div>
@@ -2782,7 +2782,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     <p className="text-gray-500 text-sm">No revenue records yet</p>
                   ) : (
                     businessRevenue.slice(0, 10).map((revenue) => (
-                      <div key={revenue.id} className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <div key={revenue.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                         <div className="flex-1">
                           <p className="text-sm font-medium">{(revenue.revenue_type || 'revenue').replace('_', ' ').toUpperCase()}</p>
                           <p className="text-xs text-gray-600">
@@ -2810,7 +2810,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     <p className="text-gray-500 text-sm">No cost records yet</p>
                   ) : (
                     operationalCosts.slice(0, 10).map((cost) => (
-                      <div key={cost.id} className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <div key={cost.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                         <div className="flex-1">
                           <p className="text-sm font-medium">{(cost.cost_type || 'cost').replace('_', ' ').toUpperCase()}</p>
                           <p className="text-xs text-gray-600">By: {cost.pilot?.full_name || 'System'}</p>
@@ -2833,11 +2833,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <span className="text-sm">New booking from John Doe</span>
                     <span className="text-xs text-gray-500">2 hours ago</span>
                   </div>
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <span className="text-sm">Payment approved for Ana Rodriguez</span>
                     <span className="text-xs text-gray-500">5 hours ago</span>
                   </div>
@@ -2851,11 +2851,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <h3 className="text-lg font-semibold mb-4">Pending Actions</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <span className="text-sm text-yellow-600">{bookings.filter(b => b.status === 'pending').length} bookings awaiting approval</span>
                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-none">Action needed</span>
                   </div>
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <span className="text-sm text-blue-600">{transactions.filter(t => t.status === 'pending').length} payments to review</span>
                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-none">Review</span>
                   </div>
@@ -2918,7 +2918,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               {/* Passenger Details */}
               {selectedBooking.passenger_details && selectedBooking.passenger_details.length > 0 && (
-                <div className="mt-3 border-t border-gray-200 pt-3">
+                <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
                   <h5 className="font-medium text-sm mb-2">Passenger Information:</h5>
                   <div className="space-y-2">
                     {selectedBooking.passenger_details.map((passenger: any, index: number) => (
@@ -2936,7 +2936,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               
               {/* Selected Add-ons */}
               {selectedBooking.selected_addons && selectedBooking.selected_addons.length > 0 && (
-                <div className="mt-3 border-t border-gray-200 pt-3">
+                <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
                   <h5 className="font-medium text-sm mb-2">Selected Add-ons:</h5>
                   <div className="space-y-1">
                     {selectedBooking.selected_addons.map((addon: any, index: number) => (
@@ -2963,8 +2963,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       key={helicopter.id}
                       className={`p-3 border rounded-none cursor-pointer transition-all ${
                         selectedHelicopter === helicopter.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                       onClick={() => setSelectedHelicopter(helicopter.id)}
                     >
@@ -2994,8 +2994,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       key={pilot.id}
                       className={`p-3 border rounded-none cursor-pointer transition-all ${
                         selectedPilot === pilot.id
-                          ? 'border-green-500 bg-green-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                       onClick={() => setSelectedPilot(pilot.id)}
                     >
@@ -3022,7 +3022,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   setSelectedHelicopter('')
                   setSelectedPilot('')
                 }}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none hover:bg-gray-300"
               >
                 {t('admin.cancel')}
               </button>
@@ -3155,7 +3155,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       phone: ''
                     })
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none hover:bg-gray-300"
                 >
                   Cancel
                 </button>
@@ -3218,8 +3218,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   />
                 </div>
               ) : (
-                <div className="bg-gray-100 p-8 rounded-none">
-                  <p className="text-gray-600">No payment proof attached to this transaction</p>
+                <div className="bg-gray-100 dark:bg-gray-800 p-8 rounded-none">
+                  <p className="text-gray-600 dark:text-gray-400">No payment proof attached to this transaction</p>
                 </div>
               )}
             </div>
@@ -3246,7 +3246,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             <div className="flex gap-4">
               <button
                 onClick={() => setSelectedTransaction(null)}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none hover:bg-gray-300"
               >
                 {t('admin.close')}
               </button>
@@ -3334,7 +3334,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="email"
                     value={editUserData.email}
                     disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none bg-gray-100 text-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
                     title="Email cannot be changed"
                   />
                 </div>
@@ -3445,7 +3445,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     setShowEditUserModal(false)
                     setSelectedUser(null)
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none hover:bg-gray-300"
                 >
                   Cancel
                 </button>
@@ -3483,8 +3483,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             </div>
             
             {/* Current Booking Details */}
-            <div className="bg-gray-50 rounded-none p-4 mb-6">
-              <h4 className="font-semibold mb-3">Original Booking:</h4>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-none p-4 mb-6">
+              <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Original Booking:</h4>
               <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div>
                   <p><span className="font-medium">Client:</span> {selectedBookingForEdit.client?.full_name}</p>
@@ -3667,7 +3667,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     setShowEditBookingModal(false)
                     setSelectedBookingForEdit(null)
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none hover:bg-gray-300"
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none hover:bg-gray-300"
                 >
                   Cancel
                 </button>
@@ -3830,7 +3830,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <button
                   type="button"
                   onClick={() => setShowAddHelicopterModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none"
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none"
                 >
                   Cancel
                 </button>
@@ -3987,7 +3987,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <button
                   type="button"
                   onClick={() => setShowEditHelicopterModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none"
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none"
                 >
                   Cancel
                 </button>
@@ -4122,7 +4122,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <button
                   type="button"
                   onClick={() => setShowMaintenanceModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-none"
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none"
                 >
                   Cancel
                 </button>

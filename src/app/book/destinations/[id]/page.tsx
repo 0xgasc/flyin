@@ -6,10 +6,10 @@ import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { useToast } from '@/lib/toast-store'
-import { LanguageSwitcher } from '@/components/language-switcher'
+import { MobileNav } from '@/components/mobile-nav'
 import {
   ArrowLeft, MapPin, CheckCircle,
-  Calendar, DollarSign, Star, Camera,
+  DollarSign, Star, Camera,
   ChevronLeft, ChevronRight, Navigation, AlertTriangle, Clock
 } from 'lucide-react'
 
@@ -43,7 +43,7 @@ export default function DestinationDetailPage() {
   const router = useRouter()
   const params = useParams()
   const { profile } = useAuthStore()
-  const { t, locale } = useTranslation()
+  const { locale } = useTranslation()
   const toast = useToast()
   
   const [destination, setDestination] = useState<Destination | null>(null)
@@ -201,25 +201,7 @@ export default function DestinationDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
       {/* Navigation */}
-      <nav className="bg-luxury-black text-white p-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="hover:opacity-80 transition-opacity">
-            <span className="text-2xl font-bold">FlyInGuate</span>
-          </Link>
-          <div className="flex items-center space-x-6">
-            <LanguageSwitcher />
-            {profile ? (
-              <Link href="/dashboard" className="hover:opacity-80">
-                {t('nav.dashboard')}
-              </Link>
-            ) : (
-              <Link href="/login" className="hover:opacity-80">
-                {t('nav.login')}
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      <MobileNav />
 
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
