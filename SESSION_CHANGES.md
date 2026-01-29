@@ -3,6 +3,156 @@
 
 ---
 
+## Transport Map UX Overhaul & Codebase Audit (v2.3.0)
+**Date:** January 29, 2026
+
+### Map & Modal Improvements
+
+#### 1. Destination Selector Modal Cleanup
+**File:** `src/components/destination-selector-modal.tsx`
+
+**Changes:**
+- **Removed "Available Experiences" section** — modal now shows only Airports, Cities & Destinations, and Custom Location
+- **Added Custom Location input** — users can type any location when the predefined list doesn't cover their needs
+  - Toggle button activates a text input field with auto-focus
+  - Selecting a preset destination deactivates custom mode and vice versa
+  - Footer button label updates dynamically to show the selected/typed value
+- **Portal rendering** — modal renders via `createPortal` to `document.body` to escape WebGL stacking contexts
+- **z-index set to 200** on the overlay for reliable layering
+
+#### 2. Map Marker Selection Matching (Department-Level)
+**Files:** `src/components/guatemala-maplibre.tsx`, `src/components/guatemala-leaflet-map.tsx`
+
+**Problem:** When a user selected "Guatemala City" from the modal, the map marker named "Ciudad de Guatemala" wouldn't turn green because of a direct name comparison mismatch.
+
+**Solution:** Selection matching now uses department-level lookup:
+```
+1. Find which department contains the selected destination/airport name
+2. For each map marker, check if it belongs to that department
+3. Highlight all markers in the matched department
+```
+This handles all naming mismatches (English vs Spanish names, abbreviated names, airport names vs city names).
+
+**MapLibre (`guatemala-maplibre.tsx`):**
+- `addMarkers()` now computes `fromDept` and `toDept` by searching `guatemalaDepartments` for matching destination or airport names
+- Each marker checks: direct name match OR airportName match OR department-level match
+- Route line drawing also uses the same fallback matching
+
+**Leaflet (`guatemala-leaflet-map.tsx`):**
+- Same pattern: markers check `dept.destinations.includes(selectedFrom)` and `dept.airports.some(a => a.name === selectedFrom)` in addition to ID-based matching
+
+#### 3. Enhanced Map Tooltip
+**File:** `src/components/guatemala-maplibre.tsx`
+
+**Changes:**
+- Airport tooltip now shows **full airport name**: `✈ GUA — La Aurora International` (was just `✈ GUA`)
+- Added **"Selected as Origin"** badge (emerald green) when hovering a marker that's the departure point
+- Added **"Selected as Destination"** badge (amber) when hovering a marker that's the destination
+- Selection status uses the same department-level matching as markers
+
+#### 4. Auto-Collapse Map After Selection
+**File:** `src/app/book/transport/page.tsx`
+
+**Changes:**
+- Added `mapCollapsed` state that auto-triggers when both `fromLocation` and `toLocation` are set in map mode
+- When collapsed, map is replaced with a compact "Show Map" button
+- Users can re-expand the map at any time by clicking the button
+- Selected Route display remains visible below the collapsed/expanded map
+
+#### 5. Modal vs WebGL Canvas Z-Index Fix
+**File:** `src/app/book/transport/page.tsx`
+
+**Problem:** The destination selector modal appeared behind the WebGL map canvas despite z-index 200 and portal rendering. WebGL GPU compositing layers paint above normal DOM elements regardless of z-index.
+
+**Previous failed attempts:**
+1. z-index 50 → 200 (didn't work)
+2. `createPortal` to document.body (didn't work alone)
+3. Map wrapper with `zIndex: -1` (didn't work)
+
+**Final fix:** Hide the map container entirely with `display: none` when the modal is open. This removes the WebGL canvas from the rendering pipeline completely, allowing the modal to render above everything.
+
+### Codebase Audit Cleanup (v2.2.0)
+**Date:** January 28, 2026
+
+#### Phase 1: Z-Index Stacking Normalization
+**Files:** `globals.css`, `mobile-nav.tsx`, `guatemala-maplibre.tsx`
+- Normalized scale: map(40) < modals(50) < nav(60) < overlay(65) < panel(70) < toast(100)
+- MapLibre popup/marker/ctrl z-index: 9999 → 40
+- Mobile nav overlay: z-55 → z-65
+- Map tooltip: z-99999 → z-40
+
+#### Phase 2: Unused CSS Removal
+**File:** `src/styles/globals.css`
+- Removed 20 unused utility classes (~80 lines): `.btn-soft`, `.btn-link`, `.card-glass`, `.card-elevated`, `.text-heading`, `.text-body`, `.text-muted`, `.form-label`, `.table-container`, `.table-header`, `.table-body`, `.table-cell`, `.nav-link`, `.nav-link-active`, `.status-badge`, `.gold-shimmer`, `.hover-lift`, `.hover-scale`, `.dark-card-bg`, `.loading-spinner-sm`
+- Kept `.card-bordered` (used by `.card-feature` via `@apply`)
+
+#### Phase 3: i18n Key Maintenance
+**File:** `src/lib/i18n.ts`
+- Added 13 nav keys (`nav.home`, `nav.experiences`, `nav.executive_services`, `nav.faq`, `nav.pilot_opportunities`, `nav.dashboard`, `nav.admin`, `nav.pilot_dashboard`, `nav.profile`, `nav.sign_in`, `nav.register`, `nav.sign_out`, `nav.switch_language`) in both `en` and `es`
+- Removed 6 unused category keys (`category.scenic`, `.romantic`, `.cultural`, `.volcano`, `.beach`, `.adventure`)
+
+#### Phase 4: Mobile Nav i18n Migration
+**File:** `src/components/mobile-nav.tsx`
+- Migrated all 13 inline `locale === 'es' ? ... : ...` patterns to `t('nav.*')` calls
+- Imported `useTranslation` from `@/lib/i18n`
+
+#### Phase 5: Dark Mode Fixes
+**Files:** `pilot/join/page.tsx` (~20 changes), `book/transport/page.tsx` (~8 changes), `faq/page.tsx` (~1 change)
+- Added `dark:` variants to backgrounds, text colors, badges, and info boxes
+- Pages no longer flash white in dark mode
+
+#### Phase 6: Console.log Leak Removal
+**Files:** `login/page.tsx`, `register/page.tsx`
+- Removed `console.log('Login successful, token received:', ...)`
+- Removed `console.log('Redirecting to:', targetUrl)`
+- Removed `console.log('User registered successfully:', ...)`
+
+#### Phase 7: Admin Improvements
+**Files:** `admin/page.tsx`, `admin/components/AdminLayout.tsx`, `i18n.ts`
+- Fixed dark mode text visibility across admin tables, modals, forms
+- Translated admin sidebar labels and section headings to support i18n
+- Removed duplicate "Pilot Opportunities" from navigation
+
+#### Phase 8: Admin Refactor TODO
+**File:** `README.md`
+- Added TODO note: `src/app/admin/page.tsx` is a 4000+ line monolith that should be split into separate components per tab
+
+### Navigation & Home Page Fixes (v2.1.5)
+**Date:** January 27, 2026
+
+- **Fixed hero section blocking clicks** on MobileNav overlay and burger menu
+- **Moved nav panel to right side** and fixed menu links not closing the panel
+- **Added Pilot Opportunities and Executive Services** to mobile nav
+- **Fixed hidden nav panel** intercepting click events on home page
+
+### Files Modified (v2.2.0–v2.3.0)
+
+| File | Changes |
+|------|---------|
+| `src/components/destination-selector-modal.tsx` | Removed experiences, added custom input, portal + z-index |
+| `src/components/guatemala-maplibre.tsx` | Department-level selection matching, enhanced tooltip |
+| `src/components/guatemala-leaflet-map.tsx` | Department-level selection matching |
+| `src/app/book/transport/page.tsx` | Auto-collapse map, hide map when modal open |
+| `src/styles/globals.css` | Z-index normalization, removed 20 unused classes |
+| `src/components/mobile-nav.tsx` | Z-index fix, i18n migration |
+| `src/lib/i18n.ts` | Added nav keys, removed unused category keys |
+| `src/app/pilot/join/page.tsx` | Dark mode fixes |
+| `src/app/faq/page.tsx` | Dark mode fix |
+| `src/app/login/page.tsx` | Removed console.logs |
+| `src/app/register/page.tsx` | Removed console.log |
+| `src/app/admin/page.tsx` | Dark mode text visibility |
+| `src/app/admin/components/AdminLayout.tsx` | i18n sidebar labels |
+| `README.md` | Added admin refactor TODO |
+
+### Build Status
+```
+Build successful — no TypeScript or compilation errors
+All routes compiled successfully
+Deployed to Vercel via main branch auto-deploy
+```
+
+---
+
 ## 🔒 Security Audit & Design Refresh (v2.1.0)
 **Date:** January 23, 2026
 
