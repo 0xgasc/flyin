@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Users, Shield, Clock, Star, MapPin, ChevronDown, Plane, DollarSign } from 'lucide-react'
+import { Shield, Clock, Star, MapPin, ChevronDown, Plane, DollarSign } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
@@ -216,14 +216,6 @@ export default function HomePage() {
                 )}
               </div>
             }
-            additionalMobileItems={[
-              {
-                href: '/pilot/join',
-                label: t('nav.pilot_opportunities'),
-                icon: <Users className="h-5 w-5" />,
-                show: !profile
-              }
-            ]}
           />
         </div>
 
