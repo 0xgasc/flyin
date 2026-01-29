@@ -86,9 +86,13 @@ export default function GuatemalaLeafletMap({
     markersRef.current = []
 
     departmentPositions.forEach(dept => {
-      const isSelected = dept.id === selectedFrom || dept.id === selectedTo
-      const isFrom = dept.id === selectedFrom
-      const isTo = dept.id === selectedTo
+      const isFrom = dept.id === selectedFrom ||
+        dept.destinations.includes(selectedFrom || '') ||
+        dept.airports.some(a => a.name === selectedFrom)
+      const isTo = dept.id === selectedTo ||
+        dept.destinations.includes(selectedTo || '') ||
+        dept.airports.some(a => a.name === selectedTo)
+      const isSelected = isFrom || isTo
       const hasAirport = dept.airports.length > 0
 
       // Create custom icon

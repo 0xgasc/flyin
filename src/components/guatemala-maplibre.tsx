@@ -300,10 +300,24 @@ export default function GuatemalaMapLibre({
   const addMarkers = () => {
     if (!map.current) return
 
+    // Find departments for selected locations to handle name mismatches
+    const fromDept = selectedFrom ? guatemalaDepartments.find(dept =>
+      dept.destinations.includes(selectedFrom) ||
+      dept.airports.some(a => a.name === selectedFrom)
+    ) : null
+    const toDept = selectedTo ? guatemalaDepartments.find(dept =>
+      dept.destinations.includes(selectedTo) ||
+      dept.airports.some(a => a.name === selectedTo)
+    ) : null
+
     activeDestinations.forEach(dest => {
-      const isSelected = selectedFrom === dest.name || selectedTo === dest.name
-      const isFromSelected = selectedFrom === dest.name
-      const isToSelected = selectedTo === dest.name
+      const isFromSelected = selectedFrom === dest.name ||
+        selectedFrom === dest.airportName ||
+        (fromDept != null && dest.dept.toLowerCase() === fromDept.name.toLowerCase())
+      const isToSelected = selectedTo === dest.name ||
+        selectedTo === dest.airportName ||
+        (toDept != null && dest.dept.toLowerCase() === toDept.name.toLowerCase())
+      const isSelected = isFromSelected || isToSelected
 
       // Create marker element - simple, no embedded tooltip
       const el = document.createElement('div')
@@ -367,8 +381,10 @@ export default function GuatemalaMapLibre({
 
     // Draw line between selected points
     if (selectedFrom && selectedTo) {
-      const fromDest = activeDestinations.find(d => d.name === selectedFrom)
-      const toDest = activeDestinations.find(d => d.name === selectedTo)
+      const fromDest = activeDestinations.find(d => d.name === selectedFrom || d.airportName === selectedFrom) ||
+        activeDestinations.find(d => fromDept && d.dept.toLowerCase() === fromDept.name.toLowerCase())
+      const toDest = activeDestinations.find(d => d.name === selectedTo || d.airportName === selectedTo) ||
+        activeDestinations.find(d => toDept && d.dept.toLowerCase() === toDept.name.toLowerCase())
 
       if (fromDest && toDest && map.current) {
         // Remove existing route layer if present
@@ -469,7 +485,25 @@ export default function GuatemalaMapLibre({
             <p className="text-gray-300 text-xs leading-relaxed">{hoveredDest.description}</p>
             {hoveredDest.airportCode && (
               <div className="mt-2 px-2 py-1 bg-blue-500/15 rounded text-[11px] text-blue-300">
-                ✈ {hoveredDest.airportCode}
+                ✈ {hoveredDest.airportCode}{hoveredDest.airportName ? ` — ${hoveredDest.airportName}` : ''}
+              </div>
+            )}
+            {selectedFrom && (selectedFrom === hoveredDest.name || selectedFrom === hoveredDest.airportName ||
+              guatemalaDepartments.some(dept =>
+                dept.name.toLowerCase() === hoveredDest.dept.toLowerCase() &&
+                (dept.destinations.includes(selectedFrom) || dept.airports.some(a => a.name === selectedFrom))
+              )) && (
+              <div className="mt-2 px-2 py-1 bg-emerald-500/15 rounded text-[11px] text-emerald-300 font-medium">
+                Selected as Origin
+              </div>
+            )}
+            {selectedTo && (selectedTo === hoveredDest.name || selectedTo === hoveredDest.airportName ||
+              guatemalaDepartments.some(dept =>
+                dept.name.toLowerCase() === hoveredDest.dept.toLowerCase() &&
+                (dept.destinations.includes(selectedTo) || dept.airports.some(a => a.name === selectedTo))
+              )) && (
+              <div className="mt-2 px-2 py-1 bg-amber-500/15 rounded text-[11px] text-amber-300 font-medium">
+                Selected as Destination
               </div>
             )}
           </div>

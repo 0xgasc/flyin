@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { X, MapPin, Plane, Mountain } from 'lucide-react'
+import { X, MapPin, Plane, Edit3 } from 'lucide-react'
 import type { Department } from '@/lib/guatemala-departments'
 
 interface DestinationSelectorModalProps {
@@ -21,6 +21,8 @@ export default function DestinationSelectorModal({
   type
 }: DestinationSelectorModalProps) {
   const [selectedDestination, setSelectedDestination] = useState<string>('')
+  const [customLocation, setCustomLocation] = useState('')
+  const [isCustom, setIsCustom] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -30,8 +32,9 @@ export default function DestinationSelectorModal({
   if (!isOpen) return null
 
   const handleSelect = () => {
-    if (selectedDestination) {
-      onSelect(selectedDestination)
+    const value = isCustom ? customLocation.trim() : selectedDestination
+    if (value) {
+      onSelect(value)
       onClose()
     }
   }
@@ -67,7 +70,7 @@ export default function DestinationSelectorModal({
                 {department.airports.map((airport) => (
                   <button
                     key={airport.code}
-                    onClick={() => setSelectedDestination(airport.name)}
+                    onClick={() => { setSelectedDestination(airport.name); setIsCustom(false); setCustomLocation('') }}
                     className={`w-full text-left p-3 rounded-none border-2 transition-all touch-manipulation ${
                       selectedDestination === airport.name
                         ? 'border-primary-500 dark:border-gold-500 bg-primary-50 dark:bg-gold-500/10'
@@ -99,7 +102,7 @@ export default function DestinationSelectorModal({
               {department.destinations.map((destination) => (
                 <button
                   key={destination}
-                  onClick={() => setSelectedDestination(destination)}
+                  onClick={() => { setSelectedDestination(destination); setIsCustom(false); setCustomLocation('') }}
                   className={`p-3 rounded-none border-2 transition-all touch-manipulation ${
                     selectedDestination === destination
                       ? 'border-primary-500 dark:border-gold-500 bg-primary-50 dark:bg-gold-500/10'
@@ -112,24 +115,34 @@ export default function DestinationSelectorModal({
             </div>
           </div>
 
-          {/* Experiences Available */}
-          {department.experiences.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3 flex items-center text-gray-900 dark:text-white">
-                <Mountain className="h-5 w-5 mr-2 text-primary-600 dark:text-gold-400" />
-                Available Experiences
-              </h3>
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-none p-3">
-                <ul className="space-y-1">
-                  {department.experiences.map((experience, idx) => (
-                    <li key={idx} className="text-sm text-gray-700 dark:text-gray-300">
-                      • {experience}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
+          {/* Custom Location */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 flex items-center text-gray-900 dark:text-white">
+              <Edit3 className="h-5 w-5 mr-2 text-primary-600 dark:text-gold-400" />
+              Custom Location
+            </h3>
+            <button
+              type="button"
+              onClick={() => { setIsCustom(true); setSelectedDestination('') }}
+              className={`w-full text-left p-3 rounded-none border-2 transition-all touch-manipulation ${
+                isCustom
+                  ? 'border-primary-500 dark:border-gold-500 bg-primary-50 dark:bg-gold-500/10'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+              }`}
+            >
+              <p className="font-medium text-sm text-gray-900 dark:text-white">Enter a custom location</p>
+            </button>
+            {isCustom && (
+              <input
+                type="text"
+                value={customLocation}
+                onChange={(e) => setCustomLocation(e.target.value)}
+                placeholder="Type your location..."
+                className="w-full mt-2 px-4 py-3 border-2 border-primary-300 dark:border-gold-500/50 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-none focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                autoFocus
+              />
+            )}
+          </div>
         </div>
 
         {/* Footer */}
@@ -143,14 +156,14 @@ export default function DestinationSelectorModal({
             </button>
             <button
               onClick={handleSelect}
-              disabled={!selectedDestination}
+              disabled={!(isCustom ? customLocation.trim() : selectedDestination)}
               className={`flex-1 px-4 py-2 rounded-none font-medium transition-colors ${
-                selectedDestination
+                (isCustom ? customLocation.trim() : selectedDestination)
                   ? 'bg-primary-600 text-white hover:bg-primary-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              Select {selectedDestination || 'Destination'}
+              Select {(isCustom ? customLocation.trim() : selectedDestination) || 'Destination'}
             </button>
           </div>
         </div>

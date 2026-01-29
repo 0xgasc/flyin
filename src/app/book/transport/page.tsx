@@ -60,10 +60,18 @@ export default function BookTransportPage() {
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null)
   const [showDestinationModal, setShowDestinationModal] = useState(false)
   const [modalType, setModalType] = useState<'from' | 'to'>('from')
+  const [mapCollapsed, setMapCollapsed] = useState(false)
 
   useEffect(() => {
     fetchAirports()
   }, [])
+
+  // Auto-collapse map when both locations are selected
+  useEffect(() => {
+    if (selectionMode === 'map' && formData.fromLocation && formData.toLocation) {
+      setMapCollapsed(true)
+    }
+  }, [formData.fromLocation, formData.toLocation, selectionMode])
 
   const fetchAirports = async () => {
     try {
@@ -425,20 +433,35 @@ export default function BookTransportPage() {
             ) : (
               /* Map Selection Mode */
               <div className="space-y-6">
-                <div className="text-center text-gray-600 mb-6">
-                  <p className="text-sm">
-                    Click on markers to select your departure and destination
-                  </p>
-                </div>
+                {mapCollapsed ? (
+                  <div className="text-center py-4">
+                    <button
+                      type="button"
+                      onClick={() => setMapCollapsed(false)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm"
+                    >
+                      <Map className="h-4 w-4" />
+                      Show Map
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-center text-gray-600 dark:text-gray-400 mb-6">
+                      <p className="text-sm">
+                        Click on markers to select your departure and destination
+                      </p>
+                    </div>
 
-                <div style={showDestinationModal ? { position: 'relative', zIndex: -1 } : undefined}>
-                  <SafeMapWrapper
-                    onDepartmentClick={handleDepartmentClick}
-                    selectedFrom={formData.fromLocation}
-                    selectedTo={formData.toLocation}
-                    mode="both"
-                  />
-                </div>
+                    <div style={showDestinationModal ? { display: 'none' } : undefined}>
+                      <SafeMapWrapper
+                        onDepartmentClick={handleDepartmentClick}
+                        selectedFrom={formData.fromLocation}
+                        selectedTo={formData.toLocation}
+                        mode="both"
+                      />
+                    </div>
+                  </>
+                )}
 
                 {/* Selected Locations Display */}
                 {(formData.fromLocation || formData.toLocation) && (
