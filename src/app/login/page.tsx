@@ -45,8 +45,6 @@ function LoginContent() {
         throw new Error(result.error || 'Login failed')
       }
 
-      console.log('Login successful, token received:', !!result.token)
-
       // Redirect based on role
       let targetUrl = redirect
 
@@ -60,7 +58,6 @@ function LoginContent() {
       // This prevents the race condition where navigation happens before cookie is stored
       await new Promise(resolve => setTimeout(resolve, 150))
 
-      console.log('Redirecting to:', targetUrl)
       window.location.replace(targetUrl)
     } catch (error: any) {
       console.error('Login error:', error)

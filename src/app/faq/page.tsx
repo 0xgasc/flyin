@@ -92,7 +92,7 @@ export default function FAQPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
       {/* Navigation */}
       <div className="bg-luxury-black text-white">
         <MobileNav

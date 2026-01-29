@@ -14,9 +14,15 @@ import { PhotoGallery } from '@/components/PhotoGallery'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 import dynamic from 'next/dynamic'
 
+/** FlyInGuate brand logo hosted on wsimg CDN. */
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
-// Dynamically import SafeMapWrapper which checks WebGL before loading MapLibre
+/**
+ * Lazily loaded map component. Detects WebGL support at runtime:
+ * - WebGL available → renders MapLibre GL (vector tiles, 3D terrain).
+ * - No WebGL       → falls back to Leaflet (raster tiles).
+ * SSR is disabled because both renderers require browser APIs (canvas/WebGL).
+ */
 const SafeMapWrapper = dynamic(() => import('@/components/safe-map-wrapper'), {
   ssr: false,
   loading: () => (
@@ -30,17 +36,36 @@ const SafeMapWrapper = dynamic(() => import('@/components/safe-map-wrapper'), {
 })
 
 
-// Base pricing per km for dynamic route calculation
+/**
+ * Pricing constants for dynamic route calculation.
+ * - BASE_PRICE_PER_KM: Cost per kilometer of flight distance (USD).
+ * - MINIMUM_FLIGHT_PRICE: Floor price regardless of distance (USD).
+ *
+ * Passenger surcharges are handled separately in the component
+ * (+25% per additional passenger beyond the base of 2).
+ */
 const BASE_PRICE_PER_KM = 12 // USD per km
 const MINIMUM_FLIGHT_PRICE = 750
 
+/**
+ * Calculates flight pricing between two Guatemalan departments using
+ * the Haversine formula for great-circle distance.
+ *
+ * @param fromId - Department ID for the origin (e.g. 'guatemala')
+ * @param toId   - Department ID for the destination (e.g. 'peten')
+ * @returns Object with `price` (USD, rounded to nearest $50),
+ *          `distance` (e.g. "285 km"), and `flightTime` (e.g. "90 min"),
+ *          or null if either department is missing or origin === destination.
+ *
+ * Flight time assumes an average helicopter speed of 200 km/h
+ * plus 5 minutes for takeoff/landing overhead.
+ */
 function calculateRoutePrice(fromId: string, toId: string): { price: number; distance: string; flightTime: string } | null {
   const fromDept = guatemalaDepartments.find(d => d.id === fromId)
   const toDept = guatemalaDepartments.find(d => d.id === toId)
 
   if (!fromDept || !toDept || fromId === toId) return null
 
-  // Calculate distance using coordinates (simple Haversine approximation)
   const lat1 = fromDept.coordinates[0]
   const lon1 = fromDept.coordinates[1]
   const lat2 = toDept.coordinates[0]
@@ -55,12 +80,10 @@ function calculateRoutePrice(fromId: string, toId: string): { price: number; dis
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
   const distance = R * c
 
-  // Estimate flight time (average helicopter speed ~200 km/h)
-  const flightMinutes = Math.round((distance / 200) * 60) + 5 // Add 5 min for takeoff/landing
+  const flightMinutes = Math.round((distance / 200) * 60) + 5
 
-  // Calculate price
   const rawPrice = distance * BASE_PRICE_PER_KM
-  const price = Math.max(MINIMUM_FLIGHT_PRICE, Math.round(rawPrice / 50) * 50) // Round to nearest 50
+  const price = Math.max(MINIMUM_FLIGHT_PRICE, Math.round(rawPrice / 50) * 50)
 
   return {
     price,
@@ -69,41 +92,68 @@ function calculateRoutePrice(fromId: string, toId: string): { price: number; dis
   }
 }
 
+/**
+ * HomePage — Landing page and primary booking interface for FlyInGuate.
+ *
+ * Layout (top to bottom):
+ *  1. **Hero section** — Full-viewport background image, logo, headline,
+ *     trust indicators (licensed, 24/7, premium fleet).
+ *  2. **Booking section** — Interactive map (MapLibre w/ Leaflet fallback)
+ *     paired with a route/pricing panel. Users click the map to set
+ *     origin and destination, choose passenger count (1-5), and see
+ *     live pricing before navigating to `/book/transport`.
+ *  3. **Services section** — Transport vs. Experiences feature cards.
+ *  4. **Photo gallery** — Fetched from API, expandable grid w/ lightbox.
+ *  5. **Footer CTA** — Final "Book Now" / "View Experiences" call to action.
+ *
+ * Key behaviours:
+ *  - Default origin is Guatemala City ('guatemala'). Map starts in
+ *    "select destination" mode; clicking a department sets the destination.
+ *  - Toggle between 'from' and 'to' select modes via overlay buttons on the map.
+ *  - Pricing is computed client-side via {@link calculateRoutePrice} and
+ *    adjusted for passenger count (+25% per passenger beyond 2).
+ *  - Authenticated users see Dashboard/Admin/Sign Out links;
+ *    guests see Login/Register and Pilot Opportunities.
+ *  - All user-facing strings come from `useTranslation()` (EN/ES).
+ */
 export default function HomePage() {
   const { t } = useTranslation()
   const { profile } = useAuthStore()
   const router = useRouter()
 
-  // Selection state - both origin and destination are now selectable
   const [selectedOrigin, setSelectedOrigin] = useState<string>('guatemala')
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null)
   const [passengerCount, setPassengerCount] = useState(2)
-  const [selectMode, setSelectMode] = useState<'from' | 'to'>('to') // Which point are we selecting?
+  const [selectMode, setSelectMode] = useState<'from' | 'to'>('to')
 
-  // Get selected departments
+  /** Resolved Department object for the current origin. */
   const originDept = useMemo(() => {
     return guatemalaDepartments.find(d => d.id === selectedOrigin)
   }, [selectedOrigin])
 
+  /** Resolved Department object for the current destination (null until selected). */
   const destinationDept = useMemo(() => {
     if (!selectedDestination) return null
     return guatemalaDepartments.find(d => d.id === selectedDestination)
   }, [selectedDestination])
 
-  // Get route pricing dynamically
+  /** Base route pricing (distance, flight time, price) — null until both endpoints are set. */
   const routePricing = useMemo(() => {
     if (!selectedOrigin || !selectedDestination) return null
     return calculateRoutePrice(selectedOrigin, selectedDestination)
   }, [selectedOrigin, selectedDestination])
 
-  // Calculate price based on passenger count
+  /**
+   * Final price adjusted for passenger count.
+   * Base rate covers 2 passengers; each additional passenger adds 25% of the base price.
+   */
   const adjustedPrice = useMemo(() => {
     if (!routePricing) return 0
-    // Base is for 2 passengers, adjust for additional passengers
     const additionalPassengers = Math.max(0, passengerCount - 2)
     return routePricing.price + (additionalPassengers * Math.round(routePricing.price * 0.25))
   }, [routePricing, passengerCount])
 
+  /** Clears auth state and redirects to the landing page. */
   const handleSignOut = async () => {
     await logout()
     router.push('/')

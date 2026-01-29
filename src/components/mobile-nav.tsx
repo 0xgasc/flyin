@@ -7,7 +7,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Menu, X, Home, User, Users, Calendar, Settings, LogOut, Globe, Briefcase, HelpCircle, Plane, MapPin } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
-import { useI18n } from '@/lib/i18n'
+import { useI18n, useTranslation } from '@/lib/i18n'
 
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
@@ -29,6 +29,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
   const [isOpen, setIsOpen] = useState(false)
   const { profile } = useAuthStore()
   const { locale, setLocale } = useI18n()
+  const { t } = useTranslation()
   const router = useRouter()
   const pathname = usePathname()
 
@@ -62,55 +63,55 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
   const navItems: NavItem[] = [
     {
       href: '/',
-      label: locale === 'es' ? 'Inicio' : 'Home',
+      label: t('nav.home'),
       icon: <Home className="h-5 w-5" />,
       show: true
     },
     {
       href: '/book/experiences',
-      label: locale === 'es' ? 'Experiencias' : 'Experiences',
+      label: t('nav.experiences'),
       icon: <Plane className="h-5 w-5" />,
       show: true
     },
     {
       href: '/book/transport',
-      label: locale === 'es' ? 'Servicios Ejecutivos' : 'Executive Services',
+      label: t('nav.executive_services'),
       icon: <Briefcase className="h-5 w-5" />,
       show: true
     },
     {
       href: '/faq',
-      label: 'FAQ',
+      label: t('nav.faq'),
       icon: <HelpCircle className="h-5 w-5" />,
       show: true
     },
     {
       href: '/pilot/join',
-      label: locale === 'es' ? 'Oportunidades de Piloto' : 'Pilot Opportunities',
+      label: t('nav.pilot_opportunities'),
       icon: <Users className="h-5 w-5" />,
       show: !profile
     },
     {
       href: '/dashboard',
-      label: 'Dashboard',
+      label: t('nav.dashboard'),
       icon: <Calendar className="h-5 w-5" />,
       show: !!profile
     },
     {
       href: '/admin',
-      label: 'Admin Panel',
+      label: t('nav.admin'),
       icon: <Settings className="h-5 w-5" />,
       show: profile?.role === 'admin'
     },
     {
       href: '/pilot',
-      label: locale === 'es' ? 'Panel de Piloto' : 'Pilot Dashboard',
+      label: t('nav.pilot_dashboard'),
       icon: <Briefcase className="h-5 w-5" />,
       show: profile?.role === 'pilot'
     },
     {
       href: '/profile',
-      label: locale === 'es' ? 'Perfil' : 'Profile',
+      label: t('nav.profile'),
       icon: <User className="h-5 w-5" />,
       show: !!profile
     }
@@ -156,7 +157,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
 
       {/* Slide-out menu overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-[55]" onClick={() => setIsOpen(false)}>
+        <div className="fixed inset-0 z-[65]" onClick={() => setIsOpen(false)}>
           <div className="absolute inset-0 bg-black bg-opacity-60" />
         </div>
       )}
@@ -234,7 +235,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
               className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 transition-colors w-full text-left"
             >
               <span className="text-gray-400"><Globe className="h-5 w-5" /></span>
-              <span>{locale === 'en' ? 'Español' : 'English'}</span>
+              <span>{t('nav.switch_language')}</span>
             </button>
           </div>
 
@@ -247,14 +248,14 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                   onClick={() => setIsOpen(false)}
                   className="flex items-center justify-center w-full py-2.5 border border-gray-600 rounded text-sm hover:bg-gray-800 transition-colors"
                 >
-                  {locale === 'es' ? 'Iniciar Sesión' : 'Sign In'}
+                  {t('nav.sign_in')}
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center justify-center w-full py-2.5 bg-primary-600 rounded text-sm hover:bg-primary-700 transition-colors font-medium"
                 >
-                  {locale === 'es' ? 'Registrarse' : 'Register'}
+                  {t('nav.register')}
                 </Link>
               </div>
             ) : (
@@ -264,7 +265,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                 className="flex items-center space-x-3 w-full py-2.5 px-3 text-red-400 hover:bg-red-600 hover:text-white rounded transition-colors"
               >
                 <LogOut className="h-5 w-5" />
-                <span>{locale === 'es' ? 'Cerrar Sesión' : 'Sign Out'}</span>
+                <span>{t('nav.sign_out')}</span>
               </button>
             )}
           </div>

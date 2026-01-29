@@ -957,7 +957,7 @@ const SortableExperienceRow = ({ experience, onDelete, onToggleActive, onImageUp
             <GripVertical className="w-4 h-4 text-gray-400" />
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-900">{experience.name}</div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">{experience.name}</div>
             <div className="text-sm text-gray-500 max-w-xs truncate">{experience.description}</div>
           </div>
         </div>
@@ -1198,7 +1198,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Experience Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Experience Management</h1>
           <div className="flex gap-3">
             <button
               onClick={() => handleExport('xlsx')}
@@ -1373,12 +1373,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <GripVertical className="w-4 h-4 text-gray-400" />
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-900">{destination.name}</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-white">{destination.name}</div>
               <div className="text-sm text-gray-500 max-w-md truncate">{destination.description}</div>
             </div>
           </div>
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
           <div className="flex items-center">
             <MapPin className="w-4 h-4 mr-1 text-gray-400" />
             {destination.location}
@@ -1618,7 +1618,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Destination Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Destination Management</h1>
           <div className="flex gap-3">
             <button
               onClick={() => handleExport('xlsx')}
@@ -1756,7 +1756,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'bookings' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">{t('admin.booking_management')}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.booking_management')}</h1>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -2120,7 +2120,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'users' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">{t('admin.user_management')}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.user_management')}</h1>
               <div className="flex space-x-2">
                 <button
                   onClick={() => {
@@ -2218,7 +2218,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'transactions' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">Top-up Approval System</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Top-up Approval System</h1>
               <div className="flex space-x-2 text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-yellow-400 rounded-none"></div>
@@ -2297,7 +2297,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-4 mb-3">
-                          <h3 className="text-xl font-bold text-gray-900">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                             ${transaction.amount} Top-up Request
                           </h3>
                           <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -2420,7 +2420,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
         {activeTab === 'pilots' && (
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('admin.pilot_management')}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('admin.pilot_management')}</h1>
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin h-12 w-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto"></div>
@@ -2464,7 +2464,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'aircrafts' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">Fleet Management</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Fleet Management</h1>
               <button
                 onClick={() => setShowAddHelicopterModal(true)}
                 className="btn-primary flex items-center"
@@ -2480,7 +2480,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600 text-sm">Total Aircraft</p>
-                    <p className="text-3xl font-bold text-gray-900">{helicopters.length}</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{helicopters.length}</p>
                   </div>
                   <Plane className="h-8 w-8 text-primary-600" />
                 </div>
@@ -2650,7 +2650,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
         {activeTab === 'analytics' && (
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">Analytics Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Analytics Dashboard</h1>
             
             {/* Financial Overview */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -2734,7 +2734,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600 text-sm">Total Users</p>
-                    <p className="text-3xl font-bold text-gray-900">{users.length}</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{users.length}</p>
                   </div>
                   <Users className="h-8 w-8 text-primary-600" />
                 </div>
@@ -2743,7 +2743,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600 text-sm">Total Bookings</p>
-                    <p className="text-3xl font-bold text-gray-900">{bookings.length}</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{bookings.length}</p>
                   </div>
                   <Calendar className="h-8 w-8 text-primary-600" />
                 </div>
@@ -2752,7 +2752,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600 text-sm">Completed Flights</p>
-                    <p className="text-3xl font-bold text-gray-900">
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
                       {bookings.filter(b => b.status === 'completed').length}
                     </p>
                   </div>
@@ -2763,7 +2763,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600 text-sm">Active Pilots</p>
-                    <p className="text-3xl font-bold text-gray-900">
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
                       {pilots.filter(p => p.kyc_verified).length}
                     </p>
                   </div>

@@ -103,23 +103,6 @@
     @apply focus:ring-white/50;
   }
 
-  /* Soft - Subtle emphasis */
-  .btn-soft {
-    @apply btn bg-primary-50 text-primary-700 rounded-soft;
-    @apply hover:bg-primary-100;
-    @apply focus:ring-primary-500;
-    @apply dark:bg-primary-900/50 dark:text-primary-300;
-    @apply dark:hover:bg-primary-900;
-  }
-
-  /* Link style button */
-  .btn-link {
-    @apply text-primary-600 font-medium underline-offset-4;
-    @apply hover:underline hover:text-primary-700;
-    @apply focus:outline-none focus:ring-0;
-    @apply dark:text-gold-400 dark:hover:text-gold-300;
-  }
-
   /* Icon button */
   .btn-icon {
     @apply inline-flex items-center justify-center;
@@ -144,11 +127,6 @@
     @apply dark:bg-luxury-charcoal dark:border dark:border-gray-800;
   }
 
-  /* Elevated card - hover state */
-  .card-elevated {
-    @apply card hover:shadow-luxury;
-  }
-
   /* Bordered card */
   .card-bordered {
     @apply card border border-gray-100;
@@ -162,13 +140,6 @@
     @apply border border-gray-100;
     @apply hover:shadow-xl transition-all duration-300;
     @apply dark:bg-luxury-charcoal dark:border-gray-800;
-  }
-
-  /* Glass card - for overlays on images */
-  .card-glass {
-    @apply bg-white/10 backdrop-blur-md;
-    @apply rounded-soft border border-white/20;
-    @apply p-6;
   }
 
   /* Feature card - services section */
@@ -213,146 +184,18 @@
   }
 
   /* ========================================
-     STATUS BADGES
-     ======================================== */
-
-  .status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  /* ========================================
      LOADING STATES
      ======================================== */
 
   .loading-spinner {
     @apply w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin;
   }
-  .loading-spinner-sm {
-    @apply w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
-  }
   .loading-spinner-lg {
     @apply w-8 h-8 border-[3px] border-current border-t-transparent rounded-full animate-spin;
   }
 
-  /* ========================================
-     NAVIGATION
-     ======================================== */
-
-  .nav-link {
-    @apply text-gray-600 hover:text-gray-900 transition-colors;
-    @apply dark:text-gray-400 dark:hover:text-white;
-  }
-
-  .nav-link-active {
-    @apply text-primary-600 font-medium;
-    @apply dark:text-gold-400;
-  }
-
-  /* ========================================
-     TEXT SYSTEM - Semantic text colors
-     ======================================== */
-
-  .text-heading {
-    @apply text-gray-900 dark:text-white;
-  }
-
-  .text-body {
-    @apply text-gray-700 dark:text-gray-300;
-  }
-
-  .text-muted {
-    @apply text-gray-600 dark:text-gray-400;
-  }
-
-  /* ========================================
-     FORM LABELS
-     ======================================== */
-
-  .form-label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
-  }
-
-  /* ========================================
-     TABLE SYSTEM
-     ======================================== */
-
-  .table-container {
-    @apply bg-white dark:bg-luxury-charcoal rounded-soft shadow-card overflow-hidden;
-    @apply dark:border dark:border-gray-800;
-  }
-
-  .table-header {
-    @apply bg-gray-50 dark:bg-gray-900;
-  }
-
-  .table-header-cell {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider;
-  }
-
-  .table-body {
-    @apply bg-white dark:bg-luxury-charcoal divide-y divide-gray-200 dark:divide-gray-700;
-  }
-
-  .table-cell {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white;
-  }
-
-  .table-cell-muted {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400;
-  }
 }
 
-@layer utilities {
-  /* ========================================
-     ANIMATIONS & INTERACTIONS
-     ======================================== */
-
-  /* Subtle lift on hover */
-  .hover-lift {
-    @apply transition-transform duration-200;
-  }
-  .hover-lift:hover {
-    @apply -translate-y-0.5;
-  }
-
-  /* Scale on hover */
-  .hover-scale {
-    @apply transition-transform duration-200;
-  }
-  .hover-scale:hover {
-    @apply scale-[1.02];
-  }
-
-  /* Gold shimmer effect */
-  .gold-shimmer {
-    background: linear-gradient(
-      120deg,
-      transparent 0%,
-      rgba(212, 175, 55, 0.1) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
-
-  /* Text gradient */
-  .text-gradient-gold {
-    @apply bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600;
-    @apply bg-clip-text text-transparent;
-  }
-
-  /* ========================================
-     DARK MODE SPECIFIC
-     ======================================== */
-
-  .dark-card-bg {
-    @apply bg-luxury-charcoal;
-  }
-
-  .dark-elevated {
-    @apply dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)];
-  }
-}
 
 /* ========================================
    MAPLIBRE POPUP STYLES
@@ -360,15 +203,15 @@
 
 /* Location preview popup - dark luxury theme */
 .location-preview-popup {
-  z-index: 9999 !important;
+  z-index: 40 !important;
 }
 
 .location-preview-popup.maplibregl-popup {
-  z-index: 9999 !important;
+  z-index: 40 !important;
 }
 
 .maplibregl-popup {
-  z-index: 9999 !important;
+  z-index: 40 !important;
 }
 
 .location-preview-popup .maplibregl-popup-content {
@@ -599,7 +442,7 @@
 /* Tooltip that appears on hover - use fixed positioning to escape overflow:hidden */
 .marker-tooltip {
   position: fixed;
-  z-index: 99999;
+  z-index: 40;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.15s ease-out, visibility 0.15s;
@@ -667,11 +510,6 @@
   border-radius: 4px;
   font-size: 11px;
   color: #93c5fd;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
 }
 
 /* Leaflet popup - dark luxury theme */

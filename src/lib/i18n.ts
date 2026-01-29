@@ -29,8 +29,16 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'nav.experiences': { en: 'Experiences', es: 'Experiencias' },
     'nav.transport': { en: 'Transport', es: 'Transporte' },
     'nav.pilot_opportunities': { en: 'Pilot Opportunities', es: 'Oportunidades para Pilotos' },
+    'nav.executive_services': { en: 'Executive Services', es: 'Servicios Ejecutivos' },
+    'nav.faq': { en: 'FAQ', es: 'Preguntas Frecuentes' },
+    'nav.pilot_dashboard': { en: 'Pilot Dashboard', es: 'Panel de Piloto' },
+    'nav.profile': { en: 'Profile', es: 'Perfil' },
+    'nav.admin': { en: 'Admin Panel', es: 'Panel de Admin' },
     'nav.login': { en: 'Login', es: 'Iniciar Sesión' },
     'nav.register': { en: 'Register', es: 'Registrarse' },
+    'nav.sign_in': { en: 'Sign In', es: 'Iniciar Sesión' },
+    'nav.sign_out': { en: 'Sign Out', es: 'Cerrar Sesión' },
+    'nav.switch_language': { en: 'Español', es: 'English' },
 
     // Homepage
     'hero.title': { 
@@ -345,13 +353,6 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'passenger.continue': { en: 'Continue to Review', es: 'Continuar a Revisión' },
     'passenger.back': { en: 'Back', es: 'Atrás' },
 
-    // Experience categories
-    'category.scenic': { en: 'Scenic Tours', es: 'Tours Panorámicos' },
-    'category.romantic': { en: 'Romantic Experiences', es: 'Experiencias Románticas' },
-    'category.cultural': { en: 'Cultural Tours', es: 'Tours Culturales' },
-    'category.volcano': { en: 'Volcano Tours', es: 'Tours de Volcanes' },
-    'category.beach': { en: 'Beach & Coast', es: 'Playa y Costa' },
-    'category.adventure': { en: 'Adventure Packages', es: 'Paquetes de Aventura' },
   }
 
   return translations[key]?.[locale] || key

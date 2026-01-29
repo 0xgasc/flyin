@@ -468,6 +468,11 @@ See [SESSION_CHANGES.md](SESSION_CHANGES.md) for complete details.
    - Stripe or local payment processor
    - Currently manual payment tracking
 
+4. **Admin Page Refactor**: `src/app/admin/page.tsx` is a 4000+ line monolith
+   - Split into separate components per tab (bookings, users, pilots, etc.)
+   - Add dark mode variants to all tables, modals, and form elements
+   - Extract inline modals into reusable components
+
 ---
 
 ## 📞 Support

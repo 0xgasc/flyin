@@ -83,8 +83,6 @@ export default function RegisterPage() {
         throw new Error(result.error || 'Registration failed')
       }
 
-      console.log('User registered successfully:', result.user?.email)
-
       if (formData.role === 'pilot') {
         router.push('/pilot/pending-verification')
       } else {

@@ -299,7 +299,7 @@ export default function BookTransportPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
               {error}
             </div>
           )}
@@ -470,7 +470,7 @@ export default function BookTransportPage() {
             </h2>
 
             {/* Trip Type Toggle */}
-            <div className="bg-gray-50 rounded p-4">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded p-4">
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('booking.form.trip_type')}</span>
                 <label className="flex items-center">
@@ -498,7 +498,7 @@ export default function BookTransportPage() {
 
             {/* Departure */}
             <div>
-              <h3 className="text-lg font-medium mb-3 text-gray-800">
+              <h3 className="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
                 {formData.isRoundTrip ? t('booking.form.departure') : t('booking.form.flight_details')}
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
@@ -534,7 +534,7 @@ export default function BookTransportPage() {
             {/* Return - Only show if round trip */}
             {formData.isRoundTrip && (
               <div>
-                <h3 className="text-lg font-medium mb-3 text-gray-800">Return</h3>
+                <h3 className="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">Return</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -555,7 +555,7 @@ export default function BookTransportPage() {
                         <button
                           type="button"
                           onClick={() => setFormData({ ...formData, returnDate: formData.date })}
-                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200"
+                          className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50"
                         >
                           {t('booking.form.same_day')}
                         </button>
@@ -566,7 +566,7 @@ export default function BookTransportPage() {
                             nextDay.setDate(nextDay.getDate() + 1)
                             setFormData({ ...formData, returnDate: format(nextDay, 'yyyy-MM-dd') })
                           }}
-                          className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200"
+                          className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
                         >
                           {t('booking.form.next_day')}
                         </button>
@@ -590,8 +590,8 @@ export default function BookTransportPage() {
 
                 {/* Same Day Return Notice */}
                 {formData.date && formData.returnDate && formData.date === formData.returnDate && (
-                  <div className="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
-                    <p className="text-sm text-blue-800">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 mt-3">
+                    <p className="text-sm text-blue-800 dark:text-blue-300">
                       💡 <strong>Same Day Return:</strong> 10% discount applied! Great for quick business trips or day tours.
                     </p>
                   </div>
@@ -637,21 +637,21 @@ export default function BookTransportPage() {
             </div>
           </div>
 
-          <div className="card-luxury bg-primary-50 border-primary-200">
+          <div className="card-luxury bg-primary-50 dark:bg-gray-900 border-primary-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <DollarSign className="h-6 w-6 text-primary-700 mr-2" />
-                <span className="text-xl font-semibold text-primary-900">
+                <DollarSign className="h-6 w-6 text-primary-700 dark:text-gold-400 mr-2" />
+                <span className="text-xl font-semibold text-primary-900 dark:text-white">
                   {t('booking.form.price_breakdown')}
                 </span>
               </div>
-              <span className="text-3xl font-bold text-primary-900">
+              <span className="text-3xl font-bold text-primary-900 dark:text-white">
                 ${price}
               </span>
             </div>
             
             {priceBredown && (
-              <div className="space-y-2 text-sm text-primary-800 mb-4">
+              <div className="space-y-2 text-sm text-primary-800 dark:text-gray-300 mb-4">
                 <div className="flex justify-between">
                   <span>{t('pricing.distance')}:</span>
                   <span>{priceBredown.distance} km {priceBredown.isRoundTrip ? t('booking.form.each_way') : ''}</span>
@@ -676,14 +676,14 @@ export default function BookTransportPage() {
                     <span>+${priceBredown.passengerFee}</span>
                   </div>
                 )}
-                <div className="border-t border-primary-300 pt-2 flex justify-between font-semibold">
+                <div className="border-t border-primary-300 dark:border-gray-600 pt-2 flex justify-between font-semibold">
                   <span>{t('pricing.total')} {priceBredown.isRoundTrip ? t('booking.form.round_trip') : ''} {t('pricing.base_price')}:</span>
                   <span>${priceBredown.totalPrice}</span>
                 </div>
               </div>
             )}
 
-            <div className="flex items-center text-sm text-primary-700">
+            <div className="flex items-center text-sm text-primary-700 dark:text-gray-400">
               <Navigation className="h-4 w-4 mr-2" />
               {formData.fromLocation && formData.toLocation ? (
                 <span>
@@ -699,7 +699,7 @@ export default function BookTransportPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-full sm:flex-1 px-6 py-4 sm:py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 font-medium text-base"
+              className="w-full sm:flex-1 px-6 py-4 sm:py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-base"
             >
               Cancel
             </button>

@@ -448,7 +448,7 @@ export default function GuatemalaMapLibre({
       {/* React-rendered tooltip - outside map container to avoid clipping */}
       {hoveredDest && tooltipPos && (
         <div
-          className="fixed z-[99999] pointer-events-none"
+          className="fixed z-[40] pointer-events-none"
           style={{
             left: tooltipPos.x,
             top: tooltipPos.y,
