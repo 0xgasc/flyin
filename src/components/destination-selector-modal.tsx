@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X, MapPin, Plane, Mountain } from 'lucide-react'
 import type { Department } from '@/lib/guatemala-departments'
 
@@ -20,6 +21,11 @@ export default function DestinationSelectorModal({
   type
 }: DestinationSelectorModalProps) {
   const [selectedDestination, setSelectedDestination] = useState<string>('')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   if (!isOpen) return null
 
@@ -30,7 +36,7 @@ export default function DestinationSelectorModal({
     }
   }
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center p-0 md:p-4 z-[200]">
       <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded-none md:rounded-none shadow-xl w-full md:max-w-md max-h-[90vh] md:max-h-[80vh] overflow-hidden">
         {/* Header */}
@@ -151,4 +157,11 @@ export default function DestinationSelectorModal({
       </div>
     </div>
   )
+
+  // Portal to document.body to escape any stacking context (WebGL canvas compositing layers)
+  if (mounted) {
+    return createPortal(modalContent, document.body)
+  }
+
+  return modalContent
 }
