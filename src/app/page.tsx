@@ -114,7 +114,7 @@ export default function HomePage() {
       {/* Hero Section - Full viewport height with background */}
       <div className="relative min-h-screen flex flex-col">
         {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <Image
             src="https://images.unsplash.com/photo-1540962351504-03099e0a754b?q=80&w=2000&auto=format&fit=crop"
             alt="Helicopter flying over Guatemala"
@@ -126,8 +126,8 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
         </div>
 
-        {/* Navigation */}
-        <div className="relative z-10">
+        {/* Navigation - z-50 ensures MobileNav overlay/panel paint above hero content (z-10) */}
+        <div className="relative z-50">
           <MobileNav
             customActions={
               <div className="hidden md:flex items-center space-x-4">
