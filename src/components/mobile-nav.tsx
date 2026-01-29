@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Menu, X, Home, User, Calendar, Settings, LogOut, Globe, Briefcase, HelpCircle, Plane, MapPin } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
@@ -30,11 +30,12 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
   const { profile } = useAuthStore()
   const { locale, setLocale } = useI18n()
   const router = useRouter()
+  const pathname = usePathname()
 
   // Close menu on route change
   useEffect(() => {
     setIsOpen(false)
-  }, [])
+  }, [pathname])
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -114,13 +115,14 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
       <nav className="bg-luxury-black text-white relative z-[60]">
         {/* Banner with centered logo */}
         <div className="flex items-center justify-between px-4 py-3">
-          {/* Left: Hamburger menu */}
+          {/* Left: Language switcher (compact) */}
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 hover:bg-gray-800 rounded transition-colors"
-            aria-label="Toggle menu"
+            onClick={() => setLocale(locale === 'en' ? 'es' : 'en')}
+            className="p-2 hover:bg-gray-800 rounded transition-colors flex items-center space-x-1 text-sm"
+            title={locale === 'en' ? 'Switch to Spanish' : 'Cambiar a inglés'}
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <Globe className="h-4 w-4" />
+            <span className="text-xs font-medium">{locale === 'en' ? 'EN' : 'ES'}</span>
           </button>
 
           {/* Center: Logo - bigger, banner style */}
@@ -135,14 +137,13 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
             />
           </Link>
 
-          {/* Right: Language switcher (compact) */}
+          {/* Right: Hamburger menu */}
           <button
-            onClick={() => setLocale(locale === 'en' ? 'es' : 'en')}
-            className="p-2 hover:bg-gray-800 rounded transition-colors flex items-center space-x-1 text-sm"
-            title={locale === 'en' ? 'Switch to Spanish' : 'Cambiar a inglés'}
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 hover:bg-gray-800 rounded transition-colors"
+            aria-label="Toggle menu"
           >
-            <Globe className="h-4 w-4" />
-            <span className="text-xs font-medium">{locale === 'en' ? 'EN' : 'ES'}</span>
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </nav>
@@ -156,8 +157,8 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
 
       {/* Slide-out menu panel */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-luxury-black border-r border-gray-800 z-[70] transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 right-0 h-full w-72 bg-luxury-black border-l border-gray-800 z-[70] transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
