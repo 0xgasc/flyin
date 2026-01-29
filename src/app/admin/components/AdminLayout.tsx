@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/lib/auth-client'
+import { useTranslation } from '@/lib/i18n'
 import {
   Plane, Calendar, Users, UserCheck, DollarSign, BarChart3,
   MapPin, Image as ImageIcon, Menu, X, LogOut, Home, ChevronLeft, ChevronRight
@@ -18,16 +19,16 @@ interface AdminLayoutProps {
   children: React.ReactNode
 }
 
-const navItems: { id: AdminTab; label: string; icon: React.ElementType; group: string }[] = [
-  { id: 'bookings', label: 'Bookings', icon: Plane, group: 'Operations' },
-  { id: 'calendar', label: 'Calendar', icon: Calendar, group: 'Operations' },
-  { id: 'users', label: 'Users', icon: Users, group: 'People' },
-  { id: 'pilots', label: 'Pilots', icon: UserCheck, group: 'People' },
-  { id: 'transactions', label: 'Transactions', icon: DollarSign, group: 'Finance' },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3, group: 'Finance' },
-  { id: 'experiences', label: 'Experiences', icon: ImageIcon, group: 'Content' },
-  { id: 'destinations', label: 'Destinations', icon: MapPin, group: 'Content' },
-  { id: 'aircrafts', label: 'Aircraft', icon: Plane, group: 'Assets' },
+const navItemDefs: { id: AdminTab; labelKey: string; icon: React.ElementType; groupKey: string }[] = [
+  { id: 'bookings', labelKey: 'admin.bookings', icon: Plane, groupKey: 'admin.group_operations' },
+  { id: 'calendar', labelKey: 'admin.calendar', icon: Calendar, groupKey: 'admin.group_operations' },
+  { id: 'users', labelKey: 'admin.users', icon: Users, groupKey: 'admin.group_people' },
+  { id: 'pilots', labelKey: 'admin.pilots', icon: UserCheck, groupKey: 'admin.group_people' },
+  { id: 'transactions', labelKey: 'admin.transactions', icon: DollarSign, groupKey: 'admin.group_finance' },
+  { id: 'analytics', labelKey: 'admin.analytics', icon: BarChart3, groupKey: 'admin.group_finance' },
+  { id: 'experiences', labelKey: 'admin.experiences', icon: ImageIcon, groupKey: 'admin.group_content' },
+  { id: 'destinations', labelKey: 'admin.destinations', icon: MapPin, groupKey: 'admin.group_content' },
+  { id: 'aircrafts', labelKey: 'admin.aircrafts', icon: Plane, groupKey: 'admin.group_assets' },
 ]
 
 export function AdminLayout({
@@ -38,6 +39,7 @@ export function AdminLayout({
   children
 }: AdminLayoutProps) {
   const router = useRouter()
+  const { t } = useTranslation()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -45,6 +47,13 @@ export function AdminLayout({
     await logout()
     router.push('/')
   }
+
+  // Resolve nav items with translations
+  const navItems = navItemDefs.map(item => ({
+    ...item,
+    label: t(item.labelKey),
+    group: t(item.groupKey),
+  }))
 
   // Group nav items
   const groups = navItems.reduce((acc, item) => {
@@ -147,7 +156,7 @@ export function AdminLayout({
             `}
           >
             <LogOut className="w-5 h-5" />
-            {sidebarOpen && <span>Sign Out</span>}
+            {sidebarOpen && <span>{t('nav.sign_out')}</span>}
           </button>
         </div>
       </aside>
@@ -179,7 +188,7 @@ export function AdminLayout({
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-soft text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
               >
                 <LogOut className="w-5 h-5" />
-                <span>Sign Out</span>
+                <span>{t('nav.sign_out')}</span>
               </button>
             </div>
           </aside>

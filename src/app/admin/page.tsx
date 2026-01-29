@@ -1198,7 +1198,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Experience Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.experience_management')}</h1>
           <div className="flex gap-3">
             <button
               onClick={() => handleExport('xlsx')}
@@ -1618,7 +1618,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Destination Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.destination_management')}</h1>
           <div className="flex gap-3">
             <button
               onClick={() => handleExport('xlsx')}
@@ -1928,7 +1928,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'calendar' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Flight Calendar & Aircraft Scheduling</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.flight_calendar_title')}</h1>
               <div className="flex space-x-2">
                 <button 
                   onClick={() => setCurrentWeekOffset(0)}
@@ -2218,7 +2218,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'transactions' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Top-up Approval System</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.topup_approval')}</h1>
               <div className="flex space-x-2 text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-yellow-400 rounded-none"></div>
@@ -2464,7 +2464,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
         {activeTab === 'aircrafts' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Fleet Management</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.fleet_management')}</h1>
               <button
                 onClick={() => setShowAddHelicopterModal(true)}
                 className="btn-primary flex items-center"
@@ -2650,7 +2650,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
         {activeTab === 'analytics' && (
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Analytics Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('admin.analytics_dashboard')}</h1>
             
             {/* Financial Overview */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

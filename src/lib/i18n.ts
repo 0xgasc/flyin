@@ -239,6 +239,17 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'admin.experiences': { en: 'Experiences', es: 'Experiencias' },
     'admin.destinations': { en: 'Destinations', es: 'Destinos' },
     'admin.aircrafts': { en: 'Aircraft', es: 'Aeronaves' },
+    'admin.group_operations': { en: 'Operations', es: 'Operaciones' },
+    'admin.group_people': { en: 'People', es: 'Personas' },
+    'admin.group_finance': { en: 'Finance', es: 'Finanzas' },
+    'admin.group_content': { en: 'Content', es: 'Contenido' },
+    'admin.group_assets': { en: 'Assets', es: 'Activos' },
+    'admin.experience_management': { en: 'Experience Management', es: 'Gestión de Experiencias' },
+    'admin.destination_management': { en: 'Destination Management', es: 'Gestión de Destinos' },
+    'admin.fleet_management': { en: 'Fleet Management', es: 'Gestión de Flota' },
+    'admin.analytics_dashboard': { en: 'Analytics Dashboard', es: 'Panel de Análisis' },
+    'admin.topup_approval': { en: 'Top-up Approval System', es: 'Sistema de Aprobación de Recargas' },
+    'admin.flight_calendar_title': { en: 'Flight Calendar & Aircraft Scheduling', es: 'Calendario de Vuelos y Programación de Aeronaves' },
 
     // Form fields
     'form.full_name': { en: 'Full Name', es: 'Nombre Completo' },
