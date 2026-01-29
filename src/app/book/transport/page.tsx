@@ -431,12 +431,14 @@ export default function BookTransportPage() {
                   </p>
                 </div>
 
-                <SafeMapWrapper
-                  onDepartmentClick={handleDepartmentClick}
-                  selectedFrom={formData.fromLocation}
-                  selectedTo={formData.toLocation}
-                  mode="both"
-                />
+                <div style={showDestinationModal ? { position: 'relative', zIndex: -1 } : undefined}>
+                  <SafeMapWrapper
+                    onDepartmentClick={handleDepartmentClick}
+                    selectedFrom={formData.fromLocation}
+                    selectedTo={formData.toLocation}
+                    mode="both"
+                  />
+                </div>
 
                 {/* Selected Locations Display */}
                 {(formData.fromLocation || formData.toLocation) && (
