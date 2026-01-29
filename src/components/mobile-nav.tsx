@@ -158,7 +158,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
       {/* Slide-out menu panel */}
       <div
         className={`fixed top-0 right-0 h-full w-72 bg-luxury-black border-l border-gray-800 z-[70] transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
         }`}
       >
         <div className="flex flex-col h-full">
