@@ -135,10 +135,12 @@ export async function PUT(
       }))
     }
 
+    // Skip timestamp update for reorder-only operations
+    const isReorderOnly = Object.keys(updateData).length === 1 && updateData.orderIndex !== undefined
     const experience = await Experience.findByIdAndUpdate(
       id,
       { $set: updateData },
-      { new: true }
+      { new: true, timestamps: !isReorderOnly }
     ).lean()
 
     if (!experience) {

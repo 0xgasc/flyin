@@ -118,10 +118,12 @@ export async function PUT(
     if (body.order_index !== undefined) updateData.orderIndex = body.order_index
     if (body.is_active !== undefined) updateData.isActive = body.is_active
 
+    // Skip timestamp update for reorder-only operations
+    const isReorderOnly = Object.keys(updateData).length === 1 && updateData.orderIndex !== undefined
     const destination = await Destination.findByIdAndUpdate(
       id,
       { $set: updateData },
-      { new: true }
+      { new: true, timestamps: !isReorderOnly }
     ).lean()
 
     if (!destination) {
