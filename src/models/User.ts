@@ -10,6 +10,7 @@ export interface IUser extends Document {
   role: 'client' | 'pilot' | 'admin'
   accountBalance: number
   kycVerified: boolean
+  adminNotes: string | null
   createdAt: Date
   updatedAt: Date
   setPassword(password: string): Promise<void>
@@ -61,6 +62,10 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   kycVerified: {
     type: Boolean,
     default: false
+  },
+  adminNotes: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true

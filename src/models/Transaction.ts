@@ -9,6 +9,8 @@ export interface ITransaction extends Document {
   paymentMethod: 'card' | 'bank' | 'bank_transfer' | 'account_balance' | 'deposit'
   status: 'pending' | 'completed' | 'failed' | 'approved' | 'rejected'
   reference: string | null
+  adminNotes: string | null
+  processedAt: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -46,6 +48,14 @@ const transactionSchema = new Schema<ITransaction>({
   },
   reference: {
     type: String,
+    default: null
+  },
+  adminNotes: {
+    type: String,
+    default: null
+  },
+  processedAt: {
+    type: Date,
     default: null
   }
 }, {

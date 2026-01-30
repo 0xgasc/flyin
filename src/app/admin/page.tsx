@@ -3876,7 +3876,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     notes: selectedHelicopterForEdit.notes,
                     total_flight_hours: selectedHelicopterForEdit.total_flight_hours,
                     last_maintenance_date: selectedHelicopterForEdit.last_maintenance_date,
-                    next_maintenance_due: selectedHelicopterForEdit.next_maintenance_due
+                    next_maintenance_due: selectedHelicopterForEdit.next_maintenance_due,
+                    insurance_expiry: selectedHelicopterForEdit.insurance_expiry
                   })
                 })
 

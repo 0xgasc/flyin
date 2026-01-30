@@ -20,6 +20,7 @@ export interface IHelicopter extends Document {
   location: string
   notes: string | null
   imageUrl: string | null
+  insuranceExpiry: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -47,7 +48,8 @@ const HelicopterSchema = new Schema<IHelicopter>(
     },
     location: { type: String, default: 'Guatemala City Base' },
     notes: { type: String, default: null },
-    imageUrl: { type: String, default: null }
+    imageUrl: { type: String, default: null },
+    insuranceExpiry: { type: Date, default: null }
   },
   { timestamps: true }
 )

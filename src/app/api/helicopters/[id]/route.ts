@@ -40,7 +40,8 @@ export async function GET(
         status: h.status,
         location: h.location,
         notes: h.notes,
-        image_url: h.imageUrl
+        image_url: h.imageUrl,
+        insurance_expiry: h.insuranceExpiry
       }
     })
   } catch (error: any) {
@@ -90,6 +91,7 @@ export async function PUT(
     if (body.location !== undefined) updates.location = body.location
     if (body.notes !== undefined) updates.notes = body.notes
     if (body.image_url !== undefined) updates.imageUrl = body.image_url
+    if (body.insurance_expiry !== undefined) updates.insuranceExpiry = body.insurance_expiry || null
 
     const helicopter = await Helicopter.findByIdAndUpdate(
       id,

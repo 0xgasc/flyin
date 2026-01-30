@@ -205,12 +205,29 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       { new: true }
     )
 
+    const ub = updatedBooking!
     return NextResponse.json({
       success: true,
       booking: {
-        id: updatedBooking!._id.toString(),
-        status: updatedBooking!.status,
-        payment_status: updatedBooking!.paymentStatus
+        id: ub._id.toString(),
+        booking_type: ub.bookingType,
+        status: ub.status,
+        from_location: ub.fromLocation,
+        to_location: ub.toLocation,
+        scheduled_date: ub.scheduledDate,
+        scheduled_time: ub.scheduledTime,
+        return_date: ub.returnDate,
+        return_time: ub.returnTime,
+        is_round_trip: ub.isRoundTrip,
+        passenger_count: ub.passengerCount,
+        total_price: ub.totalPrice,
+        price_breakdown: ub.priceBreakdown || null,
+        payment_status: ub.paymentStatus,
+        pilot_id: ub.pilotId?.toString() || null,
+        helicopter_id: ub.helicopterId,
+        admin_notes: ub.adminNotes,
+        revision_requested: ub.revisionRequested,
+        revision_notes: ub.revisionNotes
       }
     })
   } catch (error: any) {

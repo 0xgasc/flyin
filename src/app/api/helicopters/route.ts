@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
       location: h.location,
       notes: h.notes,
       image_url: h.imageUrl,
+      insurance_expiry: h.insuranceExpiry,
       created_at: h.createdAt
     }))
 

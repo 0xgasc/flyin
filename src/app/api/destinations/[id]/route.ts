@@ -138,6 +138,15 @@ export async function PUT(
         location: d.location,
         coordinates: d.coordinates,
         features: d.features,
+        highlights: d.highlights,
+        requirements: d.requirements,
+        meeting_point: d.meetingPoint,
+        best_time: d.bestTime,
+        difficulty_level: d.difficultyLevel,
+        is_hub: d.isHub || false,
+        airport_id: d.airportId?.toString() || null,
+        metadata: d.metadata,
+        order_index: d.orderIndex,
         is_active: d.isActive
       }
     })

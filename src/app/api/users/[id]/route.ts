@@ -48,6 +48,7 @@ export async function GET(
         role: u.role,
         account_balance: u.accountBalance,
         kyc_verified: u.kycVerified,
+        admin_notes: u.adminNotes,
         created_at: u.createdAt,
         updated_at: u.updatedAt
       }
@@ -100,6 +101,7 @@ export async function PUT(
       if (body.role !== undefined) updateData.role = body.role
       if (body.kyc_verified !== undefined) updateData.kycVerified = body.kyc_verified
       if (body.account_balance !== undefined) updateData.accountBalance = body.account_balance
+      if (body.admin_notes !== undefined) updateData.adminNotes = body.admin_notes
     }
 
     const user = await User.findByIdAndUpdate(
@@ -122,7 +124,8 @@ export async function PUT(
         phone: u.phone,
         role: u.role,
         account_balance: u.accountBalance,
-        kyc_verified: u.kycVerified
+        kyc_verified: u.kycVerified,
+        admin_notes: u.adminNotes
       }
     })
   } catch (error: any) {

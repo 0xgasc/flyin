@@ -157,6 +157,7 @@ export async function PUT(
         location: e.location,
         is_active: e.isActive,
         pricing_tiers: (e.pricingTiers || []).map((t: any) => ({
+          id: t._id?.toString() || `tier-${t.minPassengers}-${t.maxPassengers}`,
           min_passengers: t.minPassengers,
           max_passengers: t.maxPassengers,
           price: t.price
