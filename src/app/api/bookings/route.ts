@@ -116,6 +116,7 @@ export async function GET(request: NextRequest) {
       addon_total_price: b.addonTotalPrice,
       notes: b.notes,
       total_price: b.totalPrice,
+      price_breakdown: b.priceBreakdown || null,
       payment_status: b.paymentStatus,
       pilot_id: b.pilotId?._id?.toString() || b.pilotId,
       pilot: b.pilotId ? {
@@ -182,7 +183,8 @@ export async function POST(request: NextRequest) {
       selected_addons,
       addon_total_price,
       notes,
-      total_price
+      total_price,
+      price_breakdown
     } = body
 
     // Validate required fields
@@ -235,6 +237,7 @@ export async function POST(request: NextRequest) {
       addonTotalPrice: addon_total_price || 0,
       notes: notes || null,
       totalPrice: total_price,
+      priceBreakdown: price_breakdown || null,
       status: 'pending',
       paymentStatus: 'pending'
     })
@@ -256,6 +259,7 @@ export async function POST(request: NextRequest) {
         passenger_count: booking.passengerCount,
         notes: booking.notes,
         total_price: booking.totalPrice,
+        price_breakdown: booking.priceBreakdown || null,
         payment_status: booking.paymentStatus,
         created_at: booking.createdAt
       }

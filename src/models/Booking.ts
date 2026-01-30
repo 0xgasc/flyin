@@ -15,6 +15,15 @@ export interface ISelectedAddon {
   unitPrice: number
 }
 
+export interface IPriceBreakdown {
+  distance: number
+  flightTime: number
+  basePrice: number
+  passengerFee: number
+  multiplier: number | null
+  isRoundTrip: boolean
+}
+
 export interface IBooking extends Document {
   _id: mongoose.Types.ObjectId
   clientId: mongoose.Types.ObjectId
@@ -35,6 +44,7 @@ export interface IBooking extends Document {
   addonTotalPrice: number
   notes: string | null
   totalPrice: number
+  priceBreakdown: IPriceBreakdown | null
   paymentStatus: 'pending' | 'processing' | 'paid' | 'refunded'
   pilotId: mongoose.Types.ObjectId | null
   helicopterId: string | null
@@ -141,6 +151,17 @@ const bookingSchema = new Schema<IBooking>({
     type: Number,
     required: true,
     min: 0
+  },
+  priceBreakdown: {
+    type: {
+      distance: { type: Number },
+      flightTime: { type: Number },
+      basePrice: { type: Number },
+      passengerFee: { type: Number },
+      multiplier: { type: Number, default: null },
+      isRoundTrip: { type: Boolean, default: false }
+    },
+    default: null
   },
   paymentStatus: {
     type: String,

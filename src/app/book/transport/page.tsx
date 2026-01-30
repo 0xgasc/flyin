@@ -254,7 +254,15 @@ export default function BookTransportPage() {
           is_round_trip: formData.isRoundTrip,
           passenger_count: formData.passengers,
           notes: formData.notes,
-          total_price: price
+          total_price: price,
+          price_breakdown: priceBredown ? {
+            distance: priceBredown.distance,
+            flightTime: priceBredown.flightTime,
+            basePrice: priceBredown.basePrice,
+            passengerFee: priceBredown.passengerFee || 0,
+            multiplier: priceBredown.multiplier || null,
+            isRoundTrip: priceBredown.isRoundTrip || false
+          } : null
         })
       })
 
