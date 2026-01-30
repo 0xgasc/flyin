@@ -983,6 +983,9 @@ const SortableExperienceRow = ({ experience, onDelete, onToggleActive, onImageUp
           {experience.is_active ? 'Active' : 'Inactive'}
         </button>
       </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+        {experience.updated_at ? new Date(experience.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+      </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex items-center space-x-2">
           <button
@@ -1250,6 +1253,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Last Edited
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -1409,6 +1415,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           >
             {destination.is_active ? 'Active' : 'Inactive'}
           </button>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+          {destination.updated_at ? new Date(destination.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
           <div className="flex space-x-2">
@@ -1667,6 +1676,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Last Edited
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -1679,13 +1691,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <tbody className="bg-white dark:bg-luxury-charcoal divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                       Loading destinations...
                     </td>
                   </tr>
                 ) : destinations.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                       No destinations found
                     </td>
                   </tr>
