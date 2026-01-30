@@ -11,6 +11,7 @@ export interface ITransaction extends Document {
   reference: string | null
   adminNotes: string | null
   processedAt: Date | null
+  processedBy: mongoose.Types.ObjectId | null
   createdAt: Date
   updatedAt: Date
 }
@@ -56,6 +57,11 @@ const transactionSchema = new Schema<ITransaction>({
   },
   processedAt: {
     type: Date,
+    default: null
+  },
+  processedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     default: null
   }
 }, {

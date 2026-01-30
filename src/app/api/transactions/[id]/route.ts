@@ -96,7 +96,8 @@ export async function PATCH(
 
     const updates: any = {
       status,
-      processedAt: new Date()
+      processedAt: new Date(),
+      processedBy: payload.userId
     }
     if (admin_notes !== undefined) {
       updates.adminNotes = admin_notes

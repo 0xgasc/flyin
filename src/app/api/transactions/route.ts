@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/lib/mongodb'
 import Transaction from '@/models/Transaction'
 import { getAuthUser } from '@/lib/auth-middleware'
 
-// GET /api/transactions - Get user's transactions
+// GET /api/transactions - Get user's transactions (or all for admin)
 export async function GET(req: NextRequest) {
   try {
     const user = await getAuthUser(req)
@@ -13,21 +13,40 @@ export async function GET(req: NextRequest) {
 
     await connectToDatabase()
 
-    const transactions = await Transaction.find({ userId: user.userId })
+    const isAdmin = user.role === 'admin'
+    const query = isAdmin ? {} : { userId: user.userId }
+
+    const transactions = await Transaction.find(query)
+      .populate('userId', 'fullName email')
+      .populate('processedBy', 'fullName email')
       .sort({ createdAt: -1 })
       .lean()
 
-    // Transform to match frontend expectations
-    const transformedTransactions = transactions.map((t: any) => ({
-      id: t._id.toString(),
-      createdAt: t.createdAt,
-      userId: t.userId.toString(),
-      type: t.type,
-      amount: t.amount,
-      paymentMethod: t.paymentMethod,
-      reference: t.reference,
-      status: t.status
-    }))
+    const transformedTransactions = transactions.map((t: any) => {
+      const u = t.userId && typeof t.userId === 'object' ? t.userId : null
+      const processor = t.processedBy && typeof t.processedBy === 'object' ? t.processedBy : null
+
+      return {
+        id: t._id.toString(),
+        createdAt: t.createdAt,
+        userId: u ? u._id.toString() : t.userId?.toString(),
+        type: t.type,
+        amount: t.amount,
+        paymentMethod: t.paymentMethod,
+        reference: t.reference,
+        status: t.status,
+        adminNotes: t.adminNotes,
+        processedAt: t.processedAt,
+        user: u ? {
+          full_name: u.fullName,
+          email: u.email
+        } : null,
+        processedBy: processor ? {
+          full_name: processor.fullName,
+          email: processor.email
+        } : null
+      }
+    })
 
     return NextResponse.json({ success: true, transactions: transformedTransactions })
   } catch (error: any) {

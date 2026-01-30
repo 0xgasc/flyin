@@ -91,7 +91,21 @@ export default function AdminDashboard() {
   const { t } = useTranslation()
   
   // All state hooks must be declared before any conditional returns
-  const [activeTab, setActiveTab] = useState<AdminTab>('bookings')
+  const [activeTab, setActiveTabState] = useState<AdminTab>('bookings')
+
+  // Persist active tab in URL hash
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '')
+    const validTabs: AdminTab[] = ['bookings', 'calendar', 'users', 'pilots', 'transactions', 'aircrafts', 'analytics', 'experiences', 'destinations']
+    if (hash && validTabs.includes(hash as AdminTab)) {
+      setActiveTabState(hash as AdminTab)
+    }
+  }, [])
+
+  const setActiveTab = (tab: AdminTab) => {
+    setActiveTabState(tab)
+    window.location.hash = tab
+  }
   const [bookings, setBookings] = useState<Booking[]>([])
   const [pilots, setPilots] = useState<Pilot[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -367,51 +381,12 @@ export default function AdminDashboard() {
           processed_at: t.processedAt || t.processed_at,
           admin_notes: t.adminNotes || t.admin_notes,
           user: t.user,
+          processed_by: t.processedBy,
         }))
         setTransactions(transformed)
       } else {
         console.error('Error fetching transactions:', data.error)
-        // Demo data with payment proof URLs
-        setTransactions([
-          {
-            id: '1',
-            created_at: new Date().toISOString(),
-            user_id: '1',
-            type: 'deposit',
-            amount: 100,
-            payment_method: 'bank_transfer',
-            status: 'pending',
-            reference: 'REF-001',
-            payment_proof_url: 'https://via.placeholder.com/400x600/e5e7eb/374151?text=Bank+Transfer+Receipt',
-            user: { full_name: 'John Doe', email: 'john@example.com' }
-          },
-          {
-            id: '2',
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-            user_id: '2',
-            type: 'deposit',
-            amount: 250,
-            payment_method: 'cryptocurrency',
-            status: 'pending',
-            reference: 'CRYPTO-002',
-            payment_proof_url: 'https://via.placeholder.com/400x300/dbeafe/1e40af?text=Crypto+Transaction+Hash',
-            user: { full_name: 'Maria Garcia', email: 'maria@example.com' }
-          },
-          {
-            id: '3',
-            created_at: new Date(Date.now() - 172800000).toISOString(),
-            user_id: '3',
-            type: 'deposit',
-            amount: 500,
-            payment_method: 'bank_transfer',
-            status: 'approved',
-            reference: 'REF-003',
-            payment_proof_url: null,
-            processed_at: new Date(Date.now() - 86400000).toISOString(),
-            admin_notes: 'Verified manually by admin',
-            user: { full_name: 'Carlos Rodriguez', email: 'carlos@example.com' }
-          }
-        ])
+        setTransactions([])
       }
     } catch (err) {
       console.error('Error:', err)
@@ -1224,6 +1199,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             </label>
             <Link
               href="/admin/experiences/new"
+              prefetch={false}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
@@ -1650,6 +1626,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             </label>
             <Link
               href="/admin/destinations/new"
+              prefetch={false}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-none font-semibold flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
@@ -2328,8 +2305,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         
                         <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
                           <div>
-                            <p><span className="font-medium">Client:</span> {transaction.user?.full_name}</p>
-                            <p><span className="font-medium">{t('form.email')}:</span> {transaction.user?.email}</p>
+                            <p><span className="font-medium">Client:</span> {transaction.user?.full_name || 'Unknown'}</p>
+                            <p><span className="font-medium">{t('form.email')}:</span> {transaction.user?.email || '—'}</p>
                             <p><span className="font-medium">Method:</span> {(transaction.payment_method || 'unknown').replace('_', ' ').toUpperCase()}</p>
                           </div>
                           <div>
@@ -2337,6 +2314,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             <p><span className="font-medium">Submitted:</span> {new Date(transaction.created_at).toLocaleString()}</p>
                             {transaction.processed_at && (
                               <p><span className="font-medium">Processed:</span> {new Date(transaction.processed_at).toLocaleString()}</p>
+                            )}
+                            {transaction.processed_by && (
+                              <p><span className="font-medium">Approved by:</span> {transaction.processed_by.full_name || transaction.processed_by.email}</p>
                             )}
                           </div>
                           <div>
