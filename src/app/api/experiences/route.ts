@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
         price: t.price
       })),
       is_active: e.isActive,
+      content_edited_at: e.contentEditedAt,
       created_at: e.createdAt,
       updated_at: e.updatedAt
     }))

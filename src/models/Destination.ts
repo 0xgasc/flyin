@@ -21,6 +21,7 @@ export interface IDestination extends Document {
   metadata: any
   orderIndex: number | null
   isActive: boolean
+  contentEditedAt: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -90,6 +91,10 @@ const destinationSchema = new Schema<IDestination>({
   isActive: {
     type: Boolean,
     default: true
+  },
+  contentEditedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

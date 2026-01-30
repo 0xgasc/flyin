@@ -984,7 +984,7 @@ const SortableExperienceRow = ({ experience, onDelete, onToggleActive, onImageUp
         </button>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-        {experience.updated_at ? new Date(experience.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+        {new Date(experience.content_edited_at || experience.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex items-center space-x-2">
@@ -1417,7 +1417,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
           </button>
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-          {destination.updated_at ? new Date(destination.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+          {new Date(destination.content_edited_at || destination.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
           <div className="flex space-x-2">

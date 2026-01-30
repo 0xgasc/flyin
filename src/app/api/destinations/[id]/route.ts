@@ -120,6 +120,9 @@ export async function PUT(
 
     // Skip timestamp update for reorder-only operations
     const isReorderOnly = Object.keys(updateData).length === 1 && updateData.orderIndex !== undefined
+    if (!isReorderOnly) {
+      updateData.contentEditedAt = new Date()
+    }
     const destination = await Destination.findByIdAndUpdate(
       id,
       { $set: updateData },

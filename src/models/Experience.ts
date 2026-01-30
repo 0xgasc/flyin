@@ -32,6 +32,7 @@ export interface IExperience extends Document {
   orderIndex: number | null
   pricingTiers: IPricingTier[]
   isActive: boolean
+  contentEditedAt: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -142,6 +143,10 @@ const experienceSchema = new Schema<IExperience>({
   isActive: {
     type: Boolean,
     default: true
+  },
+  contentEditedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

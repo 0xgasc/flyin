@@ -88,6 +88,7 @@ export async function GET(request: NextRequest) {
         metadata: d.metadata,
         order_index: d.orderIndex,
         is_active: d.isActive,
+        content_edited_at: d.contentEditedAt,
         created_at: d.createdAt,
         updated_at: d.updatedAt,
         destination_images: includeImages ? (imagesByDestination[d._id.toString()] || []) : undefined
