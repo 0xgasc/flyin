@@ -292,7 +292,7 @@ export default function DestinationDetailPage() {
               </div>
             </div>
 
-            <p className="text-gray-700 leading-relaxed">{destination.description}</p>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{destination.description}</p>
 
             {/* Key Details */}
             <div className="p-4 bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded shadow-sm">
@@ -311,7 +311,7 @@ export default function DestinationDetailPage() {
                   {destination.features.map((feature, index) => (
                     <div key={index} className="flex items-center">
                       <Star className="w-4 h-4 text-yellow-500 mr-3 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -326,7 +326,7 @@ export default function DestinationDetailPage() {
                   {destination.highlights.map((highlight, index) => (
                     <div key={index} className="flex items-center">
                       <CheckCircle className="w-4 h-4 text-green-500 mr-3 flex-shrink-0" />
-                      <span className="text-gray-700">{highlight}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{highlight}</span>
                     </div>
                   ))}
                 </div>
@@ -341,7 +341,7 @@ export default function DestinationDetailPage() {
                   {destination.requirements.map((requirement, index) => (
                     <div key={index} className="flex items-start">
                       <AlertTriangle className="w-5 h-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{requirement}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{requirement}</span>
                     </div>
                   ))}
                 </div>
@@ -354,7 +354,7 @@ export default function DestinationDetailPage() {
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Meeting Point</h3>
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
-                  <p className="text-gray-700">{destination.meeting_point}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{destination.meeting_point}</p>
                 </div>
               </div>
             )}
@@ -365,7 +365,7 @@ export default function DestinationDetailPage() {
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Best Time to Visit</h3>
                 <div className="flex items-start">
                   <Clock className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
-                  <p className="text-gray-700">{destination.best_time}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{destination.best_time}</p>
                 </div>
               </div>
             )}
@@ -374,7 +374,7 @@ export default function DestinationDetailPage() {
             {destination.difficulty_level && (
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Difficulty Level</h3>
-                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200">
                   {destination.difficulty_level.charAt(0).toUpperCase() + destination.difficulty_level.slice(1)}
                 </div>
               </div>

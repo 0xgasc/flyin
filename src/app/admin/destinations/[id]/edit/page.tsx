@@ -318,7 +318,7 @@ export default function EditDestinationPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Destination Not Found</h1>
           <Link
-            href="/admin"
+            href="/admin#destinations"
             className="text-gold-400 hover:text-gold-300 flex items-center justify-center"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -334,7 +334,7 @@ export default function EditDestinationPage() {
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-8">
           <Link
-            href="/admin"
+            href="/admin#destinations"
             className="inline-flex items-center text-gold-400 hover:text-gold-300 mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
