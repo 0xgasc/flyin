@@ -165,6 +165,19 @@ export default function AdminDashboard() {
   const [showEditHelicopterModal, setShowEditHelicopterModal] = useState(false)
   const [showAddHelicopterModal, setShowAddHelicopterModal] = useState(false)
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false)
+
+  // Pilot-Aircraft Certification state
+  const [certifications, setCertifications] = useState<any[]>([])
+  const [showCertificationModal, setShowCertificationModal] = useState(false)
+  const [certModalPilotId, setCertModalPilotId] = useState<string | null>(null)
+  const [certModalHelicopterId, setCertModalHelicopterId] = useState<string | null>(null)
+  const [newCertData, setNewCertData] = useState({
+    pilot_id: '',
+    helicopter_id: '',
+    certified_since: new Date().toISOString().split('T')[0],
+    flight_hours: 0,
+    notes: ''
+  })
   const [newHelicopterData, setNewHelicopterData] = useState({
     name: '',
     model: '',
@@ -204,8 +217,11 @@ export default function AdminDashboard() {
     if (profile?.id && profile.role === 'admin') {
       if (activeTab === 'bookings') {
         fetchBookings()
+        fetchCertifications()
       } else if (activeTab === 'pilots') {
         fetchPilots()
+        fetchCertifications()
+        fetchHelicopters()
       } else if (activeTab === 'users') {
         fetchUsers()
       } else if (activeTab === 'transactions') {
@@ -213,6 +229,7 @@ export default function AdminDashboard() {
       } else if (activeTab === 'aircrafts') {
         fetchHelicopters()
         fetchMaintenanceRecords()
+        fetchCertifications()
       } else if (activeTab === 'analytics') {
         fetchFinancialData()
       } else if (activeTab === 'experiences') {
@@ -499,6 +516,114 @@ export default function AdminDashboard() {
       console.error('Error:', err)
       setMaintenanceRecords([])
     }
+  }
+
+  const fetchCertifications = async () => {
+    try {
+      const response = await fetch('/api/pilot-certifications', { credentials: 'include' })
+      const data = await response.json()
+
+      if (data.success && data.certifications) {
+        setCertifications(data.certifications)
+      } else {
+        setCertifications([])
+      }
+    } catch (err) {
+      console.error('Error fetching certifications:', err)
+      setCertifications([])
+    }
+  }
+
+  const createCertification = async () => {
+    try {
+      const response = await fetch('/api/pilot-certifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newCertData)
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert('Error: ' + (data.error || 'Failed to create certification'))
+        return
+      }
+
+      alert('Certification created successfully!')
+      setShowCertificationModal(false)
+      setNewCertData({
+        pilot_id: '',
+        helicopter_id: '',
+        certified_since: new Date().toISOString().split('T')[0],
+        flight_hours: 0,
+        notes: ''
+      })
+      fetchCertifications()
+    } catch (err) {
+      console.error('Error creating certification:', err)
+      alert('Error creating certification: ' + err)
+    }
+  }
+
+  const updateCertification = async (certId: string, updates: any) => {
+    try {
+      const response = await fetch(`/api/pilot-certifications/${certId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updates)
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert('Error: ' + (data.error || 'Failed to update certification'))
+        return
+      }
+
+      fetchCertifications()
+    } catch (err) {
+      console.error('Error updating certification:', err)
+      alert('Error updating certification: ' + err)
+    }
+  }
+
+  const deleteCertification = async (certId: string) => {
+    if (!confirm('Remove this certification?')) return
+
+    try {
+      const response = await fetch(`/api/pilot-certifications/${certId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert('Error: ' + (data.error || 'Failed to delete certification'))
+        return
+      }
+
+      fetchCertifications()
+    } catch (err) {
+      console.error('Error deleting certification:', err)
+      alert('Error deleting certification: ' + err)
+    }
+  }
+
+  const openCertModalForPilot = (pilotId: string) => {
+    setCertModalPilotId(pilotId)
+    setCertModalHelicopterId(null)
+    setNewCertData(prev => ({ ...prev, pilot_id: pilotId, helicopter_id: '' }))
+    setShowCertificationModal(true)
+  }
+
+  const openCertModalForHelicopter = (helicopterId: string) => {
+    setCertModalHelicopterId(helicopterId)
+    setCertModalPilotId(null)
+    setNewCertData(prev => ({ ...prev, helicopter_id: helicopterId, pilot_id: '' }))
+    setShowCertificationModal(true)
   }
 
   const fetchExperiences = async () => {
@@ -2419,7 +2544,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {pilots.map((pilot) => (
+                {pilots.map((pilot) => {
+                  const pilotCerts = certifications.filter(c => c.pilot_id === pilot.id)
+                  return (
                   <div key={pilot.id} className="card-luxury">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold">{pilot.full_name || 'Unnamed Pilot'}</h3>
@@ -2429,7 +2556,55 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         <AlertCircle className="h-5 w-5 text-yellow-600" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{pilot.email}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{pilot.email}</p>
+
+                    {/* Aircraft Certifications */}
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">Certified Aircraft</p>
+                      {pilotCerts.length > 0 ? (
+                        <div className="space-y-2">
+                          {pilotCerts.map((cert) => (
+                            <div key={cert.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-2 rounded text-sm">
+                              <div>
+                                <span className="font-medium">{cert.helicopter?.name || 'Unknown'}</span>
+                                <span className="text-gray-500 dark:text-gray-400 ml-1 text-xs">
+                                  ({cert.helicopter?.registration_number})
+                                </span>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {cert.flight_hours}h &middot; Since {format(new Date(cert.certified_since), 'MMM yyyy')}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                                  cert.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                                  cert.status === 'expired' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                }`}>
+                                  {cert.status}
+                                </span>
+                                <button
+                                  onClick={() => deleteCertification(cert.id)}
+                                  className="text-red-500 hover:text-red-700 ml-1"
+                                  title="Remove certification"
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic">No aircraft certifications</p>
+                      )}
+                      <button
+                        onClick={() => openCertModalForPilot(pilot.id)}
+                        className="mt-2 text-primary-600 hover:text-primary-700 text-xs font-medium flex items-center"
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Add Aircraft Certification
+                      </button>
+                    </div>
+
                     <div className="space-y-2">
                       <button
                         onClick={() => openEditUserModal(pilot)}
@@ -2447,7 +2622,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       )}
                     </div>
                   </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
@@ -2524,6 +2700,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       <th className="text-left py-3 px-4">Capacity</th>
                       <th className="text-left py-3 px-4">Rate/Hour</th>
                       <th className="text-left py-3 px-4">Flight Hours</th>
+                      <th className="text-left py-3 px-4">Certified Pilots</th>
                       <th className="text-left py-3 px-4">Status</th>
                       <th className="text-left py-3 px-4">Next Maintenance</th>
                       <th className="text-left py-3 px-4">Actions</th>
@@ -2542,6 +2719,22 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         <td className="py-3 px-4">{helicopter.capacity} pax</td>
                         <td className="py-3 px-4">${helicopter.hourly_rate}/hr</td>
                         <td className="py-3 px-4">{helicopter.total_flight_hours || 0}h</td>
+                        <td className="py-3 px-4">
+                          {(() => {
+                            const heliCerts = certifications.filter(c => c.helicopter_id === helicopter.id && c.status === 'active')
+                            return (
+                              <div>
+                                <span className="font-medium">{heliCerts.length}</span>
+                                <span className="text-gray-500 dark:text-gray-400 text-xs ml-1">pilot{heliCerts.length !== 1 ? 's' : ''}</span>
+                                {heliCerts.length > 0 && (
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                    {heliCerts.map(c => c.pilot?.full_name || c.pilot?.email || '?').join(', ')}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })()}
+                        </td>
                         <td className="py-3 px-4">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             helicopter.status === 'active' ? 'bg-green-100 text-green-800' :
@@ -2574,6 +2767,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                               className="text-green-600 hover:text-green-700 text-sm"
                             >
                               Maintenance
+                            </button>
+                            <button
+                              onClick={() => openCertModalForHelicopter(helicopter.id)}
+                              className="text-purple-600 hover:text-purple-700 text-sm"
+                            >
+                              Pilots
                             </button>
                           </div>
                         </td>
@@ -2980,8 +3179,32 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <Users className="h-5 w-5 mr-2 text-green-600" />
                   {t('admin.assign_pilot')}
                 </h4>
+                {selectedHelicopter && (() => {
+                  const certifiedPilotIds = certifications
+                    .filter(c => c.helicopter_id === selectedHelicopter && c.status === 'active')
+                    .map(c => c.pilot_id)
+                  const uncertifiedCount = availablePilots.filter(p => !certifiedPilotIds.includes(p.id)).length
+                  if (certifiedPilotIds.length > 0 && uncertifiedCount > 0) {
+                    return (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
+                        Showing {certifiedPilotIds.length} certified pilot{certifiedPilotIds.length !== 1 ? 's' : ''} for this aircraft. {uncertifiedCount} uncertified hidden.
+                      </p>
+                    )
+                  }
+                  return null
+                })()}
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {availablePilots.map((pilot) => (
+                  {(() => {
+                    const certifiedPilotIds = selectedHelicopter
+                      ? certifications
+                          .filter(c => c.helicopter_id === selectedHelicopter && c.status === 'active')
+                          .map(c => c.pilot_id)
+                      : []
+                    const filteredPilots = selectedHelicopter && certifiedPilotIds.length > 0
+                      ? availablePilots.filter(p => certifiedPilotIds.includes(p.id))
+                      : availablePilots
+
+                    return filteredPilots.map((pilot) => (
                     <div
                       key={pilot.id}
                       className={`p-3 border rounded-none cursor-pointer transition-all ${
@@ -3001,7 +3224,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         )}
                       </div>
                     </div>
-                  ))}
+                    ))
+                  })()}
                 </div>
               </div>
             </div>
@@ -4127,6 +4351,190 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Pilot-Aircraft Certification Modal */}
+      {showCertificationModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {certModalPilotId ? 'Add Aircraft Certification' : certModalHelicopterId ? 'Manage Certified Pilots' : 'New Certification'}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowCertificationModal(false)
+                  setCertModalPilotId(null)
+                  setCertModalHelicopterId(null)
+                }}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Existing certifications for context */}
+            {(certModalPilotId || certModalHelicopterId) && (() => {
+              const contextCerts = certModalPilotId
+                ? certifications.filter(c => c.pilot_id === certModalPilotId)
+                : certifications.filter(c => c.helicopter_id === certModalHelicopterId)
+
+              if (contextCerts.length === 0) return null
+
+              return (
+                <div className="mb-6">
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                    {certModalPilotId ? 'Current Certifications' : 'Certified Pilots'}
+                  </p>
+                  <div className="space-y-2">
+                    {contextCerts.map((cert) => (
+                      <div key={cert.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                        <div className="text-sm">
+                          <span className="font-medium">
+                            {certModalPilotId
+                              ? (cert.helicopter?.name || 'Unknown Aircraft')
+                              : (cert.pilot?.full_name || cert.pilot?.email || 'Unknown Pilot')
+                            }
+                          </span>
+                          {certModalPilotId && cert.helicopter?.registration_number && (
+                            <span className="text-gray-500 dark:text-gray-400 ml-1">({cert.helicopter.registration_number})</span>
+                          )}
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            {cert.flight_hours}h &middot; Since {format(new Date(cert.certified_since), 'MMM yyyy')}
+                            <span className={`ml-2 px-1.5 py-0.5 rounded text-xs font-medium ${
+                              cert.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                              cert.status === 'expired' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                            }`}>
+                              {cert.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            value={cert.flight_hours}
+                            onChange={(e) => updateCertification(cert.id, { flight_hours: parseFloat(e.target.value) || 0 })}
+                            className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm rounded"
+                            title="Flight hours"
+                          />
+                          <select
+                            value={cert.status}
+                            onChange={(e) => updateCertification(cert.id, { status: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm rounded"
+                          >
+                            <option value="active">Active</option>
+                            <option value="expired">Expired</option>
+                            <option value="suspended">Suspended</option>
+                          </select>
+                          <button
+                            onClick={() => deleteCertification(cert.id)}
+                            className="text-red-500 hover:text-red-700"
+                            title="Remove"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* Add new certification form */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">Add New Certification</p>
+              <div className="space-y-3">
+                {!certModalPilotId && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pilot</label>
+                    <select
+                      value={newCertData.pilot_id}
+                      onChange={(e) => setNewCertData(prev => ({ ...prev, pilot_id: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-none"
+                    >
+                      <option value="">Select pilot...</option>
+                      {pilots.filter(p => p.kyc_verified).map(p => (
+                        <option key={p.id} value={p.id}>{p.full_name || p.email}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {!certModalHelicopterId && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Aircraft</label>
+                    <select
+                      value={newCertData.helicopter_id}
+                      onChange={(e) => setNewCertData(prev => ({ ...prev, helicopter_id: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-none"
+                    >
+                      <option value="">Select aircraft...</option>
+                      {helicopters.map(h => (
+                        <option key={h.id} value={h.id}>{h.name} ({h.registration_number})</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Certified Since</label>
+                  <input
+                    type="date"
+                    value={newCertData.certified_since}
+                    onChange={(e) => setNewCertData(prev => ({ ...prev, certified_since: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Flight Hours</label>
+                  <input
+                    type="number"
+                    value={newCertData.flight_hours}
+                    onChange={(e) => setNewCertData(prev => ({ ...prev, flight_hours: parseFloat(e.target.value) || 0 }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-none"
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                  <textarea
+                    value={newCertData.notes}
+                    onChange={(e) => setNewCertData(prev => ({ ...prev, notes: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-none"
+                    rows={2}
+                    placeholder="Optional notes..."
+                  />
+                </div>
+
+                <div className="flex gap-4 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCertificationModal(false)
+                      setCertModalPilotId(null)
+                      setCertModalHelicopterId(null)
+                    }}
+                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-none"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={createCertification}
+                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700"
+                  >
+                    Add Certification
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

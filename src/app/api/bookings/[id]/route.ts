@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Booking from '@/models/Booking'
 import Experience from '@/models/Experience'  // Required for populate
+import { PilotAircraftCertification } from '@/models'
 import { extractToken, verifyToken } from '@/lib/jwt'
 import mongoose from 'mongoose'
 
@@ -195,6 +196,27 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
           updates[dbField] = new mongoose.Types.ObjectId(body[key])
         } else {
           updates[dbField] = body[key]
+        }
+      }
+    }
+
+    // Validate pilot-aircraft certification when both are set
+    if (isAdmin) {
+      const finalPilotId = updates.pilotId || booking.pilotId
+      const finalHelicopterId = updates.helicopterId || booking.helicopterId
+
+      if (finalPilotId && finalHelicopterId && mongoose.Types.ObjectId.isValid(finalHelicopterId?.toString())) {
+        const cert = await PilotAircraftCertification.findOne({
+          pilotId: finalPilotId,
+          helicopterId: finalHelicopterId,
+          status: 'active'
+        })
+
+        if (!cert) {
+          return NextResponse.json(
+            { error: 'Pilot is not certified to operate this aircraft' },
+            { status: 400 }
+          )
         }
       }
     }

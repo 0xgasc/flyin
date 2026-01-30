@@ -126,4 +126,25 @@ export interface DestinationImage {
   order_index: number
 }
 
+export interface PilotCertification {
+  id: string
+  pilot_id: string
+  pilot: {
+    id: string
+    full_name: string | null
+    email: string
+  } | null
+  helicopter_id: string
+  helicopter: {
+    id: string
+    name: string
+    model: string
+    registration_number: string
+  } | null
+  certified_since: string
+  flight_hours: number
+  status: 'active' | 'expired' | 'suspended'
+  notes: string | null
+}
+
 export type AdminTab = 'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'aircrafts' | 'analytics' | 'experiences' | 'destinations'

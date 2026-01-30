@@ -9,3 +9,4 @@ export { default as ExperienceImage, type IExperienceImage } from './ExperienceI
 export { default as DestinationImage, type IDestinationImage } from './DestinationImage'
 export { default as Helicopter, type IHelicopter } from './Helicopter'
 export { default as MaintenanceRecord, type IMaintenanceRecord } from './MaintenanceRecord'
+export { default as PilotAircraftCertification, type IPilotAircraftCertification } from './PilotAircraftCertification'
