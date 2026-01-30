@@ -1,5 +1,11 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'
 
+export interface IPricingTier {
+  minPassengers: number
+  maxPassengers: number
+  price: number
+}
+
 export interface IExperience extends Document {
   _id: mongoose.Types.ObjectId
   name: string
@@ -24,6 +30,7 @@ export interface IExperience extends Document {
   categoryNameEs: string | null
   imageUrl: string | null
   orderIndex: number | null
+  pricingTiers: IPricingTier[]
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -119,6 +126,14 @@ const experienceSchema = new Schema<IExperience>({
   imageUrl: {
     type: String,
     default: null
+  },
+  pricingTiers: {
+    type: [{
+      minPassengers: { type: Number, required: true, min: 1 },
+      maxPassengers: { type: Number, required: true, min: 1 },
+      price: { type: Number, required: true, min: 0 }
+    }],
+    default: []
   },
   orderIndex: {
     type: Number,

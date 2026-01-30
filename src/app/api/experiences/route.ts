@@ -54,6 +54,12 @@ export async function GET(request: NextRequest) {
       category_name_es: e.categoryNameEs,
       image_url: e.imageUrl,
       order_index: e.orderIndex,
+      pricing_tiers: (e.pricingTiers || []).map((t: any) => ({
+        id: t._id?.toString() || `tier-${t.minPassengers}-${t.maxPassengers}`,
+        min_passengers: t.minPassengers,
+        max_passengers: t.maxPassengers,
+        price: t.price
+      })),
       is_active: e.isActive,
       created_at: e.createdAt,
       updated_at: e.updatedAt
@@ -99,7 +105,8 @@ export async function POST(request: NextRequest) {
       max_passengers,
       includes,
       location,
-      image_url
+      image_url,
+      pricing_tiers
     } = body
 
     if (!name || !description || !duration_hours || !base_price || !location) {
@@ -118,6 +125,11 @@ export async function POST(request: NextRequest) {
       includes: includes || [],
       location: location.trim(),
       imageUrl: image_url || null,
+      pricingTiers: (pricing_tiers || []).map((tier: any) => ({
+        minPassengers: tier.min_passengers,
+        maxPassengers: tier.max_passengers,
+        price: tier.price
+      })),
       isActive: true
     })
 

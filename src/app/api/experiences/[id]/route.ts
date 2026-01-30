@@ -54,6 +54,12 @@ export async function GET(
         category_name_es: e.categoryNameEs,
         image_url: e.imageUrl,
         order_index: e.orderIndex,
+        pricing_tiers: (e.pricingTiers || []).map((t: any) => ({
+          id: t._id?.toString() || `tier-${t.minPassengers}-${t.maxPassengers}`,
+          min_passengers: t.minPassengers,
+          max_passengers: t.maxPassengers,
+          price: t.price
+        })),
         is_active: e.isActive,
         created_at: e.createdAt,
         updated_at: e.updatedAt
@@ -121,6 +127,13 @@ export async function PUT(
     if (body.image_url !== undefined) updateData.imageUrl = body.image_url
     if (body.order_index !== undefined) updateData.orderIndex = body.order_index
     if (body.is_active !== undefined) updateData.isActive = body.is_active
+    if (body.pricing_tiers !== undefined) {
+      updateData.pricingTiers = (body.pricing_tiers || []).map((tier: any) => ({
+        minPassengers: tier.min_passengers,
+        maxPassengers: tier.max_passengers,
+        price: tier.price
+      }))
+    }
 
     const experience = await Experience.findByIdAndUpdate(
       id,
@@ -142,7 +155,12 @@ export async function PUT(
         duration_hours: e.durationHours,
         base_price: e.basePrice,
         location: e.location,
-        is_active: e.isActive
+        is_active: e.isActive,
+        pricing_tiers: (e.pricingTiers || []).map((t: any) => ({
+          min_passengers: t.minPassengers,
+          max_passengers: t.maxPassengers,
+          price: t.price
+        }))
       }
     })
   } catch (error: any) {
