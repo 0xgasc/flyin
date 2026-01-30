@@ -234,7 +234,6 @@ export default function EditExperiencePage() {
 
       console.log('✅ Experience updated successfully')
       alert('Experience updated successfully!')
-      router.push('/admin')
     } catch (error: any) {
       console.error('❌ Error updating experience:', error)
       alert(`Failed to update experience: ${error?.message || error}`)

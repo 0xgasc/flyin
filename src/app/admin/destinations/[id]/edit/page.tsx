@@ -204,7 +204,6 @@ export default function EditDestinationPage() {
 
       console.log('✅ Destination updated successfully')
       alert('Destination updated successfully!')
-      router.push('/admin')
     } catch (error: any) {
       console.error('❌ Error updating destination:', error)
       alert(`Failed to update destination: ${error?.message || error}`)
