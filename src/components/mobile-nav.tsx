@@ -117,54 +117,150 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
     }
   ]
 
+  // Desktop nav items (subset for ribbon)
+  const desktopNavItems = navItems.filter(item =>
+    item.show && ['/', '/book/experiences', '/book/transport', '/faq'].includes(item.href)
+  )
+
   return (
     <>
-      <nav className="bg-luxury-black text-white relative z-[60]">
-        {/* Banner with centered logo */}
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* Left: Language switcher (compact) */}
-          <button
-            onClick={() => setLocale(locale === 'en' ? 'es' : 'en')}
-            className="p-2 hover:bg-gray-800 rounded transition-colors flex items-center space-x-1 text-sm"
-            title={locale === 'en' ? 'Switch to Spanish' : 'Cambiar a inglés'}
-          >
-            <Globe className="h-4 w-4" />
-            <span className="text-xs font-medium">{locale === 'en' ? 'EN' : 'ES'}</span>
-          </button>
+      <nav className="text-white relative z-[60]">
+        {/* Mobile: Banner with centered logo and burger */}
+        <div className="md:hidden bg-luxury-black">
+          <div className="flex items-center justify-between px-4 py-3">
+            {/* Left: Language switcher (compact) */}
+            <button
+              onClick={() => setLocale(locale === 'en' ? 'es' : 'en')}
+              className="p-2 hover:bg-gray-800 rounded transition-colors flex items-center space-x-1 text-sm"
+              title={locale === 'en' ? 'Switch to Spanish' : 'Cambiar a inglés'}
+            >
+              <Globe className="h-4 w-4" />
+              <span className="text-xs font-medium">{locale === 'en' ? 'EN' : 'ES'}</span>
+            </button>
 
-          {/* Center: Logo - bigger, banner style */}
-          <Link href="/" className="absolute left-1/2 transform -translate-x-1/2">
-            <Image
-              src={LOGO_URL}
-              alt="FlyInGuate"
-              width={200}
-              height={60}
-              className="h-12 sm:h-14 w-auto"
-              priority
-            />
-          </Link>
+            {/* Center: Logo - bigger, banner style */}
+            <Link href="/" className="absolute left-1/2 transform -translate-x-1/2">
+              <Image
+                src={LOGO_URL}
+                alt="FlyInGuate"
+                width={200}
+                height={60}
+                className="h-12 sm:h-14 w-auto"
+                priority
+              />
+            </Link>
 
-          {/* Right: Hamburger menu */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 hover:bg-gray-800 rounded transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+            {/* Right: Hamburger menu */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 hover:bg-gray-800 rounded transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop: Full ribbon navigation */}
+        <div className="hidden md:block bg-black/70 backdrop-blur-md">
+          <div className="container mx-auto px-6">
+            <div className="flex items-center justify-between py-3">
+              {/* Left: Logo */}
+              <Link href="/" className="flex-shrink-0">
+                <Image
+                  src={LOGO_URL}
+                  alt="FlyInGuate"
+                  width={160}
+                  height={50}
+                  className="h-10 w-auto"
+                  priority
+                />
+              </Link>
+
+              {/* Center: Nav links */}
+              <div className="flex items-center space-x-6">
+                {desktopNavItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-sm font-medium text-white/90 hover:text-gold-400 transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                {!profile && (
+                  <Link
+                    href="/pilot/join"
+                    className="text-sm font-medium text-white/90 hover:text-gold-400 transition-colors"
+                  >
+                    {t('nav.pilot_opportunities')}
+                  </Link>
+                )}
+              </div>
+
+              {/* Right: Auth + Language */}
+              <div className="flex items-center space-x-4">
+                {/* Language switcher */}
+                <button
+                  onClick={() => setLocale(locale === 'en' ? 'es' : 'en')}
+                  className="p-2 hover:bg-white/10 rounded transition-colors flex items-center space-x-1 text-sm"
+                  title={locale === 'en' ? 'Switch to Spanish' : 'Cambiar a inglés'}
+                >
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium">{locale === 'en' ? 'EN' : 'ES'}</span>
+                </button>
+
+                {profile ? (
+                  <>
+                    <Link href="/dashboard" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                      Dashboard
+                    </Link>
+                    {profile.role === 'admin' && (
+                      <Link href="/admin" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                        Admin
+                      </Link>
+                    )}
+                    {profile.role === 'pilot' && (
+                      <Link href="/pilot" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                        Pilot
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleSignOut}
+                      className="text-sm text-white/90 hover:text-gold-400 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                      {t('nav.sign_in')}
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="text-sm px-4 py-2 bg-gold-500 text-gray-900 font-semibold rounded-soft hover:bg-gold-400 transition-colors"
+                    >
+                      {t('nav.register')}
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </nav>
 
-      {/* Slide-out menu overlay */}
+      {/* Slide-out menu overlay (mobile only) */}
       {isOpen && (
-        <div className="fixed inset-0 z-[65]" onClick={() => setIsOpen(false)}>
+        <div className="fixed inset-0 z-[65] md:hidden" onClick={() => setIsOpen(false)}>
           <div className="absolute inset-0 bg-black bg-opacity-60" />
         </div>
       )}
 
-      {/* Slide-out menu panel */}
+      {/* Slide-out menu panel (mobile only) */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-luxury-black border-l border-gray-800 z-[70] transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-72 bg-luxury-black border-l border-gray-800 z-[70] transform transition-transform duration-300 ease-in-out md:hidden ${
           isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
         }`}
       >

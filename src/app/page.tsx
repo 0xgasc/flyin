@@ -266,13 +266,13 @@ export default function HomePage() {
       </div>
 
       {/* Booking Section with Map */}
-      <div className="bg-luxury-charcoal">
+      <div className="bg-white">
         <div className="container mx-auto px-4 sm:px-6 py-16 lg:py-24">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Plan Your Flight
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-600 max-w-2xl mx-auto">
               Select your origin and destination on the map to see flight details and pricing
             </p>
           </div>
@@ -281,7 +281,7 @@ export default function HomePage() {
             <div className="grid lg:grid-cols-5 gap-6 items-start">
               {/* Left Panel - Pricing/Selection */}
               <div className="lg:col-span-2 order-2 lg:order-1">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-soft p-5">
+                <div className="bg-gray-100 border border-gray-200 rounded-soft p-5">
                   {/* Route Display */}
                   <div className="flex items-center gap-3 mb-5">
                     <div className="flex-1">
@@ -289,20 +289,20 @@ export default function HomePage() {
                         <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
                         <span className="text-xs text-gray-500 uppercase tracking-wide">From</span>
                       </div>
-                      <div className="text-white font-semibold">{originDept?.name || 'Select origin'}</div>
+                      <div className="text-gray-900 font-semibold">{originDept?.name || 'Select origin'}</div>
                       {originDept?.airports?.[0] && (
-                        <div className="text-sm text-gold-400">{originDept.airports[0].code}</div>
+                        <div className="text-sm text-gold-600">{originDept.airports[0].code}</div>
                       )}
                     </div>
-                    <Plane className="h-5 w-5 text-gold-400 rotate-90" />
+                    <Plane className="h-5 w-5 text-gold-600 rotate-90" />
                     <div className="flex-1 text-right">
                       <div className="flex items-center justify-end gap-2 mb-1">
                         <span className="text-xs text-gray-500 uppercase tracking-wide">To</span>
                         <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                       </div>
-                      <div className="text-white font-semibold">{destinationDept?.name || 'Select destination'}</div>
+                      <div className="text-gray-900 font-semibold">{destinationDept?.name || 'Select destination'}</div>
                       {destinationDept?.destinations?.[0] && (
-                        <div className="text-sm text-gray-400">{destinationDept.destinations[0]}</div>
+                        <div className="text-sm text-gray-600">{destinationDept.destinations[0]}</div>
                       )}
                     </div>
                   </div>
@@ -313,17 +313,17 @@ export default function HomePage() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setPassengerCount(Math.max(1, passengerCount - 1))}
-                        className="w-10 h-10 rounded-soft bg-white/10 hover:bg-white/20 text-white font-bold transition-colors"
+                        className="w-10 h-10 rounded-soft bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold transition-colors"
                       >
                         -
                       </button>
                       <div className="flex-1 text-center">
-                        <span className="text-2xl font-bold text-white">{passengerCount}</span>
-                        <span className="text-gray-400 text-sm ml-1">passenger{passengerCount !== 1 ? 's' : ''}</span>
+                        <span className="text-2xl font-bold text-gray-900">{passengerCount}</span>
+                        <span className="text-gray-600 text-sm ml-1">passenger{passengerCount !== 1 ? 's' : ''}</span>
                       </div>
                       <button
                         onClick={() => setPassengerCount(Math.min(5, passengerCount + 1))}
-                        className="w-10 h-10 rounded-soft bg-white/10 hover:bg-white/20 text-white font-bold transition-colors"
+                        className="w-10 h-10 rounded-soft bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold transition-colors"
                       >
                         +
                       </button>
@@ -336,29 +336,29 @@ export default function HomePage() {
                     <>
                       {/* Flight Details */}
                       <div className="grid grid-cols-3 gap-3 mb-5">
-                        <div className="bg-white/5 rounded-soft p-3 text-center">
+                        <div className="bg-gray-200 rounded-soft p-3 text-center">
                           <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Distance</div>
-                          <div className="text-white font-medium">{routePricing.distance}</div>
+                          <div className="text-gray-900 font-medium">{routePricing.distance}</div>
                         </div>
-                        <div className="bg-white/5 rounded-soft p-3 text-center">
+                        <div className="bg-gray-200 rounded-soft p-3 text-center">
                           <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Flight</div>
-                          <div className="text-white font-medium">{routePricing.flightTime}</div>
+                          <div className="text-gray-900 font-medium">{routePricing.flightTime}</div>
                         </div>
-                        <div className="bg-white/5 rounded-soft p-3 text-center">
+                        <div className="bg-gray-200 rounded-soft p-3 text-center">
                           <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Aircraft</div>
-                          <div className="text-white font-medium">Bell 407</div>
+                          <div className="text-gray-900 font-medium">Bell 407</div>
                         </div>
                       </div>
 
-                      {/* Price Card */}
-                      <div className="bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-500/30 rounded-soft p-5 text-center mb-5">
-                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Roundtrip ({passengerCount} passenger{passengerCount !== 1 ? 's' : ''})</div>
+                      {/* Price Card - Enhanced for visibility */}
+                      <div className="bg-gradient-to-br from-gold-500 to-gold-600 border-2 border-gold-700 rounded-soft p-5 text-center mb-5 shadow-lg">
+                        <div className="text-xs text-gray-900 uppercase tracking-wide mb-1 font-medium">Roundtrip ({passengerCount} passenger{passengerCount !== 1 ? 's' : ''})</div>
                         <div className="flex items-center justify-center gap-1 mb-2">
-                          <DollarSign className="h-7 w-7 text-gold-400" />
-                          <span className="text-3xl font-bold text-white">{adjustedPrice.toLocaleString()}</span>
-                          <span className="text-gray-400 text-sm self-end mb-1">USD</span>
+                          <DollarSign className="h-8 w-8 text-gray-900" />
+                          <span className="text-4xl font-bold text-gray-900">{adjustedPrice.toLocaleString()}</span>
+                          <span className="text-gray-800 text-sm self-end mb-1 font-medium">USD</span>
                         </div>
-                        <div className="text-xs text-gray-500 mb-4">
+                        <div className="text-sm text-gray-800 mb-4 font-medium">
                           ${Math.round(adjustedPrice / passengerCount).toLocaleString()} per person
                         </div>
                         <button
@@ -369,7 +369,7 @@ export default function HomePage() {
                             params.set('passengers', passengerCount.toString())
                             router.push(`/book/transport?${params.toString()}`)
                           }}
-                          className="w-full btn-luxury py-3"
+                          className="w-full bg-gray-900 text-gold-400 font-semibold uppercase tracking-wider py-3 rounded-soft hover:bg-gray-800 transition-colors"
                         >
                           Book This Flight
                         </button>
@@ -381,7 +381,7 @@ export default function HomePage() {
                           <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Destinations in {destinationDept.name}</div>
                           <div className="flex flex-wrap gap-1.5">
                             {destinationDept.destinations.map(dest => (
-                              <span key={dest} className="px-2.5 py-1 bg-white/10 rounded-full text-xs text-white">
+                              <span key={dest} className="px-2.5 py-1 bg-gray-200 rounded-full text-xs text-gray-700">
                                 {dest}
                               </span>
                             ))}
@@ -392,20 +392,20 @@ export default function HomePage() {
                   ) : (
                     /* Prompt to complete selection */
                     <div className="text-center py-4">
-                      <MapPin className="h-10 w-10 text-gold-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold text-white mb-2">
+                      <MapPin className="h-10 w-10 text-gold-600 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         {!selectedOrigin && !selectedDestination
                           ? 'Select Your Route'
                           : !selectedDestination
                             ? 'Now Select Destination'
                             : 'Select Origin Point'}
                       </h3>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-gray-600 text-sm">
                         Click on the map to set your {selectMode === 'from' ? 'origin' : 'destination'} point
                       </p>
 
                       {/* Quick destination list */}
-                      <div className="mt-5 pt-5 border-t border-white/10 text-left">
+                      <div className="mt-5 pt-5 border-t border-gray-200 text-left">
                         <div className="text-xs text-gray-500 uppercase tracking-wide mb-3">Popular Destinations</div>
                         <div className="space-y-2">
                           {['sacatepequez', 'solola', 'peten', 'alta-verapaz'].map(id => {
@@ -416,13 +416,13 @@ export default function HomePage() {
                               <button
                                 key={id}
                                 onClick={() => setSelectedDestination(id)}
-                                className="w-full flex items-center justify-between p-2.5 bg-white/5 hover:bg-white/10 rounded-soft transition-colors text-left"
+                                className="w-full flex items-center justify-between p-2.5 bg-gray-200 hover:bg-gray-300 rounded-soft transition-colors text-left"
                               >
                                 <div>
-                                  <div className="text-white text-sm font-medium">{dept.name}</div>
+                                  <div className="text-gray-900 text-sm font-medium">{dept.name}</div>
                                   <div className="text-gray-500 text-xs">{pricing.flightTime} • {pricing.distance}</div>
                                 </div>
-                                <div className="text-gold-400 font-semibold">${pricing.price}</div>
+                                <div className="text-gold-600 font-semibold">${pricing.price}</div>
                               </button>
                             )
                           })}
@@ -434,9 +434,9 @@ export default function HomePage() {
 
                 {/* Quick Links */}
                 <div className="mt-4 text-center">
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-600 text-sm">
                     Want a scenic tour?{' '}
-                    <Link href="/book/experiences" className="text-gold-400 hover:underline">
+                    <Link href="/book/experiences" className="text-gold-600 hover:underline font-medium">
                       Browse experiences →
                     </Link>
                   </p>
@@ -445,7 +445,7 @@ export default function HomePage() {
 
               {/* Right Panel - Map */}
               <div className="lg:col-span-3 order-1 lg:order-2">
-                <div className="relative h-[400px] lg:h-[550px] rounded-soft overflow-hidden border border-white/10">
+                <div className="relative h-[400px] lg:h-[550px] rounded-soft overflow-hidden border border-gray-300 shadow-lg">
                   <SafeMapWrapper
                     onDepartmentClick={(dept: Department) => {
                       if (selectMode === 'from') {
@@ -465,13 +465,13 @@ export default function HomePage() {
                   />
 
                   {/* Selection Mode Toggle - Overlaid on Map */}
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex gap-1 bg-luxury-charcoal rounded-full p-1 shadow-lg border border-gray-700">
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex gap-1 bg-white rounded-full p-1 shadow-lg border border-gray-300">
                     <button
                       onClick={() => setSelectMode('from')}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         selectMode === 'from'
                           ? 'bg-green-500 text-white'
-                          : 'text-gray-300 hover:bg-gray-700'
+                          : 'text-gray-600 hover:bg-gray-100'
                       }`}
                     >
                       <span className="w-2 h-2 rounded-full bg-green-400"></span>
@@ -482,7 +482,7 @@ export default function HomePage() {
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         selectMode === 'to'
                           ? 'bg-red-500 text-white'
-                          : 'text-gray-300 hover:bg-gray-700'
+                          : 'text-gray-600 hover:bg-gray-100'
                       }`}
                     >
                       <span className="w-2 h-2 rounded-full bg-red-400"></span>
@@ -497,7 +497,7 @@ export default function HomePage() {
       </div>
 
       {/* Services Section */}
-      <div className="bg-luxury-charcoal py-16 lg:py-24">
+      <div className="bg-black py-16 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mb-4">
@@ -573,7 +573,11 @@ export default function HomePage() {
       </div>
 
       {/* Photo Gallery */}
-      <PhotoGallery />
+      <div className="bg-white py-16">
+        <div className="container mx-auto px-4 sm:px-6">
+          <PhotoGallery />
+        </div>
+      </div>
 
       {/* Footer CTA */}
       <div className="bg-luxury-black text-white py-16">

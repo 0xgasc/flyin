@@ -86,7 +86,9 @@ export function PhotoGallery() {
 
   if (loading) {
     return (
-      <div className="mt-16">
+      <div>
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 text-center">Gallery</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-center mb-8">Explore Guatemala from above</p>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-6xl mx-auto">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
@@ -102,7 +104,9 @@ export function PhotoGallery() {
 
   return (
     <>
-      <div className="mt-16">
+      <div>
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 text-center">Gallery</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-center mb-8">Explore Guatemala from above</p>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-6xl mx-auto relative">
           {displayedImages.map((image, index) => (
             <div
@@ -148,7 +152,7 @@ export function PhotoGallery() {
         <div className="flex items-center justify-center gap-4 mt-6">
           <button
             onClick={shuffleImages}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-none transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-soft transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
             Shuffle
@@ -157,14 +161,14 @@ export function PhotoGallery() {
           {displayCount < allImages.length && (
             <button
               onClick={showMore}
-              className="px-6 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700 transition-colors"
+              className="px-6 py-2 bg-gold-500 text-gray-900 font-semibold rounded-soft hover:bg-gold-400 transition-colors"
             >
               Show More ({allImages.length - displayCount} remaining)
             </button>
           )}
         </div>
 
-        <p className="text-center text-gray-400 text-sm mt-3">
+        <p className="text-center text-gray-500 text-sm mt-3">
           Click any image to browse gallery
         </p>
       </div>
