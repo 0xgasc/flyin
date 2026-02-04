@@ -161,45 +161,46 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
           </div>
         </div>
 
-        {/* Desktop: Full ribbon navigation */}
-        <div className="hidden md:block bg-black/70 backdrop-blur-md">
+        {/* Desktop: Full ribbon navigation - more transparent with centered logo */}
+        <div className="hidden md:block bg-black/25 backdrop-blur-sm">
           <div className="container mx-auto px-6">
             <div className="flex items-center justify-between py-3">
-              {/* Left: Logo */}
-              <Link href="/" className="flex-shrink-0">
-                <Image
-                  src={LOGO_URL}
-                  alt="FlyInGuate"
-                  width={160}
-                  height={50}
-                  className="h-10 w-auto"
-                  priority
-                />
-              </Link>
-
-              {/* Center: Nav links */}
-              <div className="flex items-center space-x-6">
+              {/* Left: Nav links */}
+              <div className="flex items-center space-x-6 flex-1">
                 {desktopNavItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-sm font-medium text-white/90 hover:text-gold-400 transition-colors"
+                    className="text-sm font-medium uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors"
                   >
                     {item.label}
                   </Link>
                 ))}
+              </div>
+
+              {/* Center: Logo */}
+              <Link href="/" className="flex-shrink-0 mx-8">
+                <Image
+                  src={LOGO_URL}
+                  alt="FlyInGuate"
+                  width={180}
+                  height={55}
+                  className="h-12 w-auto"
+                  priority
+                />
+              </Link>
+
+              {/* Right: Auth + Language */}
+              <div className="flex items-center justify-end space-x-4 flex-1">
                 {!profile && (
                   <Link
                     href="/pilot/join"
-                    className="text-sm font-medium text-white/90 hover:text-gold-400 transition-colors"
+                    className="text-sm font-medium uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors"
                   >
                     {t('nav.pilot_opportunities')}
                   </Link>
                 )}
-              </div>
 
-              {/* Right: Auth + Language */}
-              <div className="flex items-center space-x-4">
                 {/* Language switcher */}
                 <button
                   onClick={() => setLocale(locale === 'en' ? 'es' : 'en')}
@@ -212,34 +213,34 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
 
                 {profile ? (
                   <>
-                    <Link href="/dashboard" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                    <Link href="/dashboard" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
                       Dashboard
                     </Link>
                     {profile.role === 'admin' && (
-                      <Link href="/admin" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                      <Link href="/admin" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
                         Admin
                       </Link>
                     )}
                     {profile.role === 'pilot' && (
-                      <Link href="/pilot" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                      <Link href="/pilot" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
                         Pilot
                       </Link>
                     )}
                     <button
                       onClick={handleSignOut}
-                      className="text-sm text-white/90 hover:text-gold-400 transition-colors"
+                      className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors"
                     >
                       Sign Out
                     </button>
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className="text-sm text-white/90 hover:text-gold-400 transition-colors">
+                    <Link href="/login" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
                       {t('nav.sign_in')}
                     </Link>
                     <Link
                       href="/register"
-                      className="text-sm px-4 py-2 bg-gold-500 text-gray-900 font-semibold rounded-soft hover:bg-gold-400 transition-colors"
+                      className="text-sm px-4 py-2 bg-gold-500 text-gray-900 font-semibold rounded-soft hover:bg-gold-400 transition-colors uppercase tracking-wider"
                     >
                       {t('nav.register')}
                     </Link>
