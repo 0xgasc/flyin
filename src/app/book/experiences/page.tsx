@@ -8,7 +8,7 @@ import { useTranslation } from '@/lib/i18n'
 import { MobileNav } from '@/components/mobile-nav'
 import { ExperienceBookingModal, BookingIntent } from '@/components/experience-booking-modal'
 import { QuickSignUpModal } from '@/components/quick-signup-modal'
-import { Users, Clock, MapPin, Plane } from 'lucide-react'
+import { Users, Clock, MapPin, Plane, ArrowRight, Sparkles } from 'lucide-react'
 
 
 interface PricingTier {
@@ -81,9 +81,9 @@ export default function BookExperiencesPage() {
         setLoading(false)
       }
     }, 15000)
-    
+
     fetchExperiences()
-    
+
     return () => clearTimeout(timeoutId)
   }, [])
 
@@ -248,33 +248,41 @@ export default function BookExperiencesPage() {
     router.push(`/book/passenger-details?booking_id=${bookingId}`)
   }
 
-  const filteredExperiences = selectedCategory === 'all' 
-    ? experiences 
+  const filteredExperiences = selectedCategory === 'all'
+    ? experiences
     : experiences.filter(exp => exp.category === selectedCategory)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
+    <div className="min-h-screen bg-white">
       <MobileNav />
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl font-bold mb-4">
-            {locale === 'es' ? 'Experiencias y Destinos' : 'Experiences & Destinations'}
-          </h1>
-          <p className="text-xl opacity-90 max-w-3xl mx-auto">
-            {locale === 'es' 
-              ? 'Descubre Guatemala desde las alturas con nuestros tours en helicóptero y servicios de transporte premium.'
-              : 'Discover Guatemala from above with our helicopter tours and premium transport services.'
-            }
-          </p>
+      {/* Hero Section - Clean and minimal */}
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-20">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="h-5 w-5 text-gold-400" />
+              <span className="text-gold-400 font-medium text-sm uppercase tracking-wider">
+                {locale === 'es' ? 'Experiencias Premium' : 'Premium Experiences'}
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {locale === 'es' ? 'Vuela Sobre Guatemala' : 'Fly Over Guatemala'}
+            </h1>
+            <p className="text-lg text-slate-300 max-w-2xl">
+              {locale === 'es'
+                ? 'Tours en helicóptero y transporte aéreo privado. Descubre vistas que pocos han visto.'
+                : 'Helicopter tours and private air transport. Discover views that few have seen.'
+              }
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-6 py-12">
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -282,20 +290,20 @@ export default function BookExperiencesPage() {
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-2 border-slate-200 border-t-primary-600 mx-auto mb-4"></div>
+              <p className="text-slate-500">{t('common.loading')}</p>
             </div>
           </div>
         ) : (
           <div>
-            {/* Category Filter */}
-            <div className="flex flex-wrap gap-2 mb-8">
+            {/* Category Filter - Pill style */}
+            <div className="flex flex-wrap gap-3 mb-10">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
                   selectedCategory === 'all'
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
+                    ? 'bg-slate-900 text-white shadow-lg'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 {locale === 'es' ? 'Todas' : 'All'}
@@ -304,16 +312,16 @@ export default function BookExperiencesPage() {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
                     selectedCategory === category
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
+                      ? 'bg-slate-900 text-white shadow-lg'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  {category === 'experiences' 
+                  {category === 'experiences'
                     ? (locale === 'es' ? 'Experiencias' : 'Experiences')
                     : category === 'destinations'
-                    ? (locale === 'es' ? 'Destinos' : 'Destinations') 
+                    ? (locale === 'es' ? 'Destinos' : 'Destinations')
                     : category
                   }
                 </button>
@@ -322,95 +330,95 @@ export default function BookExperiencesPage() {
 
             {/* Experiences Grid */}
             {filteredExperiences.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600 dark:text-gray-400 text-lg">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
+              <div className="text-center py-16">
+                <Plane className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500 text-lg">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredExperiences.map((experience) => (
-                <div key={experience.id} className="card-luxury hover:scale-105 transition-transform">
-                  <div className="aspect-video bg-gray-200 dark:bg-gray-800 rounded mb-4 relative overflow-hidden">
+                <div
+                  key={experience.id}
+                  className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-slate-300 transition-all duration-300"
+                >
+                  {/* Image */}
+                  <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
                     {(() => {
-                      // Get primary image from experience_images or destination_images
                       const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images
                       const primaryImage = images?.find(img => img.is_primary)?.image_url
                       const firstImage = images?.[0]?.image_url
                       const displayImage = primaryImage || firstImage || experience.image_url
-                      
+
                       return displayImage ? (
                         <img
                           src={displayImage}
                           alt={getDisplayName(experience)}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary-100 to-primary-200">
-                          <Plane className="h-12 w-12 text-primary-600" />
+                        <div className="flex items-center justify-center h-full bg-gradient-to-br from-slate-100 to-slate-200">
+                          <Plane className="h-16 w-16 text-slate-300" />
                         </div>
                       )
                     })()}
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                    {/* Category Badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-white/90 backdrop-blur-sm text-slate-700 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">
                         {getCategoryName(experience)}
                       </span>
                     </div>
-                  </div>
-                  
-                  <h3 className="text-xl font-bold mb-2">{getDisplayName(experience)}</h3>
-                  <p className="text-gray-600 mb-4 text-sm line-clamp-3">{getDisplayDescription(experience)}</p>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      {experience.location}
-                    </div>
-                    {experience.type === 'experience' && (
-                      <>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="h-4 w-4 mr-2" />
-                          {experience.duration_minutes ? `${experience.duration_minutes} ${t('common.minutes')}` : `${experience.duration_hours} ${t('common.hours')}`}
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Users className="h-4 w-4 mr-2" />
-                          {experience.min_passengers === experience.max_passengers 
-                            ? `${experience.max_passengers} ${t('common.passengers')}`
-                            : `${experience.min_passengers}-${experience.max_passengers} ${t('common.passengers')}`
-                          }
-                        </div>
-                      </>
+                    {/* Price Badge */}
+                    {experience.type === 'experience' && hasValidPrice(experience) && (
+                      <div className="absolute bottom-4 right-4">
+                        <span className="bg-slate-900/90 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full">
+                          ${getDisplayPrice(experience).toLocaleString()}
+                        </span>
+                      </div>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      {experience.type === 'experience' && hasValidPrice(experience) ? (
+                  {/* Content */}
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
+                      {getDisplayName(experience)}
+                    </h3>
+                    <p className="text-slate-500 text-sm line-clamp-2 mb-4">
+                      {getDisplayDescription(experience)}
+                    </p>
+
+                    {/* Quick Info */}
+                    <div className="flex flex-wrap gap-3 mb-5">
+                      <div className="flex items-center text-xs text-slate-500">
+                        <MapPin className="h-3.5 w-3.5 mr-1" />
+                        {experience.location}
+                      </div>
+                      {experience.type === 'experience' && (
                         <>
-                          <span className="text-sm text-gray-500">
-                            {locale === 'es' ? 'Desde' : 'From'}
-                          </span>
-                          <span className="text-2xl font-bold text-primary-900 ml-1">
-                            ${getDisplayPrice(experience).toLocaleString()}
-                          </span>
-                          <span className="text-sm text-gray-600 ml-1">USD</span>
+                          <div className="flex items-center text-xs text-slate-500">
+                            <Clock className="h-3.5 w-3.5 mr-1" />
+                            {experience.duration_minutes ? `${experience.duration_minutes} min` : `${experience.duration_hours}h`}
+                          </div>
+                          <div className="flex items-center text-xs text-slate-500">
+                            <Users className="h-3.5 w-3.5 mr-1" />
+                            {experience.min_passengers}-{experience.max_passengers}
+                          </div>
                         </>
-                      ) : (
-                        <span className="text-sm text-gray-600 font-medium">
-                          {locale === 'es' ? 'Cotización personalizada' : 'Custom Quote'}
-                        </span>
                       )}
                     </div>
-                    <div className="flex gap-2">
+
+                    {/* Actions */}
+                    <div className="flex gap-3">
                       <button
                         onClick={() => handleOpenBookingModal(experience)}
-                        className="btn-primary text-sm"
+                        className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
                       >
-                        {locale === 'es' ? 'Reservar' : 'Book'}
+                        {locale === 'es' ? 'Reservar Ahora' : 'Book Now'}
                       </button>
                       <Link
                         href={experience.type === 'destination' ? `/book/destinations/${experience.id}` : `/book/experiences/${experience.id}`}
-                        className="btn-ghost text-sm"
+                        className="flex items-center justify-center px-4 py-2.5 border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 rounded-lg transition-colors"
                       >
-                        {locale === 'es' ? 'Detalles' : 'Details'}
+                        <ArrowRight className="h-4 w-4" />
                       </Link>
                     </div>
                   </div>
