@@ -6,9 +6,17 @@ import Link from 'next/link'
 
 import { useTranslation } from '@/lib/i18n'
 import { MobileNav } from '@/components/mobile-nav'
-import { Calendar, Users, Clock, MapPin, CheckCircle, ArrowLeft, Plane } from 'lucide-react'
-import { format } from 'date-fns'
+import { ExperienceBookingModal, BookingIntent } from '@/components/experience-booking-modal'
+import { QuickSignUpModal } from '@/components/quick-signup-modal'
+import { Users, Clock, MapPin, Plane } from 'lucide-react'
 
+
+interface PricingTier {
+  id: string
+  min_passengers: number
+  max_passengers: number
+  price: number
+}
 
 interface Experience {
   id: string
@@ -32,6 +40,7 @@ interface Experience {
   category_name_es: string | null
   type: 'experience' | 'destination'
   order_index?: number | null
+  pricing_tiers?: PricingTier[]
   experience_images?: Array<{
     id: string
     image_url: string
@@ -57,6 +66,12 @@ export default function BookExperiencesPage() {
   const [error, setError] = useState('')
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
+  // Modal state
+  const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null)
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
+  const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false)
+  const [bookingIntent, setBookingIntent] = useState<BookingIntent | null>(null)
 
   useEffect(() => {
     // Add timeout to prevent infinite spinning
@@ -119,6 +134,7 @@ export default function BookExperiencesPage() {
           category_name_es: exp.category_name_es,
           type: 'experience' as const,
           order_index: exp.order_index,
+          pricing_tiers: exp.pricing_tiers || [],
           experience_images: exp.experience_images || []
         }))
         allItems.push(...experienceItems)
@@ -187,6 +203,29 @@ export default function BookExperiencesPage() {
       return locale === 'es' ? 'Destino' : 'Destination'
     }
     return locale === 'es' ? 'Experiencia' : 'Experience'
+  }
+
+  // Modal handlers
+  const handleOpenBookingModal = (experience: Experience) => {
+    setSelectedExperience(experience)
+    setIsBookingModalOpen(true)
+  }
+
+  const handleCloseBookingModal = () => {
+    setIsBookingModalOpen(false)
+    setSelectedExperience(null)
+  }
+
+  const handleSignUpRequired = (intent: BookingIntent) => {
+    setBookingIntent(intent)
+    setIsBookingModalOpen(false)
+    setIsSignUpModalOpen(true)
+  }
+
+  const handleSignUpSuccess = (bookingId: string) => {
+    setIsSignUpModalOpen(false)
+    setBookingIntent(null)
+    router.push(`/book/passenger-details?booking_id=${bookingId}`)
   }
 
   const filteredExperiences = selectedCategory === 'all' 
@@ -337,12 +376,20 @@ export default function BookExperiencesPage() {
                         </span>
                       )}
                     </div>
-                    <Link
-                      href={experience.type === 'destination' ? `/book/destinations/${experience.id}` : `/book/experiences/${experience.id}`}
-                      className="btn-primary text-sm inline-block text-center"
-                    >
-                      {locale === 'es' ? 'Ver Detalles' : 'View Details'}
-                    </Link>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleOpenBookingModal(experience)}
+                        className="btn-primary text-sm"
+                      >
+                        {locale === 'es' ? 'Reservar' : 'Book'}
+                      </button>
+                      <Link
+                        href={experience.type === 'destination' ? `/book/destinations/${experience.id}` : `/book/experiences/${experience.id}`}
+                        className="btn-ghost text-sm"
+                      >
+                        {locale === 'es' ? 'Detalles' : 'Details'}
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -351,6 +398,24 @@ export default function BookExperiencesPage() {
           </div>
         )}
       </div>
+
+      {/* Booking Modal */}
+      {selectedExperience && (
+        <ExperienceBookingModal
+          experience={selectedExperience}
+          isOpen={isBookingModalOpen}
+          onClose={handleCloseBookingModal}
+          onSignUpRequired={handleSignUpRequired}
+        />
+      )}
+
+      {/* Sign Up Modal */}
+      <QuickSignUpModal
+        isOpen={isSignUpModalOpen}
+        onClose={() => setIsSignUpModalOpen(false)}
+        bookingIntent={bookingIntent}
+        onSuccess={handleSignUpSuccess}
+      />
     </div>
   )
 }

@@ -374,6 +374,37 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'passenger.continue': { en: 'Continue to Review', es: 'Continuar a Revisión' },
     'passenger.back': { en: 'Back', es: 'Atrás' },
 
+    // Booking modal
+    'booking.modal.continue': { en: 'Continue Booking', es: 'Continuar Reserva' },
+    'booking.modal.view_details': { en: 'View Full Details', es: 'Ver Todos los Detalles' },
+    'booking.modal.processing': { en: 'Processing...', es: 'Procesando...' },
+    'booking.modal.per_person': { en: 'per person', es: 'por persona' },
+    'booking.modal.select_date': { en: 'Please select a date', es: 'Por favor selecciona una fecha' },
+
+    // Confirmation page
+    'confirmation.title': { en: 'Booking Confirmed!', es: '¡Reserva Confirmada!' },
+    'confirmation.subtitle': { en: 'Your booking has been successfully created', es: 'Tu reserva ha sido creada exitosamente' },
+    'confirmation.reference': { en: 'Booking Reference', es: 'Número de Reserva' },
+    'confirmation.experience': { en: 'Experience', es: 'Experiencia' },
+    'confirmation.pending': { en: 'Pending confirmation', es: 'Pendiente de confirmación' },
+    'confirmation.email_notice': { en: "You'll receive an email when your booking is confirmed.", es: 'Recibirás un correo cuando tu reserva sea confirmada.' },
+    'confirmation.next_steps': { en: 'Next Steps', es: 'Próximos Pasos' },
+    'confirmation.view_dashboard': { en: 'View in Dashboard', es: 'Ver en Mi Panel' },
+    'confirmation.explore_more': { en: 'Explore More Experiences', es: 'Explorar Más Experiencias' },
+
+    // WhatsApp
+    'whatsapp.questions': { en: 'Questions? Contact us on WhatsApp', es: '¿Preguntas? Contáctanos por WhatsApp' },
+    'whatsapp.contact': { en: 'Contact us on WhatsApp', es: 'Contáctanos por WhatsApp' },
+
+    // Quick signup
+    'signup.create_to_continue': { en: 'Create Account to Continue', es: 'Crear Cuenta para Continuar' },
+    'signup.signin_to_continue': { en: 'Sign In to Continue', es: 'Iniciar Sesión para Continuar' },
+    'signup.booking': { en: 'Booking', es: 'Reservando' },
+    'signup.create_and_continue': { en: 'Create Account & Continue', es: 'Crear Cuenta y Continuar' },
+    'signup.signin_and_continue': { en: 'Sign In & Continue', es: 'Iniciar Sesión y Continuar' },
+    'signup.already_have_account': { en: 'Already have an account?', es: '¿Ya tienes cuenta?' },
+    'signup.no_account': { en: "Don't have an account?", es: '¿No tienes cuenta?' },
+
   }
 
   return translations[key]?.[locale] || key
