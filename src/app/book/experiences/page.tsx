@@ -207,7 +207,7 @@ function BookingCard({
           <button
             onClick={() => handlePassengerChange(-1)}
             disabled={passengerCount <= experience.min_passengers}
-            className="p-2 rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <Minus className="h-5 w-5" />
           </button>
@@ -217,7 +217,7 @@ function BookingCard({
           <button
             onClick={() => handlePassengerChange(1)}
             disabled={passengerCount >= experience.max_passengers}
-            className="p-2 rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <Plus className="h-5 w-5" />
           </button>
