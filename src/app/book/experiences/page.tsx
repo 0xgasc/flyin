@@ -205,6 +205,26 @@ export default function BookExperiencesPage() {
     return locale === 'es' ? 'Experiencia' : 'Experience'
   }
 
+  // Get display price - use lowest tier price if available, otherwise base_price
+  const getDisplayPrice = (experience: Experience): number => {
+    if (experience.pricing_tiers && experience.pricing_tiers.length > 0) {
+      // Get the lowest price from tiers
+      const lowestTier = experience.pricing_tiers.reduce((min, tier) =>
+        tier.price < min.price ? tier : min
+      , experience.pricing_tiers[0])
+      return lowestTier.price
+    }
+    return experience.base_price
+  }
+
+  // Check if experience has valid pricing
+  const hasValidPrice = (experience: Experience): boolean => {
+    if (experience.pricing_tiers && experience.pricing_tiers.length > 0) {
+      return experience.pricing_tiers.some(t => t.price > 0)
+    }
+    return experience.base_price > 0
+  }
+
   // Modal handlers
   const handleOpenBookingModal = (experience: Experience) => {
     setSelectedExperience(experience)
@@ -363,10 +383,13 @@ export default function BookExperiencesPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      {experience.type === 'experience' ? (
+                      {experience.type === 'experience' && hasValidPrice(experience) ? (
                         <>
-                          <span className="text-2xl font-bold text-primary-900">
-                            ${experience.base_price}
+                          <span className="text-sm text-gray-500">
+                            {locale === 'es' ? 'Desde' : 'From'}
+                          </span>
+                          <span className="text-2xl font-bold text-primary-900 ml-1">
+                            ${getDisplayPrice(experience).toLocaleString()}
                           </span>
                           <span className="text-sm text-gray-600 ml-1">USD</span>
                         </>

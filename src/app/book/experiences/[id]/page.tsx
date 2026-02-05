@@ -190,7 +190,7 @@ export default function ExperienceDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -198,9 +198,9 @@ export default function ExperienceDetailPage() {
 
   if (!experience) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-luxury-black flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Experience Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Experience Not Found</h1>
           <Link
             href="/book/experiences"
             className="text-primary-600 hover:text-primary-800 flex items-center justify-center"
@@ -218,7 +218,7 @@ export default function ExperienceDetailPage() {
   const displayIncludes = locale === 'es' && experience.includes_es ? experience.includes_es : experience.includes
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
+    <div className="min-h-screen bg-white">
       <MobileNav />
 
       <div className="container mx-auto px-4 py-8">
@@ -236,7 +236,7 @@ export default function ExperienceDetailPage() {
           <div className="space-y-4">
             {images.length > 0 ? (
               <div className="relative">
-                <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded overflow-hidden">
+                <div className="relative w-full bg-gray-200 rounded overflow-hidden">
                   <img
                     src={images[currentImageIndex]?.image_url}
                     alt={images[currentImageIndex]?.caption || displayName}
@@ -262,7 +262,7 @@ export default function ExperienceDetailPage() {
                 )}
               </div>
             ) : experience.image_url ? (
-              <div className="relative w-full bg-gray-200 dark:bg-gray-800 rounded overflow-hidden">
+              <div className="relative w-full bg-gray-200 rounded overflow-hidden">
                 <img
                   src={experience.image_url}
                   alt={displayName}
@@ -270,7 +270,7 @@ export default function ExperienceDetailPage() {
                 />
               </div>
             ) : (
-              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center">
+              <div className="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded flex items-center justify-center">
                 <Camera className="w-12 h-12 text-gray-400" />
               </div>
             )}
@@ -300,8 +300,8 @@ export default function ExperienceDetailPage() {
           {/* Experience Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{displayName}</h1>
-              <div className="flex items-center space-x-4 text-gray-600 dark:text-gray-400">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{displayName}</h1>
+              <div className="flex items-center space-x-4 text-gray-600">
                 <div className="flex items-center">
                   <MapPin className="w-4 h-4 mr-1" />
                   {experience.location}
@@ -316,23 +316,23 @@ export default function ExperienceDetailPage() {
             <p className="text-gray-700 leading-relaxed">{displayDescription}</p>
 
             {/* Key Details */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded shadow-sm">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 border border-gray-200 rounded shadow-sm">
               <div className="text-center">
-                <DollarSign className="w-6 h-6 text-primary-600 dark:text-gold-400 mx-auto mb-1" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">${experience.base_price}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">From</div>
+                <DollarSign className="w-6 h-6 text-primary-600 mx-auto mb-1" />
+                <div className="text-2xl font-bold text-gray-900">${experience.base_price}</div>
+                <div className="text-sm text-gray-600">From</div>
               </div>
               <div className="text-center">
-                <Users className="w-6 h-6 text-primary-600 dark:text-gold-400 mx-auto mb-1" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">{experience.min_passengers}-{experience.max_passengers}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Passengers</div>
+                <Users className="w-6 h-6 text-primary-600 mx-auto mb-1" />
+                <div className="text-2xl font-bold text-gray-900">{experience.min_passengers}-{experience.max_passengers}</div>
+                <div className="text-sm text-gray-600">Passengers</div>
               </div>
             </div>
 
             {/* What's Included */}
             {displayIncludes && displayIncludes.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">What's Included</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">What's Included</h3>
                 <div className="space-y-2">
                   {displayIncludes.map((item, index) => (
                     <div key={index} className="flex items-center">
@@ -347,7 +347,7 @@ export default function ExperienceDetailPage() {
             {/* Route Waypoints */}
             {experience.route_waypoints && experience.route_waypoints.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Route Highlights</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Route Highlights</h3>
                 <div className="space-y-2">
                   {experience.route_waypoints.map((waypoint, index) => (
                     <div key={index} className="flex items-center">
@@ -362,7 +362,7 @@ export default function ExperienceDetailPage() {
             {/* Requirements */}
             {experience.requirements && experience.requirements.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Requirements</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Requirements</h3>
                 <div className="space-y-2">
                   {experience.requirements.map((requirement, index) => (
                     <div key={index} className="flex items-start">
@@ -377,7 +377,7 @@ export default function ExperienceDetailPage() {
             {/* Meeting Point */}
             {experience.meeting_point && (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Meeting Point</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Meeting Point</h3>
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-primary-600 mr-3 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-700">{experience.meeting_point}</p>
@@ -399,12 +399,12 @@ export default function ExperienceDetailPage() {
       {/* Booking Modal */}
       {showBookingModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-luxury-charcoal dark:border dark:border-gray-800 rounded p-6 max-w-md w-full max-h-screen overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Book {displayName}</h2>
-            
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full max-h-screen overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Book {displayName}</h2>
+
             <form onSubmit={handleBooking} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('booking.form.date')}
                 </label>
                 <input
@@ -412,32 +412,32 @@ export default function ExperienceDetailPage() {
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
                   min={format(new Date(), 'yyyy-MM-dd')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('booking.form.time')}
                 </label>
                 <input
                   type="time"
                   value={formData.time}
                   onChange={(e) => setFormData({...formData, time: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('booking.form.passengers')}
                 </label>
                 <select
                   value={formData.passengers}
                   onChange={(e) => setFormData({...formData, passengers: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   {(() => {
                     const minPass = experience?.min_passengers || 1;
@@ -456,14 +456,14 @@ export default function ExperienceDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('booking.form.notes')}
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder={t('booking.form.notesPlaceholder')}
                 />
               </div>
@@ -472,7 +472,7 @@ export default function ExperienceDetailPage() {
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                 >
                   Cancel
                 </button>
