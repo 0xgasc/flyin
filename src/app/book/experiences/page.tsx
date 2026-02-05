@@ -6,9 +6,11 @@ import Link from 'next/link'
 
 import { useTranslation } from '@/lib/i18n'
 import { MobileNav } from '@/components/mobile-nav'
-import { ExperienceBookingModal, BookingIntent } from '@/components/experience-booking-modal'
 import { QuickSignUpModal } from '@/components/quick-signup-modal'
-import { Users, Clock, MapPin, Plane, ArrowRight, Sparkles } from 'lucide-react'
+import { BookingIntent } from '@/components/experience-booking-modal'
+import { useAuthStore } from '@/lib/auth-store'
+import { getAuthHeaders } from '@/lib/auth-client'
+import { Users, Clock, MapPin, Plane, ChevronDown, ChevronUp, Check, Minus, Plus } from 'lucide-react'
 
 
 interface PricingTier {
@@ -57,6 +59,231 @@ interface Experience {
   }>
 }
 
+// Inline booking card component
+function BookingCard({
+  experience,
+  locale,
+  onClose,
+  onSignUpRequired
+}: {
+  experience: Experience
+  locale: string
+  onClose: () => void
+  onSignUpRequired: (intent: BookingIntent) => void
+}) {
+  const router = useRouter()
+  const { profile } = useAuthStore()
+  const [passengerCount, setPassengerCount] = useState(experience.min_passengers || 1)
+  const [scheduledDate, setScheduledDate] = useState('')
+  const [scheduledTime, setScheduledTime] = useState('09:00')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const getDisplayName = () => {
+    return locale === 'es' && experience.name_es ? experience.name_es : experience.name
+  }
+
+  // Calculate price based on pricing tiers
+  const calculatePrice = (passengers: number): number => {
+    if (experience.pricing_tiers && experience.pricing_tiers.length > 0) {
+      const tier = experience.pricing_tiers.find(t =>
+        passengers >= t.min_passengers && passengers <= t.max_passengers
+      )
+      if (tier) return tier.price
+
+      const sortedTiers = [...experience.pricing_tiers].sort((a, b) => a.min_passengers - b.min_passengers)
+      for (const t of sortedTiers) {
+        if (passengers <= t.max_passengers) return t.price
+      }
+      return sortedTiers[sortedTiers.length - 1]?.price || experience.base_price * passengers
+    }
+    return experience.base_price * passengers
+  }
+
+  const totalPrice = calculatePrice(passengerCount)
+  const pricePerPerson = Math.round(totalPrice / passengerCount)
+
+  const handlePassengerChange = (delta: number) => {
+    const newCount = passengerCount + delta
+    if (newCount >= experience.min_passengers && newCount <= experience.max_passengers) {
+      setPassengerCount(newCount)
+    }
+  }
+
+  const handleBook = async () => {
+    if (!scheduledDate) {
+      setError(locale === 'es' ? 'Selecciona una fecha' : 'Select a date')
+      return
+    }
+
+    const bookingIntent: BookingIntent = {
+      experienceId: experience.id,
+      experienceName: getDisplayName(),
+      passengerCount,
+      scheduledDate,
+      scheduledTime,
+      totalPrice,
+      type: experience.type
+    }
+
+    if (!profile) {
+      localStorage.setItem('booking-intent', JSON.stringify(bookingIntent))
+      onSignUpRequired(bookingIntent)
+      return
+    }
+
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({
+          booking_type: 'experience',
+          experience_id: experience.id,
+          scheduled_date: scheduledDate,
+          scheduled_time: scheduledTime,
+          passenger_count: passengerCount,
+          total_price: totalPrice,
+          price_breakdown: {
+            base_price: totalPrice,
+            passengers: passengerCount,
+            per_person: pricePerPerson
+          }
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create booking')
+      }
+
+      sessionStorage.setItem('lastBookingId', data.booking.id)
+      sessionStorage.setItem('lastBooking', JSON.stringify({
+        ...data.booking,
+        experienceName: getDisplayName()
+      }))
+
+      router.push(`/book/passenger-details?booking_id=${data.booking.id}`)
+    } catch (err: any) {
+      setError(err.message || (locale === 'es' ? 'Error al crear la reserva' : 'Failed to create booking'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+
+  const timeOptions = [
+    '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
+    '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
+  ]
+
+  return (
+    <div className="border-t border-slate-200 bg-slate-50 p-5 space-y-4">
+      {/* Price Display */}
+      <div className="bg-white rounded-xl p-4 border border-slate-200">
+        <div className="text-center">
+          <div className="text-3xl font-bold text-slate-900">
+            ${totalPrice.toLocaleString()} <span className="text-base font-normal text-slate-500">USD</span>
+          </div>
+          <div className="text-sm text-slate-500">
+            ${pricePerPerson} {locale === 'es' ? 'por persona' : 'per person'}
+          </div>
+        </div>
+      </div>
+
+      {/* Passengers */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          {locale === 'es' ? 'Pasajeros' : 'Passengers'}
+        </label>
+        <div className="flex items-center justify-center gap-4 bg-white rounded-lg border border-slate-200 p-3">
+          <button
+            onClick={() => handlePassengerChange(-1)}
+            disabled={passengerCount <= experience.min_passengers}
+            className="p-2 rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <Minus className="h-5 w-5" />
+          </button>
+          <span className="text-2xl font-bold text-slate-900 min-w-[3rem] text-center">
+            {passengerCount}
+          </span>
+          <button
+            onClick={() => handlePassengerChange(1)}
+            disabled={passengerCount >= experience.max_passengers}
+            className="p-2 rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Date & Time */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            {locale === 'es' ? 'Fecha' : 'Date'}
+          </label>
+          <input
+            type="date"
+            value={scheduledDate}
+            onChange={(e) => setScheduledDate(e.target.value)}
+            min={today}
+            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            {locale === 'es' ? 'Hora' : 'Time'}
+          </label>
+          <select
+            value={scheduledTime}
+            onChange={(e) => setScheduledTime(e.target.value)}
+            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            {timeOptions.map(time => (
+              <option key={time} value={time}>{time}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="text-red-600 text-sm text-center bg-red-50 py-2 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-3">
+        <button
+          onClick={handleBook}
+          disabled={isSubmitting}
+          className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+        >
+          {isSubmitting
+            ? (locale === 'es' ? 'Procesando...' : 'Processing...')
+            : (locale === 'es' ? 'Confirmar Reserva' : 'Confirm Booking')
+          }
+        </button>
+        <button
+          onClick={onClose}
+          className="px-4 py-3 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+        >
+          {locale === 'es' ? 'Cerrar' : 'Close'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function BookExperiencesPage() {
   const router = useRouter()
 
@@ -66,15 +293,13 @@ export default function BookExperiencesPage() {
   const [error, setError] = useState('')
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [expandedCard, setExpandedCard] = useState<string | null>(null)
 
-  // Modal state
-  const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null)
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
+  // Sign up modal state
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false)
   const [bookingIntent, setBookingIntent] = useState<BookingIntent | null>(null)
 
   useEffect(() => {
-    // Add timeout to prevent infinite spinning
     const timeoutId = setTimeout(() => {
       if (loading) {
         console.warn('⏰ Query timeout after 15 seconds')
@@ -88,12 +313,9 @@ export default function BookExperiencesPage() {
   }, [])
 
   const fetchExperiences = async () => {
-    console.log('🔄 fetchExperiences started')
     setLoading(true)
 
     try {
-      // Fetch both experiences and destinations from MongoDB API
-      console.log('📡 Querying experiences and destinations...')
       const [experiencesResponse, destinationsResponse] = await Promise.all([
         fetch('/api/experiences'),
         fetch('/api/destinations?include_images=true')
@@ -102,15 +324,9 @@ export default function BookExperiencesPage() {
       const experiencesData = await experiencesResponse.json()
       const destinationsData = await destinationsResponse.json()
 
-      console.log('📊 Query results:', {
-        experiencesCount: experiencesData.experiences?.length || 0,
-        destinationsCount: destinationsData.destinations?.length || 0
-      })
-
-      const allItems = []
+      const allItems: Experience[] = []
       const allCategories = new Set(['experiences', 'destinations'])
 
-      // Process experiences
       if (experiencesData.success && experiencesData.experiences?.length > 0) {
         const experienceItems = experiencesData.experiences.map((exp: any) => ({
           id: exp.id,
@@ -138,10 +354,8 @@ export default function BookExperiencesPage() {
           experience_images: exp.experience_images || []
         }))
         allItems.push(...experienceItems)
-        console.log('✅ Added', experienceItems.length, 'experiences')
       }
 
-      // Process destinations
       if (destinationsData.success && destinationsData.destinations?.length > 0) {
         const destinationItems = destinationsData.destinations.map((dest: any) => ({
           id: dest.id,
@@ -151,7 +365,7 @@ export default function BookExperiencesPage() {
           description_es: null,
           duration_hours: 0,
           duration_minutes: null,
-          base_price: 0, // Destinations have custom pricing
+          base_price: 0,
           max_passengers: 8,
           min_passengers: 1,
           includes: dest.features || [],
@@ -168,10 +382,8 @@ export default function BookExperiencesPage() {
           order_index: dest.order_index
         }))
         allItems.push(...destinationItems)
-        console.log('✅ Added', destinationItems.length, 'destinations')
       }
 
-      // Sort all items by order_index to maintain proper ordering across both types
       const sortedItems = allItems.sort((a, b) => {
         const aOrder = a.order_index ?? 999
         const bOrder = b.order_index ?? 999
@@ -180,7 +392,6 @@ export default function BookExperiencesPage() {
 
       setExperiences(sortedItems)
       setCategories(Array.from(allCategories))
-      console.log('✅ Total items loaded:', sortedItems.length)
 
     } catch (error) {
       console.error('❌ Error fetching data:', error)
@@ -194,21 +405,20 @@ export default function BookExperiencesPage() {
     return locale === 'es' && experience.name_es ? experience.name_es : experience.name
   }
 
-  const getDisplayDescription = (experience: Experience) => {
-    return locale === 'es' && experience.description_es ? experience.description_es : experience.description
-  }
-
   const getCategoryName = (experience: Experience) => {
     if (experience.type === 'destination') {
       return locale === 'es' ? 'Destino' : 'Destination'
     }
-    return locale === 'es' ? 'Experiencia' : 'Experience'
+    return locale === 'es' ? 'Sobrevuelo Panorámico' : 'Panoramic Flight'
   }
 
-  // Get display price - use lowest tier price if available, otherwise base_price
+  const getDisplayIncludes = (experience: Experience) => {
+    return locale === 'es' && experience.includes_es ? experience.includes_es : experience.includes
+  }
+
+  // Get display price - use lowest tier price if available
   const getDisplayPrice = (experience: Experience): number => {
     if (experience.pricing_tiers && experience.pricing_tiers.length > 0) {
-      // Get the lowest price from tiers
       const lowestTier = experience.pricing_tiers.reduce((min, tier) =>
         tier.price < min.price ? tier : min
       , experience.pricing_tiers[0])
@@ -217,7 +427,6 @@ export default function BookExperiencesPage() {
     return experience.base_price
   }
 
-  // Check if experience has valid pricing
   const hasValidPrice = (experience: Experience): boolean => {
     if (experience.pricing_tiers && experience.pricing_tiers.length > 0) {
       return experience.pricing_tiers.some(t => t.price > 0)
@@ -225,20 +434,20 @@ export default function BookExperiencesPage() {
     return experience.base_price > 0
   }
 
-  // Modal handlers
-  const handleOpenBookingModal = (experience: Experience) => {
-    setSelectedExperience(experience)
-    setIsBookingModalOpen(true)
+  // Format pricing tiers for display
+  const formatPricingTiers = (experience: Experience) => {
+    if (!experience.pricing_tiers || experience.pricing_tiers.length === 0) {
+      return null
+    }
+    return experience.pricing_tiers.sort((a, b) => a.min_passengers - b.min_passengers)
   }
 
-  const handleCloseBookingModal = () => {
-    setIsBookingModalOpen(false)
-    setSelectedExperience(null)
+  const handleToggleBooking = (experienceId: string) => {
+    setExpandedCard(expandedCard === experienceId ? null : experienceId)
   }
 
   const handleSignUpRequired = (intent: BookingIntent) => {
     setBookingIntent(intent)
-    setIsBookingModalOpen(false)
     setIsSignUpModalOpen(true)
   }
 
@@ -253,34 +462,26 @@ export default function BookExperiencesPage() {
     : experiences.filter(exp => exp.category === selectedCategory)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       <MobileNav />
 
-      {/* Hero Section - Clean and minimal */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-20">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-gold-400" />
-              <span className="text-gold-400 font-medium text-sm uppercase tracking-wider">
-                {locale === 'es' ? 'Experiencias Premium' : 'Premium Experiences'}
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {locale === 'es' ? 'Vuela Sobre Guatemala' : 'Fly Over Guatemala'}
-            </h1>
-            <p className="text-lg text-slate-300 max-w-2xl">
-              {locale === 'es'
-                ? 'Tours en helicóptero y transporte aéreo privado. Descubre vistas que pocos han visto.'
-                : 'Helicopter tours and private air transport. Discover views that few have seen.'
-              }
-            </p>
-          </div>
+      {/* Hero Section - Minimal like screenshot */}
+      <div className="bg-white border-b border-slate-200 py-12">
+        <div className="container mx-auto px-6 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+            {locale === 'es' ? 'Vive La Experiencia' : 'Live The Experience'}
+          </h1>
+          <p className="text-slate-500 text-sm">
+            {locale === 'es'
+              ? 'El cielo a hora del despegue quedará a tu elección.'
+              : 'The sky at takeoff time will be your choice.'
+            }
+          </p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-6 py-8">
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
@@ -290,20 +491,20 @@ export default function BookExperiencesPage() {
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-2 border-slate-200 border-t-primary-600 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-slate-600 mx-auto mb-4"></div>
               <p className="text-slate-500">{t('common.loading')}</p>
             </div>
           </div>
         ) : (
           <div>
-            {/* Category Filter - Pill style */}
-            <div className="flex flex-wrap gap-3 mb-10">
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2 mb-8">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === 'all'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
                 }`}
               >
                 {locale === 'es' ? 'Todas' : 'All'}
@@ -312,10 +513,10 @@ export default function BookExperiencesPage() {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     selectedCategory === category
-                      ? 'bg-slate-900 text-white shadow-lg'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   {category === 'experiences'
@@ -332,113 +533,143 @@ export default function BookExperiencesPage() {
             {filteredExperiences.length === 0 ? (
               <div className="text-center py-16">
                 <Plane className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500 text-lg">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
+                <p className="text-slate-500">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredExperiences.map((experience) => (
-                <div
-                  key={experience.id}
-                  className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-slate-300 transition-all duration-300"
-                >
-                  {/* Image */}
-                  <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
-                    {(() => {
-                      const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images
-                      const primaryImage = images?.find(img => img.is_primary)?.image_url
-                      const firstImage = images?.[0]?.image_url
-                      const displayImage = primaryImage || firstImage || experience.image_url
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredExperiences.map((experience) => {
+                  const pricingTiers = formatPricingTiers(experience)
+                  const isExpanded = expandedCard === experience.id
+                  const includes = getDisplayIncludes(experience)
 
-                      return displayImage ? (
-                        <img
-                          src={displayImage}
-                          alt={getDisplayName(experience)}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full bg-gradient-to-br from-slate-100 to-slate-200">
-                          <Plane className="h-16 w-16 text-slate-300" />
+                  return (
+                    <div
+                      key={experience.id}
+                      className={`bg-white rounded-xl border overflow-hidden transition-all duration-300 ${
+                        isExpanded ? 'border-slate-300 shadow-lg' : 'border-slate-200 hover:shadow-md'
+                      }`}
+                    >
+                      {/* Image */}
+                      <div className="aspect-[4/3] bg-slate-100 relative">
+                        {(() => {
+                          const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images
+                          const primaryImage = images?.find(img => img.is_primary)?.image_url
+                          const firstImage = images?.[0]?.image_url
+                          const displayImage = primaryImage || firstImage || experience.image_url
+
+                          return displayImage ? (
+                            <img
+                              src={displayImage}
+                              alt={getDisplayName(experience)}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center h-full">
+                              <Plane className="h-12 w-12 text-slate-300" />
+                            </div>
+                          )
+                        })()}
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-5">
+                        <div className="flex items-start justify-between gap-4 mb-3">
+                          <div>
+                            <h3 className="font-semibold text-slate-900 mb-1">
+                              {getDisplayName(experience)}
+                              {experience.type === 'experience' && experience.duration_minutes && (
+                                <span className="text-slate-500 font-normal"> - {experience.duration_minutes} Min</span>
+                              )}
+                            </h3>
+                          </div>
+                          <span className="text-xs text-slate-500 whitespace-nowrap">
+                            {getCategoryName(experience)}
+                          </span>
                         </div>
-                      )
-                    })()}
-                    {/* Category Badge */}
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-white/90 backdrop-blur-sm text-slate-700 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">
-                        {getCategoryName(experience)}
-                      </span>
-                    </div>
-                    {/* Price Badge */}
-                    {experience.type === 'experience' && hasValidPrice(experience) && (
-                      <div className="absolute bottom-4 right-4">
-                        <span className="bg-slate-900/90 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full">
-                          ${getDisplayPrice(experience).toLocaleString()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Content */}
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
-                      {getDisplayName(experience)}
-                    </h3>
-                    <p className="text-slate-500 text-sm line-clamp-2 mb-4">
-                      {getDisplayDescription(experience)}
-                    </p>
+                        {/* Pricing Tiers - Display like in screenshot */}
+                        {pricingTiers && pricingTiers.length > 0 ? (
+                          <div className="space-y-1 mb-4 text-sm">
+                            {pricingTiers.map((tier, idx) => (
+                              <div key={idx} className="flex justify-between">
+                                <span className="text-slate-900 font-medium">
+                                  $ {tier.price.toLocaleString()} USD
+                                </span>
+                                <span className="text-slate-400">
+                                  / {locale === 'es' ? 'Para' : 'For'} {tier.min_passengers === tier.max_passengers
+                                    ? tier.min_passengers
+                                    : `${tier.min_passengers}-${tier.max_passengers}`
+                                  } {locale === 'es' ? 'pasajeros.' : 'passengers.'}
+                                </span>
+                              </div>
+                            ))}
+                            {experience.aircraft_options && (
+                              <div className="text-xs text-slate-400 mt-1">
+                                ({experience.aircraft_options})
+                              </div>
+                            )}
+                          </div>
+                        ) : experience.type === 'experience' && hasValidPrice(experience) ? (
+                          <div className="mb-4">
+                            <span className="text-lg font-semibold text-slate-900">
+                              ${getDisplayPrice(experience).toLocaleString()}
+                            </span>
+                            <span className="text-slate-500 text-sm ml-1">USD</span>
+                          </div>
+                        ) : (
+                          <div className="mb-4 text-sm text-slate-500">
+                            {locale === 'es' ? 'Cotización personalizada' : 'Custom quote'}
+                          </div>
+                        )}
 
-                    {/* Quick Info */}
-                    <div className="flex flex-wrap gap-3 mb-5">
-                      <div className="flex items-center text-xs text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 mr-1" />
-                        {experience.location}
+                        {/* Includes */}
+                        {includes && includes.length > 0 && (
+                          <ul className="space-y-1 mb-4 text-sm text-slate-600">
+                            {includes.slice(0, 4).map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-2">
+                                <Check className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                            {includes.length > 4 && (
+                              <li className="text-slate-400 text-xs pl-6">
+                                +{includes.length - 4} {locale === 'es' ? 'más' : 'more'}
+                              </li>
+                            )}
+                          </ul>
+                        )}
+
+                        {/* Book Button */}
+                        <button
+                          onClick={() => handleToggleBooking(experience.id)}
+                          className={`w-full py-2.5 font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
+                            isExpanded
+                              ? 'bg-slate-200 text-slate-700'
+                              : 'bg-slate-900 text-white hover:bg-slate-800'
+                          }`}
+                        >
+                          {locale === 'es' ? 'Reservar Ahora' : 'Book Now'}
+                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </button>
                       </div>
-                      {experience.type === 'experience' && (
-                        <>
-                          <div className="flex items-center text-xs text-slate-500">
-                            <Clock className="h-3.5 w-3.5 mr-1" />
-                            {experience.duration_minutes ? `${experience.duration_minutes} min` : `${experience.duration_hours}h`}
-                          </div>
-                          <div className="flex items-center text-xs text-slate-500">
-                            <Users className="h-3.5 w-3.5 mr-1" />
-                            {experience.min_passengers}-{experience.max_passengers}
-                          </div>
-                        </>
+
+                      {/* Expanded Booking Section */}
+                      {isExpanded && (
+                        <BookingCard
+                          experience={experience}
+                          locale={locale}
+                          onClose={() => setExpandedCard(null)}
+                          onSignUpRequired={handleSignUpRequired}
+                        />
                       )}
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handleOpenBookingModal(experience)}
-                        className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
-                      >
-                        {locale === 'es' ? 'Reservar Ahora' : 'Book Now'}
-                      </button>
-                      <Link
-                        href={experience.type === 'destination' ? `/book/destinations/${experience.id}` : `/book/experiences/${experience.id}`}
-                        className="flex items-center justify-center px-4 py-2.5 border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 rounded-lg transition-colors"
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  )
+                })}
               </div>
             )}
           </div>
         )}
       </div>
-
-      {/* Booking Modal */}
-      {selectedExperience && (
-        <ExperienceBookingModal
-          experience={selectedExperience}
-          isOpen={isBookingModalOpen}
-          onClose={handleCloseBookingModal}
-          onSignUpRequired={handleSignUpRequired}
-        />
-      )}
 
       {/* Sign Up Modal */}
       <QuickSignUpModal

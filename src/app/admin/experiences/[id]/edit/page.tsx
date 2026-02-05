@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth-store'
 import IrysUpload from '@/components/IrysUpload'
-import { ArrowLeft, Plus, Trash2, ImageIcon, X } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, ImageIcon, X, Eye, EyeOff, Check, Clock, Users, MapPin, Plane } from 'lucide-react'
 import Link from 'next/link'
 
 interface PricingTier {
@@ -80,6 +80,141 @@ const MEETING_POINT_PRESETS = [
   'Custom location (to be arranged)'
 ]
 
+// Preview Card Component - mimics public experience card
+function PreviewCard({
+  formData,
+  images,
+  isExpanded,
+  onToggle
+}: {
+  formData: {
+    name: string
+    description: string
+    location: string
+    duration_hours: number
+    duration_minutes: number
+    base_price: number
+    max_passengers: number
+    min_passengers: number
+    includes: string[]
+    pricing_tiers: PricingTier[]
+  }
+  images: ExperienceImage[]
+  isExpanded: boolean
+  onToggle: () => void
+}) {
+  const primaryImage = images.find(img => img.is_primary)?.image_url || images[0]?.image_url
+  const pricingTiers = formData.pricing_tiers.sort((a, b) => a.min_passengers - b.min_passengers)
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-lg max-w-sm">
+      {/* Image */}
+      <div className="aspect-[4/3] bg-slate-100 relative">
+        {primaryImage ? (
+          <img
+            src={primaryImage}
+            alt={formData.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <Plane className="h-12 w-12 text-slate-300" />
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <h3 className="font-semibold text-slate-900 mb-1">
+              {formData.name || 'Experience Name'}
+              {formData.duration_minutes > 0 && (
+                <span className="text-slate-500 font-normal"> - {formData.duration_minutes} Min</span>
+              )}
+            </h3>
+          </div>
+          <span className="text-xs text-slate-500 whitespace-nowrap">
+            Sobrevuelo Panorámico
+          </span>
+        </div>
+
+        {/* Pricing Tiers */}
+        {pricingTiers.length > 0 ? (
+          <div className="space-y-1 mb-4 text-sm">
+            {pricingTiers.map((tier, idx) => (
+              <div key={idx} className="flex justify-between">
+                <span className="text-slate-900 font-medium">
+                  $ {tier.price.toLocaleString()} USD
+                </span>
+                <span className="text-slate-400">
+                  / Para {tier.min_passengers === tier.max_passengers
+                    ? tier.min_passengers
+                    : `${tier.min_passengers}-${tier.max_passengers}`
+                  } pasajeros.
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : formData.base_price > 0 ? (
+          <div className="mb-4">
+            <span className="text-lg font-semibold text-slate-900">
+              ${formData.base_price.toLocaleString()}
+            </span>
+            <span className="text-slate-500 text-sm ml-1">USD</span>
+          </div>
+        ) : null}
+
+        {/* Includes */}
+        {formData.includes.length > 0 && (
+          <ul className="space-y-1 mb-4 text-sm text-slate-600">
+            {formData.includes.slice(0, 4).map((item, idx) => (
+              <li key={idx} className="flex items-start gap-2">
+                <Check className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+            {formData.includes.length > 4 && (
+              <li className="text-slate-400 text-xs pl-6">
+                +{formData.includes.length - 4} más
+              </li>
+            )}
+          </ul>
+        )}
+
+        {/* Book Button */}
+        <button
+          onClick={onToggle}
+          className={`w-full py-2.5 font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
+            isExpanded
+              ? 'bg-slate-200 text-slate-700'
+              : 'bg-slate-900 text-white hover:bg-slate-800'
+          }`}
+        >
+          Reservar Ahora
+        </button>
+      </div>
+
+      {/* Expanded Booking Preview */}
+      {isExpanded && (
+        <div className="border-t border-slate-200 bg-slate-50 p-5">
+          <div className="bg-white rounded-xl p-4 border border-slate-200 mb-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-slate-900">
+                ${(pricingTiers[0]?.price || formData.base_price).toLocaleString()} <span className="text-base font-normal text-slate-500">USD</span>
+              </div>
+              <div className="text-sm text-slate-500">Price updates with passenger count</div>
+            </div>
+          </div>
+          <div className="text-center text-sm text-slate-400">
+            [Booking form would appear here]
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function EditExperiencePage() {
   const router = useRouter()
   const params = useParams()
@@ -89,6 +224,8 @@ export default function EditExperiencePage() {
   const [experience, setExperience] = useState<Experience | null>(null)
   const [images, setImages] = useState<ExperienceImage[]>([])
   const [showImageUpload, setShowImageUpload] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewExpanded, setPreviewExpanded] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -398,18 +535,52 @@ export default function EditExperiencePage() {
     <div className="min-h-screen bg-luxury-black py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8">
-          <Link
-            href="/admin#experiences"
-            className="inline-flex items-center text-gold-400 hover:text-gold-300 mb-4 font-medium transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Admin Panel
-          </Link>
+          <div className="flex items-center justify-between mb-4">
+            <Link
+              href="/admin#experiences"
+              className="inline-flex items-center text-gold-400 hover:text-gold-300 font-medium transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Admin Panel
+            </Link>
+            <button
+              onClick={() => setShowPreview(!showPreview)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                showPreview
+                  ? 'bg-gold-500 text-black'
+                  : 'bg-gray-700 text-white hover:bg-gray-600'
+              }`}
+            >
+              {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showPreview ? 'Hide Preview' : 'Show Preview'}
+            </button>
+          </div>
           <h1 className="text-4xl font-bold text-white">
             Edit Experience
           </h1>
           <p className="text-gray-400 mt-2 text-lg">Manage experience details, pricing, and media</p>
         </div>
+
+        {/* Live Preview Panel */}
+        {showPreview && (
+          <div className="mb-8 p-6 bg-slate-800 rounded-xl border border-slate-700">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Eye className="w-5 h-5 text-gold-400" />
+              Live Preview - How it will look on the booking page
+            </h3>
+            <div className="flex justify-center">
+              <PreviewCard
+                formData={formData}
+                images={images}
+                isExpanded={previewExpanded}
+                onToggle={() => setPreviewExpanded(!previewExpanded)}
+              />
+            </div>
+            <p className="text-slate-400 text-sm text-center mt-4">
+              Click "Reservar Ahora" to preview the expanded booking section
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
