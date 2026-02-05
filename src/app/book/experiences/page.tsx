@@ -185,14 +185,14 @@ function BookingCard({
   ]
 
   return (
-    <div className="border-t border-slate-200 bg-slate-50 p-5 space-y-4">
+    <div className="border-t border-slate-200 bg-slate-50 p-4 space-y-3">
       {/* Price Display */}
-      <div className="bg-white rounded-xl p-4 border border-slate-200">
+      <div className="bg-white rounded-lg p-3 border border-slate-200">
         <div className="text-center">
-          <div className="text-3xl font-bold text-slate-900">
-            ${totalPrice.toLocaleString()} <span className="text-base font-normal text-slate-500">USD</span>
+          <div className="text-xl font-bold text-slate-900">
+            ${totalPrice.toLocaleString()} <span className="text-sm font-normal text-slate-500">USD</span>
           </div>
-          <div className="text-sm text-slate-500">
+          <div className="text-xs text-slate-400">
             ${pricePerPerson} {locale === 'es' ? 'por persona' : 'per person'}
           </div>
         </div>
@@ -200,34 +200,34 @@ function BookingCard({
 
       {/* Passengers */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">
+        <label className="block text-xs font-medium text-slate-600 mb-1.5">
           {locale === 'es' ? 'Pasajeros' : 'Passengers'}
         </label>
-        <div className="flex items-center justify-center gap-4 bg-white rounded-lg border border-slate-200 p-3">
+        <div className="flex items-center justify-center gap-3 bg-white rounded-lg border border-slate-200 p-2">
           <button
             onClick={() => handlePassengerChange(-1)}
             disabled={passengerCount <= experience.min_passengers}
-            className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1.5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            <Minus className="h-5 w-5" />
+            <Minus className="h-4 w-4" />
           </button>
-          <span className="text-2xl font-bold text-slate-900 min-w-[3rem] text-center">
+          <span className="text-lg font-bold text-slate-900 min-w-[2rem] text-center">
             {passengerCount}
           </span>
           <button
             onClick={() => handlePassengerChange(1)}
             disabled={passengerCount >= experience.max_passengers}
-            className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1.5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Date & Time */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">
             {locale === 'es' ? 'Fecha' : 'Date'}
           </label>
           <input
@@ -235,17 +235,17 @@ function BookingCard({
             value={scheduledDate}
             onChange={(e) => setScheduledDate(e.target.value)}
             min={today}
-            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-2.5 py-2 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">
             {locale === 'es' ? 'Hora' : 'Time'}
           </label>
           <select
             value={scheduledTime}
             onChange={(e) => setScheduledTime(e.target.value)}
-            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-2.5 py-2 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             {timeOptions.map(time => (
               <option key={time} value={time}>{time}</option>
@@ -256,17 +256,17 @@ function BookingCard({
 
       {/* Error */}
       {error && (
-        <div className="text-red-600 text-sm text-center bg-red-50 py-2 rounded-lg">
+        <div className="text-red-600 text-xs text-center bg-red-50 py-1.5 rounded-lg">
           {error}
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <button
           onClick={handleBook}
           disabled={isSubmitting}
-          className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+          className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
         >
           {isSubmitting
             ? (locale === 'es' ? 'Procesando...' : 'Processing...')
@@ -275,7 +275,7 @@ function BookingCard({
         </button>
         <button
           onClick={onClose}
-          className="px-4 py-3 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+          className="px-3 py-2.5 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-100 transition-colors"
         >
           {locale === 'es' ? 'Cerrar' : 'Close'}
         </button>
@@ -466,12 +466,12 @@ export default function BookExperiencesPage() {
       <MobileNav />
 
       {/* Hero Section - Minimal like screenshot */}
-      <div className="bg-white border-b border-slate-200 py-12">
+      <div className="bg-white border-b border-slate-200 py-8">
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
             {locale === 'es' ? 'Vive La Experiencia' : 'Live The Experience'}
           </h1>
-          <p className="text-slate-500 text-sm">
+          <p className="text-slate-400 text-xs">
             {locale === 'es'
               ? 'El cielo a hora del despegue quedará a tu elección.'
               : 'The sky at takeoff time will be your choice.'
@@ -498,13 +498,13 @@ export default function BookExperiencesPage() {
         ) : (
           <div>
             {/* Category Filter */}
-            <div className="flex flex-wrap gap-2 mb-8">
+            <div className="flex flex-wrap gap-1.5 mb-6">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   selectedCategory === 'all'
                     ? 'bg-slate-900 text-white'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                    : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'
                 }`}
               >
                 {locale === 'es' ? 'Todas' : 'All'}
@@ -513,10 +513,10 @@ export default function BookExperiencesPage() {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     selectedCategory === category
                       ? 'bg-slate-900 text-white'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                      : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   {category === 'experiences'
@@ -536,7 +536,7 @@ export default function BookExperiencesPage() {
                 <p className="text-slate-500">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredExperiences.map((experience) => {
                   const pricingTiers = formatPricingTiers(experience)
                   const isExpanded = expandedCard === experience.id
@@ -572,24 +572,24 @@ export default function BookExperiencesPage() {
                       </div>
 
                       {/* Content */}
-                      <div className="p-5">
-                        <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-3 mb-2">
                           <div>
-                            <h3 className="font-semibold text-slate-900 mb-1">
+                            <h3 className="text-sm font-semibold text-slate-900">
                               {getDisplayName(experience)}
                               {experience.type === 'experience' && experience.duration_minutes && (
-                                <span className="text-slate-500 font-normal"> - {experience.duration_minutes} Min</span>
+                                <span className="text-slate-400 font-normal"> - {experience.duration_minutes} Min</span>
                               )}
                             </h3>
                           </div>
-                          <span className="text-xs text-slate-500 whitespace-nowrap">
+                          <span className="text-[10px] text-slate-400 whitespace-nowrap">
                             {getCategoryName(experience)}
                           </span>
                         </div>
 
                         {/* Pricing Tiers - Display like in screenshot */}
                         {pricingTiers && pricingTiers.length > 0 ? (
-                          <div className="space-y-1 mb-4 text-sm">
+                          <div className="space-y-0.5 mb-3 text-xs">
                             {pricingTiers.map((tier, idx) => (
                               <div key={idx} className="flex justify-between">
                                 <span className="text-slate-900 font-medium">
@@ -604,36 +604,36 @@ export default function BookExperiencesPage() {
                               </div>
                             ))}
                             {experience.aircraft_options && (
-                              <div className="text-xs text-slate-400 mt-1">
+                              <div className="text-[10px] text-slate-400 mt-0.5">
                                 ({experience.aircraft_options})
                               </div>
                             )}
                           </div>
                         ) : experience.type === 'experience' && hasValidPrice(experience) ? (
-                          <div className="mb-4">
-                            <span className="text-lg font-semibold text-slate-900">
+                          <div className="mb-3">
+                            <span className="text-base font-semibold text-slate-900">
                               ${getDisplayPrice(experience).toLocaleString()}
                             </span>
-                            <span className="text-slate-500 text-sm ml-1">USD</span>
+                            <span className="text-slate-400 text-xs ml-1">USD</span>
                           </div>
                         ) : (
-                          <div className="mb-4 text-sm text-slate-500">
+                          <div className="mb-3 text-xs text-slate-400">
                             {locale === 'es' ? 'Cotización personalizada' : 'Custom quote'}
                           </div>
                         )}
 
                         {/* Includes */}
                         {includes && includes.length > 0 && (
-                          <ul className="space-y-1 mb-4 text-sm text-slate-600">
-                            {includes.slice(0, 4).map((item, idx) => (
-                              <li key={idx} className="flex items-start gap-2">
-                                <Check className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                          <ul className="space-y-0.5 mb-3 text-xs text-slate-500">
+                            {includes.slice(0, 3).map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-1.5">
+                                <Check className="h-3 w-3 text-slate-400 flex-shrink-0 mt-0.5" />
                                 <span>{item}</span>
                               </li>
                             ))}
-                            {includes.length > 4 && (
-                              <li className="text-slate-400 text-xs pl-6">
-                                +{includes.length - 4} {locale === 'es' ? 'más' : 'more'}
+                            {includes.length > 3 && (
+                              <li className="text-slate-400 text-[10px] pl-4">
+                                +{includes.length - 3} {locale === 'es' ? 'más' : 'more'}
                               </li>
                             )}
                           </ul>
@@ -642,14 +642,14 @@ export default function BookExperiencesPage() {
                         {/* Book Button */}
                         <button
                           onClick={() => handleToggleBooking(experience.id)}
-                          className={`w-full py-2.5 font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
+                          className={`w-full py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${
                             isExpanded
                               ? 'bg-slate-200 text-slate-700'
                               : 'bg-slate-900 text-white hover:bg-slate-800'
                           }`}
                         >
                           {locale === 'es' ? 'Reservar Ahora' : 'Book Now'}
-                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                         </button>
                       </div>
 
