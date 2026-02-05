@@ -25,9 +25,12 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
   const translations: Record<string, Record<'en' | 'es', string>> = {
     // Navigation
     'nav.home': { en: 'Home', es: 'Inicio' },
+    'nav.destinations': { en: 'Destinations', es: 'Destinos' },
     'nav.dashboard': { en: 'Dashboard', es: 'Panel' },
     'nav.experiences': { en: 'Experiences', es: 'Experiencias' },
     'nav.transport': { en: 'Transport', es: 'Transporte' },
+    'nav.book_flight': { en: 'Book Flight', es: 'Confirma tu vuelo' },
+    'nav.more': { en: 'More', es: 'Más' },
     'nav.pilot_opportunities': { en: 'Pilot Opportunities', es: 'Oportunidades para Pilotos' },
     'nav.executive_services': { en: 'Executive Services', es: 'Servicios Ejecutivos' },
     'nav.faq': { en: 'FAQ', es: 'Preguntas Frecuentes' },
@@ -39,6 +42,13 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'nav.sign_in': { en: 'Sign In', es: 'Iniciar Sesión' },
     'nav.sign_out': { en: 'Sign Out', es: 'Cerrar Sesión' },
     'nav.switch_language': { en: 'Español', es: 'English' },
+    'nav.privacy_policy': { en: 'Privacy Policy', es: 'Política de privacidad' },
+    'nav.contact': { en: 'Contact', es: 'Contacto' },
+
+    // Footer
+    'footer.follow_us': { en: 'Follow Us on Social Media', es: 'Síguenos en las Redes Sociales' },
+    'footer.tagline': { en: 'Intermediation of aeronautical leisure services.', es: 'Intermediación de servicios de esparcimiento aeronáutico.' },
+    'footer.copyright': { en: 'Copyright © 2026 FlyInGuate - All Rights Reserved.', es: 'Copyright © 2026 FlyInGuate - Todos los derechos reservados.' },
 
     // Homepage
     'hero.title': { 

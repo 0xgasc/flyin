@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Shield, Clock, Star, MapPin, ChevronDown, Plane, DollarSign } from 'lucide-react'
+import { Shield, Clock, Star, MapPin, ChevronDown, Plane, DollarSign, Facebook, Instagram, Phone } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
@@ -579,28 +579,81 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer CTA */}
-      <div className="bg-luxury-black text-white py-16">
+      {/* Social Media Section */}
+      <div className="bg-black text-white py-16">
         <div className="container mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Ready for <span className="text-brand-accent">takeoff</span>?
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold uppercase tracking-widest mb-8">
+            {t('footer.follow_us')}
           </h2>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-            Experience Guatemala from above. Book your flight today.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/book/transport"
-              className="btn-luxury text-lg px-10 py-4"
+          <div className="w-16 h-0.5 bg-white mx-auto mb-10" />
+          <div className="flex items-center justify-center gap-10">
+            <a
+              href="https://www.facebook.com/flyinguate"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-gold-400 transition-colors"
+              aria-label="Facebook"
             >
-              Book Now
-            </Link>
-            <Link
-              href="/book/experiences"
-              className="btn-ghost-dark text-lg px-10 py-4"
+              <Facebook className="h-14 w-14" strokeWidth={1.5} />
+            </a>
+            <a
+              href="https://www.instagram.com/flyinguate"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-gold-400 transition-colors"
+              aria-label="Instagram"
             >
-              View Experiences
+              <Instagram className="h-14 w-14" strokeWidth={1.5} />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Links & Info */}
+      <div className="bg-white text-gray-900 py-16">
+        <div className="container mx-auto px-4 sm:px-6">
+          {/* Navigation Links */}
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-10">
+            <Link href="/book/transport" className="text-sm uppercase tracking-widest hover:text-gold-600 transition-colors">
+              {t('nav.destinations')}
             </Link>
+            <Link href="/book/experiences" className="text-sm uppercase tracking-widest hover:text-gold-600 transition-colors">
+              {t('nav.experiences')}
+            </Link>
+            <Link href="/book/transport" className="text-sm uppercase tracking-widest hover:text-gold-600 transition-colors">
+              {t('nav.book_flight')}
+            </Link>
+            <Link href="/book/transport" className="text-sm uppercase tracking-widest hover:text-gold-600 transition-colors">
+              {t('nav.executive_services')}
+            </Link>
+            <Link href="/faq" className="text-sm uppercase tracking-widest hover:text-gold-600 transition-colors">
+              {t('nav.faq')}
+            </Link>
+            <Link href="/privacy" className="text-sm uppercase tracking-widest hover:text-gold-600 transition-colors">
+              {t('nav.privacy_policy')}
+            </Link>
+            <Link href="/contact" className="text-sm uppercase tracking-widest hover:text-gold-600 transition-colors">
+              {t('nav.contact')}
+            </Link>
+          </div>
+
+          {/* Company Info */}
+          <div className="text-center">
+            <h3 className="text-xl font-bold mb-3">FlyInGuate</h3>
+            <p className="text-gray-600 mb-4 max-w-md mx-auto">
+              {t('footer.tagline')}
+            </p>
+            <div className="flex items-center justify-center gap-2 text-gray-700 mb-8">
+              <Phone className="h-4 w-4" />
+              <span className="font-medium">+502 5550-7700 / 3000-7700</span>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="border-t border-gray-200 pt-6 text-center">
+            <p className="text-sm text-gray-500">
+              {t('footer.copyright')}
+            </p>
           </div>
         </div>
       </div>

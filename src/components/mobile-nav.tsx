@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
-import { Menu, X, Home, User, Users, Calendar, Settings, LogOut, Globe, Briefcase, HelpCircle, Plane, MapPin } from 'lucide-react'
+import { Menu, X, Home, User, Users, Calendar, Settings, LogOut, Globe, Briefcase, HelpCircle, Plane, MapPin, ChevronDown } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { useI18n, useTranslation } from '@/lib/i18n'
@@ -163,89 +163,135 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
 
         {/* Desktop: Full ribbon navigation - more transparent with centered logo */}
         <div className="hidden md:block bg-black/25 backdrop-blur-sm">
-          <div className="container mx-auto px-6">
-            <div className="flex items-center justify-between py-3">
-              {/* Left: Nav links */}
-              <div className="flex items-center space-x-6 flex-1">
-                {desktopNavItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="text-sm font-medium uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+          <div className="max-w-7xl mx-auto px-8">
+            <div className="flex items-center justify-between py-4">
+              {/* Left: Nav links - Inicio, Destinos, Experiencias */}
+              <div className="flex items-center space-x-10 flex-1">
+                <Link
+                  href="/"
+                  className="text-sm font-medium uppercase tracking-widest text-white hover:text-gold-400 transition-colors"
+                >
+                  {t('nav.home')}
+                </Link>
+                <Link
+                  href="/book/transport"
+                  className="text-sm font-medium uppercase tracking-widest text-white hover:text-gold-400 transition-colors"
+                >
+                  {t('nav.destinations')}
+                </Link>
+                <Link
+                  href="/book/experiences"
+                  className="text-sm font-medium uppercase tracking-widest text-white hover:text-gold-400 transition-colors"
+                >
+                  {t('nav.experiences')}
+                </Link>
               </div>
 
               {/* Center: Logo */}
-              <Link href="/" className="flex-shrink-0 mx-8">
+              <Link href="/" className="flex-shrink-0 mx-12">
                 <Image
                   src={LOGO_URL}
                   alt="FlyInGuate"
-                  width={180}
-                  height={55}
-                  className="h-12 w-auto"
+                  width={200}
+                  height={60}
+                  className="h-14 w-auto"
                   priority
                 />
               </Link>
 
-              {/* Right: Auth + Language */}
-              <div className="flex items-center justify-end space-x-4 flex-1">
-                {!profile && (
-                  <Link
-                    href="/pilot/join"
-                    className="text-sm font-medium uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors"
-                  >
-                    {t('nav.pilot_opportunities')}
-                  </Link>
-                )}
+              {/* Right: Confirma tu vuelo, More, Language */}
+              <div className="flex items-center justify-end space-x-10 flex-1">
+                <Link
+                  href="/book/transport"
+                  className="text-sm font-medium uppercase tracking-widest text-white hover:text-gold-400 transition-colors"
+                >
+                  {t('nav.book_flight')}
+                </Link>
+
+                {/* More dropdown */}
+                <div className="relative group">
+                  <button className="text-sm font-medium uppercase tracking-widest text-white hover:text-gold-400 transition-colors flex items-center gap-1">
+                    {t('nav.more')}
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div className="bg-black/90 backdrop-blur-md rounded-soft border border-white/10 py-2 min-w-[200px] shadow-xl">
+                      <Link
+                        href="/faq"
+                        className="block px-4 py-2 text-sm text-white hover:bg-white/10 hover:text-gold-400 transition-colors"
+                      >
+                        {t('nav.faq')}
+                      </Link>
+                      {!profile && (
+                        <Link
+                          href="/pilot/join"
+                          className="block px-4 py-2 text-sm text-white hover:bg-white/10 hover:text-gold-400 transition-colors"
+                        >
+                          {t('nav.pilot_opportunities')}
+                        </Link>
+                      )}
+                      {profile && (
+                        <>
+                          <Link
+                            href="/dashboard"
+                            className="block px-4 py-2 text-sm text-white hover:bg-white/10 hover:text-gold-400 transition-colors"
+                          >
+                            {t('nav.dashboard')}
+                          </Link>
+                          {profile.role === 'admin' && (
+                            <Link
+                              href="/admin"
+                              className="block px-4 py-2 text-sm text-white hover:bg-white/10 hover:text-gold-400 transition-colors"
+                            >
+                              {t('nav.admin')}
+                            </Link>
+                          )}
+                          {profile.role === 'pilot' && (
+                            <Link
+                              href="/pilot"
+                              className="block px-4 py-2 text-sm text-white hover:bg-white/10 hover:text-gold-400 transition-colors"
+                            >
+                              {t('nav.pilot_dashboard')}
+                            </Link>
+                          )}
+                        </>
+                      )}
+                      <div className="border-t border-white/10 my-2" />
+                      {!profile ? (
+                        <>
+                          <Link
+                            href="/login"
+                            className="block px-4 py-2 text-sm text-white hover:bg-white/10 hover:text-gold-400 transition-colors"
+                          >
+                            {t('nav.sign_in')}
+                          </Link>
+                          <Link
+                            href="/register"
+                            className="block px-4 py-2 text-sm text-gold-400 hover:bg-white/10 transition-colors font-medium"
+                          >
+                            {t('nav.register')}
+                          </Link>
+                        </>
+                      ) : (
+                        <button
+                          onClick={handleSignOut}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/10 transition-colors"
+                        >
+                          {t('nav.sign_out')}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
                 {/* Language switcher */}
                 <button
                   onClick={() => setLocale(locale === 'en' ? 'es' : 'en')}
-                  className="p-2 hover:bg-white/10 rounded transition-colors flex items-center space-x-1 text-sm"
+                  className="text-sm font-medium uppercase tracking-widest text-white hover:text-gold-400 transition-colors"
                   title={locale === 'en' ? 'Switch to Spanish' : 'Cambiar a inglés'}
                 >
-                  <Globe className="h-4 w-4" />
-                  <span className="text-xs font-medium">{locale === 'en' ? 'EN' : 'ES'}</span>
+                  {locale === 'en' ? 'ES' : 'EN'}
                 </button>
-
-                {profile ? (
-                  <>
-                    <Link href="/dashboard" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
-                      Dashboard
-                    </Link>
-                    {profile.role === 'admin' && (
-                      <Link href="/admin" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
-                        Admin
-                      </Link>
-                    )}
-                    {profile.role === 'pilot' && (
-                      <Link href="/pilot" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
-                        Pilot
-                      </Link>
-                    )}
-                    <button
-                      onClick={handleSignOut}
-                      className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/login" className="text-sm uppercase tracking-wider text-white/90 hover:text-gold-400 transition-colors">
-                      {t('nav.sign_in')}
-                    </Link>
-                    <Link
-                      href="/register"
-                      className="text-sm px-4 py-2 bg-gold-500 text-gray-900 font-semibold rounded-soft hover:bg-gold-400 transition-colors uppercase tracking-wider"
-                    >
-                      {t('nav.register')}
-                    </Link>
-                  </>
-                )}
               </div>
             </div>
           </div>
