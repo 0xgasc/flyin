@@ -147,4 +147,4 @@ export interface PilotCertification {
   notes: string | null
 }
 
-export type AdminTab = 'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'aircrafts' | 'analytics' | 'experiences' | 'destinations'
+export type AdminTab = 'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'aircrafts' | 'analytics' | 'experiences' | 'destinations' | 'addons'

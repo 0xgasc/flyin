@@ -7,7 +7,7 @@ import { logout } from '@/lib/auth-client'
 import { useTranslation } from '@/lib/i18n'
 import {
   Plane, Calendar, Users, UserCheck, DollarSign, BarChart3,
-  MapPin, Image as ImageIcon, Menu, X, LogOut, Home, ChevronLeft, ChevronRight
+  MapPin, Image as ImageIcon, Menu, X, LogOut, Home, ChevronLeft, ChevronRight, ShoppingBag
 } from 'lucide-react'
 import type { AdminTab } from '../types'
 
@@ -28,6 +28,7 @@ const navItemDefs: { id: AdminTab; labelKey: string; icon: React.ElementType; gr
   { id: 'analytics', labelKey: 'admin.analytics', icon: BarChart3, groupKey: 'admin.group_finance' },
   { id: 'experiences', labelKey: 'admin.experiences', icon: ImageIcon, groupKey: 'admin.group_content' },
   { id: 'destinations', labelKey: 'admin.destinations', icon: MapPin, groupKey: 'admin.group_content' },
+  { id: 'addons', labelKey: 'admin.addons', icon: ShoppingBag, groupKey: 'admin.group_content' },
   { id: 'aircrafts', labelKey: 'admin.aircrafts', icon: Plane, groupKey: 'admin.group_assets' },
 ]
 

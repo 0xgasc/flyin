@@ -98,7 +98,7 @@ export default function AdminDashboard() {
   // Persist active tab in URL hash
   useEffect(() => {
     const hash = window.location.hash.replace('#', '')
-    const validTabs: AdminTab[] = ['bookings', 'calendar', 'users', 'pilots', 'transactions', 'aircrafts', 'analytics', 'experiences', 'destinations']
+    const validTabs: AdminTab[] = ['bookings', 'calendar', 'users', 'pilots', 'transactions', 'aircrafts', 'analytics', 'experiences', 'destinations', 'addons']
     if (hash && validTabs.includes(hash as AdminTab)) {
       setActiveTabState(hash as AdminTab)
     }
@@ -131,6 +131,11 @@ export default function AdminDashboard() {
   const [financialSummary, setFinancialSummary] = useState<any>(null)
   const [operationalCosts, setOperationalCosts] = useState<any[]>([])
   const [businessRevenue, setBusinessRevenue] = useState<any[]>([])
+  const [addons, setAddons] = useState<any[]>([])
+  const [addonsLoading, setAddonsLoading] = useState(false)
+  const [showNewAddonForm, setShowNewAddonForm] = useState(false)
+  const [newAddonData, setNewAddonData] = useState({ name: '', description: '', price: 0, category: 'service' })
+  const [addonSaving, setAddonSaving] = useState(false)
   const [newUserData, setNewUserData] = useState({
     email: '',
     password: '',
@@ -238,6 +243,8 @@ export default function AdminDashboard() {
         fetchExperiences()
       } else if (activeTab === 'destinations') {
         fetchDestinations()
+      } else if (activeTab === 'addons') {
+        fetchAddons()
       }
     }
   }, [profile, activeTab, statusFilter])
@@ -452,14 +459,89 @@ export default function AdminDashboard() {
         setBusinessRevenue(revenueEntries)
       }
 
-      // Operational costs would need a separate model - set empty for now
-      setOperationalCosts([])
+      // Fetch operational costs from maintenance records
+      try {
+        const maintRes = await fetch('/api/maintenance', { credentials: 'include' })
+        const maintData = await maintRes.json()
+        if (maintData.success && maintData.records) {
+          const costs = maintData.records.filter((r: any) => r.cost != null)
+          setOperationalCosts(costs)
+          const totalCosts = costs.reduce((sum: number, r: any) => sum + (r.cost || 0), 0)
+          // Merge cost totals into financial summary
+          setFinancialSummary((prev: any) => {
+            const revenue = prev?.total_business_revenue || prev?.total_revenue || 0
+            return {
+              ...prev,
+              total_operational_costs: totalCosts,
+              net_revenue: revenue - totalCosts
+            }
+          })
+        } else {
+          setOperationalCosts([])
+        }
+      } catch {
+        setOperationalCosts([])
+      }
 
     } catch (error) {
       console.error('Error fetching financial data:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchAddons = async () => {
+    setAddonsLoading(true)
+    try {
+      const res = await fetch('/api/addons?include_inactive=true', { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) setAddons(data.addons)
+    } catch { /* ignore */ } finally {
+      setAddonsLoading(false)
+    }
+  }
+
+  const createAddon = async () => {
+    if (!newAddonData.name || !newAddonData.description || !newAddonData.category) return
+    setAddonSaving(true)
+    try {
+      const res = await fetch('/api/addons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newAddonData)
+      })
+      const data = await res.json()
+      if (data.success) {
+        setAddons(prev => [...prev, data.addon])
+        setNewAddonData({ name: '', description: '', price: 0, category: 'service' })
+        setShowNewAddonForm(false)
+      }
+    } catch { /* ignore */ } finally {
+      setAddonSaving(false)
+    }
+  }
+
+  const toggleAddon = async (id: string, currentActive: boolean) => {
+    try {
+      const res = await fetch(`/api/addons/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ is_active: !currentActive })
+      })
+      if (res.ok) {
+        setAddons(prev => prev.map(a => a.id === id ? { ...a, is_active: !currentActive } : a))
+      }
+    } catch { /* ignore */ }
+  }
+
+  const deleteAddon = async (id: string) => {
+    if (!confirm('Delete this addon?')) return
+    try {
+      const res = await fetch(`/api/addons/${id}`, { method: 'DELETE', credentials: 'include' })
+      if (res.ok) setAddons(prev => prev.filter(a => a.id !== id))
+    } catch { /* ignore */ }
   }
 
   const fetchHelicopters = async () => {
@@ -3118,6 +3200,136 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
             fetchDestinations={fetchDestinations}
             loading={loading}
           />
+        )}
+
+        {activeTab === 'addons' && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Addons</h1>
+              <button
+                onClick={() => setShowNewAddonForm(v => !v)}
+                className="px-4 py-2 bg-primary-600 text-white rounded-soft hover:bg-primary-700 text-sm font-medium"
+              >
+                {showNewAddonForm ? 'Cancel' : '+ New Addon'}
+              </button>
+            </div>
+
+            {showNewAddonForm && (
+              <div className="card-luxury mb-6">
+                <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">New Addon</h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+                    <input
+                      type="text"
+                      value={newAddonData.name}
+                      onChange={e => setNewAddonData(p => ({ ...p, name: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded"
+                      placeholder="e.g. Aerial Photography"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category *</label>
+                    <select
+                      value={newAddonData.category}
+                      onChange={e => setNewAddonData(p => ({ ...p, category: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded"
+                    >
+                      <option value="service">Service</option>
+                      <option value="comfort">Comfort</option>
+                      <option value="catering">Catering</option>
+                      <option value="equipment">Equipment</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (USD) *</label>
+                    <input
+                      type="number"
+                      value={newAddonData.price}
+                      onChange={e => setNewAddonData(p => ({ ...p, price: parseFloat(e.target.value) || 0 }))}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description *</label>
+                    <input
+                      type="text"
+                      value={newAddonData.description}
+                      onChange={e => setNewAddonData(p => ({ ...p, description: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded"
+                      placeholder="Short description"
+                    />
+                  </div>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={createAddon}
+                    disabled={addonSaving || !newAddonData.name || !newAddonData.description}
+                    className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-medium disabled:opacity-50"
+                  >
+                    {addonSaving ? 'Saving…' : 'Create Addon'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {addonsLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin h-8 w-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto" />
+              </div>
+            ) : addons.length === 0 ? (
+              <div className="card-luxury text-center py-12 text-gray-500 dark:text-gray-400">
+                No addons yet. Create one above.
+              </div>
+            ) : (
+              <div className="card-luxury overflow-hidden p-0">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Name</th>
+                      <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Category</th>
+                      <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Description</th>
+                      <th className="text-right px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Price</th>
+                      <th className="text-center px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Status</th>
+                      <th className="px-4 py-3" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {addons.map(addon => (
+                      <tr key={addon.id} className={`${!addon.is_active ? 'opacity-50' : ''}`}>
+                        <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{addon.name}</td>
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400 capitalize">{addon.category}</td>
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400 max-w-xs truncate">{addon.description}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">${addon.price}</td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => toggleAddon(addon.id, addon.is_active)}
+                            className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                              addon.is_active
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200'
+                                : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200'
+                            }`}
+                          >
+                            {addon.is_active ? 'Active' : 'Inactive'}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            onClick={() => deleteAddon(addon.id)}
+                            className="text-red-500 hover:text-red-700 text-xs"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         )}
       </div>
 

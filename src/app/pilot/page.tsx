@@ -223,6 +223,43 @@ export default function PilotDashboard() {
           </div>
         )}
 
+        {/* Next Flight Summary Card */}
+        {!loading && (() => {
+          const upcoming = bookings
+            .filter(b => ['assigned', 'accepted'].includes(b.status) && b.scheduled_date >= new Date().toISOString().split('T')[0])
+            .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date) || a.scheduled_time.localeCompare(b.scheduled_time))
+          const next = upcoming[0]
+          if (!next) return null
+          const daysUntil = Math.ceil((new Date(next.scheduled_date).getTime() - new Date().setHours(0,0,0,0)) / 86400000)
+          return (
+            <div className="card-luxury border-2 border-luxury-gold/40 bg-gradient-to-r from-gray-900 to-gray-800 mb-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-luxury-gold uppercase tracking-widest mb-1">Your Next Flight</p>
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    {next.booking_type === 'experience' && next.experiences
+                      ? next.experiences.name
+                      : next.from_location && next.to_location
+                        ? `${next.from_location} → ${next.to_location}`
+                        : 'Charter Flight'}
+                  </h3>
+                  <div className="flex flex-wrap gap-3 text-sm text-gray-300 mt-2">
+                    <span className="flex items-center gap-1"><Calendar className="h-4 w-4" /> {next.scheduled_date}</span>
+                    <span className="flex items-center gap-1"><Clock className="h-4 w-4" /> {next.scheduled_time}</span>
+                    <span className="flex items-center gap-1"><Users className="h-4 w-4" /> {next.passenger_count} pax</span>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0 ml-4">
+                  <span className={`text-3xl font-bold ${daysUntil === 0 ? 'text-red-400' : daysUntil === 1 ? 'text-yellow-400' : 'text-luxury-gold'}`}>
+                    {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `${daysUntil}d`}
+                  </span>
+                  <p className="text-xs text-gray-400 mt-1 capitalize">{next.status}</p>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
+
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin h-12 w-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto"></div>
