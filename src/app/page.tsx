@@ -11,11 +11,22 @@ import { MobileNav } from '@/components/mobile-nav'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
 import { PhotoGallery } from '@/components/PhotoGallery'
+import { HeroCarousel } from '@/components/HeroCarousel'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 import dynamic from 'next/dynamic'
 
 /** FlyInGuate brand logo hosted on wsimg CDN. */
 const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
+
+/** Hero carousel images — uploaded to Irys devnet. */
+const HERO_IMAGES = [
+  'https://devnet.irys.xyz/AGXhj5MZqgTZAtwf3MTsQwsxxmfSNrRtP9xMWLd1XtHi',
+  'https://devnet.irys.xyz/Gtu4qPPPuPdDXo27kPZR8bc3HRULPyUCeXobbT1ECJNM',
+  'https://devnet.irys.xyz/EcwWSNgGSMjYqwXZBiXAqvJXAJ1Sah1V2b51HN28iJBV',
+  'https://devnet.irys.xyz/BjHCQM1iwcVJUJjmMKDi1hCXLRsaiWipnkqUtiAhMiZN',
+  'https://devnet.irys.xyz/8dNbk9G62suNFHYcEntbWK7hKyrn8zJXbz6YWc5Dydjz',
+  'https://devnet.irys.xyz/59pb987poVtAH6EhXsEtdCWQG9fe8tEtHzexcWuy9enP',
+]
 
 /**
  * Lazily loaded map component. Detects WebGL support at runtime:
@@ -163,18 +174,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-luxury-black">
       {/* Hero Section - Full viewport height with background */}
       <div className="relative min-h-screen flex flex-col">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 pointer-events-none">
-          <Image
-            src="https://images.unsplash.com/photo-1540962351504-03099e0a754b?q=80&w=2000&auto=format&fit=crop"
-            alt="Helicopter flying over Guatemala"
-            fill
-            className="object-cover object-center"
-            priority
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-        </div>
+        {/* Background Carousel with Overlay */}
+        <HeroCarousel images={HERO_IMAGES} />
 
         {/* Navigation - z-50 ensures MobileNav overlay/panel paint above hero content (z-10) */}
         <div className="relative z-50">
