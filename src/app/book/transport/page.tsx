@@ -61,6 +61,9 @@ export default function BookTransportPage() {
   const [showDestinationModal, setShowDestinationModal] = useState(false)
   const [modalType, setModalType] = useState<'from' | 'to'>('from')
   const [mapCollapsed, setMapCollapsed] = useState(false)
+  const [showPhoneGate, setShowPhoneGate] = useState(false)
+  const [phoneInput, setPhoneInput] = useState('')
+  const [phoneSaving, setPhoneSaving] = useState(false)
 
   useEffect(() => {
     fetchAirports()
@@ -214,6 +217,12 @@ export default function BookTransportPage() {
       return
     }
 
+    // Require phone number before booking
+    if (!profile.phone) {
+      setShowPhoneGate(true)
+      return
+    }
+
     // Validate date is not in the past
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -285,9 +294,33 @@ export default function BookTransportPage() {
     }
   }
 
+  const savePhoneAndBook = async () => {
+    if (!phoneInput.trim()) return
+    setPhoneSaving(true)
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ phone: phoneInput.trim() })
+      })
+      if (!res.ok) throw new Error('Failed to save phone')
+      // Patch the store profile so the gate won't re-fire
+      useAuthStore.getState().setProfile({ ...profile!, phone: phoneInput.trim() })
+      setShowPhoneGate(false)
+      // Submit the form now that phone is saved
+      const syntheticEvent = { preventDefault: () => {} } as React.FormEvent
+      await handleSubmit(syntheticEvent)
+    } catch {
+      setError('Could not save phone number. Please try again.')
+    } finally {
+      setPhoneSaving(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-luxury-black">
-      <MobileNav 
+      <MobileNav
         title={t('services.transport.cta')}
         showBackButton={true}
         customActions={
@@ -746,6 +779,43 @@ export default function BookTransportPage() {
           </div>
         </form>
       </div>
+
+      {/* Phone Gate Modal */}
+      {showPhoneGate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">WhatsApp Number Required</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              We use WhatsApp to confirm your booking and send flight updates. Enter your number to continue.
+            </p>
+            <input
+              type="tel"
+              value={phoneInput}
+              onChange={(e) => setPhoneInput(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded mb-4 focus:ring-2 focus:ring-primary-500"
+              placeholder="+502 5550-0000"
+              autoFocus
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowPhoneGate(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 text-sm"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={savePhoneAndBook}
+                disabled={phoneSaving || !phoneInput.trim()}
+                className="flex-1 px-4 py-2 btn-luxury text-sm disabled:opacity-50"
+              >
+                {phoneSaving ? 'Saving…' : 'Continue'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Destination Selector Modal */}
       {showDestinationModal && selectedDepartment && (

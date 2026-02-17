@@ -13,7 +13,8 @@ interface PassengerDetails {
   name: string
   age: number
   passport: string
-  emergency_contact: string
+  emergency_contact_name: string
+  emergency_contact_phone: string
   dietary_restrictions: string
   special_requests: string
 }
@@ -102,7 +103,8 @@ function PassengerDetailsContent() {
           name: i === 0 ? profile?.fullName || '' : '',
           age: 25,
           passport: '',
-          emergency_contact: '',
+          emergency_contact_name: '',
+          emergency_contact_phone: '',
           dietary_restrictions: '',
           special_requests: ''
         }))
@@ -369,14 +371,27 @@ function PassengerDetailsContent() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.emergency_contact')}
+                        {t('passenger.emergency_contact')} — Name
                       </label>
                       <input
                         type="text"
-                        value={passenger.emergency_contact}
-                        onChange={(e) => updatePassenger(index, 'emergency_contact', e.target.value)}
+                        value={passenger.emergency_contact_name}
+                        onChange={(e) => updatePassenger(index, 'emergency_contact_name', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        placeholder="Name and phone number"
+                        placeholder="Full name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {t('passenger.emergency_contact')} — Phone
+                      </label>
+                      <input
+                        type="tel"
+                        value={passenger.emergency_contact_phone}
+                        onChange={(e) => updatePassenger(index, 'emergency_contact_phone', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
+                        placeholder="+502 5550-0000"
                       />
                     </div>
 

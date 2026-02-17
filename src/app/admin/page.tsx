@@ -62,6 +62,7 @@ interface Booking {
     id: string
     full_name: string | null
     email: string
+    phone: string | null
   } | null
   experiences: {
     name: string
@@ -3270,6 +3271,47 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 </div>
               </div>
             </div>
+
+            {/* Pilot schedule preview */}
+            {selectedPilot && (() => {
+              const pilotFlights = bookings.filter(b =>
+                b.pilot_id === selectedPilot &&
+                ['assigned', 'accepted'].includes(b.status) &&
+                b.id !== selectedBooking.id
+              )
+              const sameDay = pilotFlights.filter(b => b.scheduled_date === selectedBooking.scheduled_date)
+              return (
+                <div className={`mt-4 p-3 rounded-none border text-sm ${
+                  sameDay.length > 0
+                    ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
+                    : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50'
+                }`}>
+                  <p className="font-medium mb-1 text-gray-900 dark:text-white">
+                    {pilots.find(p => p.id === selectedPilot)?.full_name || 'Pilot'} — upcoming flights
+                  </p>
+                  {sameDay.length > 0 && (
+                    <p className="text-red-600 dark:text-red-400 font-medium text-xs mb-1">
+                      ⚠ Already assigned on {selectedBooking.scheduled_date}
+                    </p>
+                  )}
+                  {pilotFlights.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">No upcoming assignments</p>
+                  ) : (
+                    <ul className="space-y-0.5">
+                      {pilotFlights.slice(0, 5).map(b => (
+                        <li key={b.id} className={`text-xs flex gap-2 ${
+                          b.scheduled_date === selectedBooking.scheduled_date ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-600 dark:text-gray-400'
+                        }`}>
+                          <span>{b.scheduled_date}</span>
+                          <span>{b.scheduled_time}</span>
+                          <span>{b.from_location && b.to_location ? `${b.from_location} → ${b.to_location}` : b.experiences?.name || b.booking_type}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )
+            })()}
 
             {/* Actions */}
             <div className="flex gap-4 mt-6">

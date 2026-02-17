@@ -24,6 +24,7 @@ interface Booking {
   toLocation: string | null
   scheduledDate: string
   scheduledTime: string
+  passengerCount: number
   totalPrice: number
   paymentStatus: string
   experience: {

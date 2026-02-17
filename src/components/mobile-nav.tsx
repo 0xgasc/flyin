@@ -238,6 +238,12 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
                           >
                             {t('nav.dashboard')}
                           </Link>
+                          <Link
+                            href="/profile"
+                            className="block px-4 py-2 text-sm text-white hover:bg-white/10 hover:text-gold-400 transition-colors"
+                          >
+                            {t('nav.profile')}
+                          </Link>
                           {profile.role === 'admin' && (
                             <Link
                               href="/admin"
