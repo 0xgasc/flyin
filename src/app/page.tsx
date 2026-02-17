@@ -223,15 +223,6 @@ export default function HomePage() {
         {/* Hero Content - Centered */}
         <div className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <Image
-              src={LOGO_URL}
-              alt="FlyInGuate"
-              width={350}
-              height={122}
-              className="h-24 sm:h-32 md:h-40 w-auto mx-auto mb-8"
-              priority
-            />
-
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-4 tracking-wide">
               {t('hero.title')}
             </h1>
