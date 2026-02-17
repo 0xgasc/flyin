@@ -219,6 +219,47 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
           )
         }
       }
+
+      // Double-booking conflict check when assigning pilot or helicopter
+      const newStatus = updates.status || booking.status
+      if (newStatus === 'assigned' && booking.scheduledDate) {
+        const dateStart = new Date(booking.scheduledDate)
+        dateStart.setHours(0, 0, 0, 0)
+        const dateEnd = new Date(booking.scheduledDate)
+        dateEnd.setHours(23, 59, 59, 999)
+
+        if (updates.pilotId || booking.pilotId) {
+          const pilotToCheck = updates.pilotId || booking.pilotId
+          const pilotConflict = await Booking.findOne({
+            pilotId: pilotToCheck,
+            scheduledDate: { $gte: dateStart, $lte: dateEnd },
+            status: { $in: ['assigned', 'accepted'] },
+            _id: { $ne: id }
+          })
+          if (pilotConflict) {
+            return NextResponse.json(
+              { error: 'Pilot already assigned to another flight on this date' },
+              { status: 409 }
+            )
+          }
+        }
+
+        if (updates.helicopterId || booking.helicopterId) {
+          const heliToCheck = updates.helicopterId || booking.helicopterId
+          const heliConflict = await Booking.findOne({
+            helicopterId: heliToCheck,
+            scheduledDate: { $gte: dateStart, $lte: dateEnd },
+            status: { $in: ['assigned', 'accepted'] },
+            _id: { $ne: id }
+          })
+          if (heliConflict) {
+            return NextResponse.json(
+              { error: 'Aircraft already assigned to another flight on this date' },
+              { status: 409 }
+            )
+          }
+        }
+      }
     }
 
     const updatedBooking = await Booking.findByIdAndUpdate(

@@ -22,11 +22,13 @@ interface WhatsAppContactButtonProps {
   booking: BookingDetails
   variant?: 'button' | 'icon' | 'link'
   className?: string
+  /** Override target phone (e.g. admin messaging a client directly) */
+  targetPhone?: string
 }
 
 const WHATSAPP_PHONE = '50255507700' // +502 5550-7700
 
-export function WhatsAppContactButton({ booking, variant = 'button', className = '' }: WhatsAppContactButtonProps) {
+export function WhatsAppContactButton({ booking, variant = 'button', className = '', targetPhone }: WhatsAppContactButtonProps) {
   const { locale } = useTranslation()
 
   const formatDate = (dateStr: string) => {
@@ -96,7 +98,8 @@ My question is: `
 
   const handleClick = () => {
     const message = encodeURIComponent(generateMessage())
-    const url = `https://wa.me/${WHATSAPP_PHONE}?text=${message}`
+    const phone = targetPhone ? targetPhone.replace(/\D/g, '') : WHATSAPP_PHONE
+    const url = `https://wa.me/${phone}?text=${message}`
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
@@ -132,6 +135,84 @@ My question is: `
     >
       <MessageCircle className="h-5 w-5" />
       <span>{locale === 'es' ? '¿Preguntas? Contáctanos por WhatsApp' : 'Questions? Contact us on WhatsApp'}</span>
+    </button>
+  )
+}
+
+// Admin → Client or Admin → Pilot outbound button
+interface AdminWhatsAppButtonProps {
+  targetPhone: string
+  targetName: string
+  role: 'client' | 'pilot'
+  booking: {
+    id: string
+    date: string
+    time: string
+    type: 'transport' | 'experience'
+    from?: string
+    to?: string
+    experienceName?: string
+    status: string
+  }
+  variant?: 'button' | 'icon' | 'link'
+  className?: string
+}
+
+export function AdminWhatsAppButton({
+  targetPhone, targetName, role, booking, variant = 'icon', className = ''
+}: AdminWhatsAppButtonProps) {
+  const bookingRef = booking.id.slice(-6).toUpperCase()
+  const route = booking.type === 'experience'
+    ? (booking.experienceName || 'Experience')
+    : `${booking.from || '?'} → ${booking.to || '?'}`
+
+  const generateMessage = () => {
+    if (role === 'pilot') {
+      return `Hola ${targetName}! 👋 Somos FlyInGuate.\n\nTienes una nueva asignación de vuelo:\n\n📋 *Vuelo:* #${bookingRef}\n✈️ *Ruta:* ${route}\n📅 *Fecha:* ${booking.date}\n🕐 *Hora:* ${booking.time}\n\nPor favor confirma tu disponibilidad.`
+    }
+    return `Hola ${targetName}! 👋 Somos FlyInGuate.\n\nTe contactamos sobre tu reserva:\n\n📋 *Reserva:* #${bookingRef}\n✈️ *Vuelo:* ${route}\n📅 *Fecha:* ${booking.date}\n🕐 *Hora:* ${booking.time}\n📊 *Estado:* ${booking.status}\n\n`
+  }
+
+  const handleClick = () => {
+    const phone = targetPhone.replace(/\D/g, '')
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(generateMessage())}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  const label = role === 'pilot' ? `WA Pilot` : `WA Client`
+  const title = role === 'pilot' ? `Message pilot ${targetName}` : `Message client ${targetName}`
+
+  if (variant === 'icon') {
+    return (
+      <button
+        onClick={handleClick}
+        title={title}
+        className={`p-1.5 bg-green-500 hover:bg-green-600 text-white rounded-full transition-colors ${className}`}
+      >
+        <MessageCircle className="h-4 w-4" />
+      </button>
+    )
+  }
+
+  if (variant === 'link') {
+    return (
+      <button
+        onClick={handleClick}
+        className={`flex items-center gap-1 text-green-600 hover:text-green-700 text-xs font-medium transition-colors ${className}`}
+      >
+        <MessageCircle className="h-3.5 w-3.5" />
+        <span>{label}</span>
+      </button>
+    )
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded transition-colors ${className}`}
+    >
+      <MessageCircle className="h-4 w-4" />
+      <span>{label}</span>
     </button>
   )
 }

@@ -2,15 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-
 import { useTranslation } from '@/lib/i18n'
 import { MobileNav } from '@/components/mobile-nav'
 import { QuickSignUpModal } from '@/components/quick-signup-modal'
 import { BookingIntent } from '@/components/experience-booking-modal'
 import { useAuthStore } from '@/lib/auth-store'
 import { getAuthHeaders } from '@/lib/auth-client'
-import { Users, Clock, MapPin, Plane, ChevronDown, ChevronUp, Check, Minus, Plus } from 'lucide-react'
+import { Plane, ChevronDown, ChevronUp, Check, Minus, Plus } from 'lucide-react'
 
 
 interface PricingTier {
@@ -78,6 +76,9 @@ function BookingCard({
   const [scheduledTime, setScheduledTime] = useState('09:00')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [showPhoneGate, setShowPhoneGate] = useState(false)
+  const [phoneInput, setPhoneInput] = useState('')
+  const [phoneSaving, setPhoneSaving] = useState(false)
 
   const getDisplayName = () => {
     return locale === 'es' && experience.name_es ? experience.name_es : experience.name
@@ -132,6 +133,11 @@ function BookingCard({
       return
     }
 
+    if (!profile.phone) {
+      setShowPhoneGate(true)
+      return
+    }
+
     setIsSubmitting(true)
     setError('')
 
@@ -177,12 +183,72 @@ function BookingCard({
     }
   }
 
+  const savePhoneAndBook = async () => {
+    if (!phoneInput.trim()) return
+    setPhoneSaving(true)
+    try {
+      await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ phone: phoneInput.trim() })
+      })
+      // Update local profile store if available
+      if (profile) (profile as any).phone = phoneInput.trim()
+      setShowPhoneGate(false)
+      await handleBook()
+    } catch {
+      setError(locale === 'es' ? 'Error al guardar el teléfono' : 'Failed to save phone number')
+    } finally {
+      setPhoneSaving(false)
+    }
+  }
+
   const today = new Date().toISOString().split('T')[0]
 
   const timeOptions = [
     '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
     '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
   ]
+
+  if (showPhoneGate) {
+    return (
+      <div className="border-t border-slate-200 bg-slate-50 p-5 space-y-4">
+        <p className="text-sm font-semibold text-slate-800">
+          {locale === 'es' ? '¿Tu número de WhatsApp?' : 'Your WhatsApp number?'}
+        </p>
+        <p className="text-xs text-slate-500">
+          {locale === 'es'
+            ? 'Lo necesitamos para enviarte confirmaciones de tu vuelo.'
+            : 'We need it to send you your flight confirmations.'}
+        </p>
+        <input
+          type="tel"
+          value={phoneInput}
+          onChange={e => setPhoneInput(e.target.value)}
+          placeholder="+502 5555-5555"
+          className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {error && <p className="text-xs text-red-600">{error}</p>}
+        <div className="flex gap-2">
+          <button
+            onClick={savePhoneAndBook}
+            disabled={phoneSaving || !phoneInput.trim()}
+            className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium py-2 rounded"
+          >
+            {phoneSaving
+              ? (locale === 'es' ? 'Guardando...' : 'Saving...')
+              : (locale === 'es' ? 'Continuar' : 'Continue')}
+          </button>
+          <button
+            onClick={() => setShowPhoneGate(false)}
+            className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700"
+          >
+            {locale === 'es' ? 'Atrás' : 'Back'}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="border-t border-slate-200 bg-slate-50 p-4 space-y-3">
@@ -203,29 +269,29 @@ function BookingCard({
         <label className="block text-xs font-medium text-slate-600 mb-1.5">
           {locale === 'es' ? 'Pasajeros' : 'Passengers'}
         </label>
-        <div className="flex items-center justify-center gap-3 bg-white rounded-lg border border-slate-200 p-2">
+        <div className="flex items-center justify-center gap-4 bg-white rounded-lg border border-slate-200 p-2">
           <button
             onClick={() => handlePassengerChange(-1)}
             disabled={passengerCount <= experience.min_passengers}
-            className="p-1.5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
           >
-            <Minus className="h-4 w-4" />
+            <Minus className="h-5 w-5" />
           </button>
-          <span className="text-lg font-bold text-slate-900 min-w-[2rem] text-center">
+          <span className="text-xl font-bold text-slate-900 min-w-[2.5rem] text-center">
             {passengerCount}
           </span>
           <button
             onClick={() => handlePassengerChange(1)}
             disabled={passengerCount >= experience.max_passengers}
-            className="p-1.5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-5 w-5" />
           </button>
         </div>
       </div>
 
       {/* Date & Time */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1.5">
             {locale === 'es' ? 'Fecha' : 'Date'}
@@ -235,7 +301,7 @@ function BookingCard({
             value={scheduledDate}
             onChange={(e) => setScheduledDate(e.target.value)}
             min={today}
-            className="w-full px-2.5 py-2 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full min-h-[44px] px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
         <div>
@@ -245,7 +311,8 @@ function BookingCard({
           <select
             value={scheduledTime}
             onChange={(e) => setScheduledTime(e.target.value)}
-            className="w-full px-2.5 py-2 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full min-h-[44px] px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-no-repeat bg-right"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M3 5l3 3 3-3'/%3E%3C/svg%3E")`, backgroundPosition: 'right 12px center' }}
           >
             {timeOptions.map(time => (
               <option key={time} value={time}>{time}</option>
@@ -266,7 +333,7 @@ function BookingCard({
         <button
           onClick={handleBook}
           disabled={isSubmitting}
-          className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+          className="flex-1 min-h-[44px] py-2.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 active:scale-[0.98]"
         >
           {isSubmitting
             ? (locale === 'es' ? 'Procesando...' : 'Processing...')
@@ -275,7 +342,7 @@ function BookingCard({
         </button>
         <button
           onClick={onClose}
-          className="px-3 py-2.5 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-100 transition-colors"
+          className="px-4 min-h-[44px] py-2.5 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors active:scale-[0.98]"
         >
           {locale === 'es' ? 'Cerrar' : 'Close'}
         </button>
@@ -466,8 +533,8 @@ export default function BookExperiencesPage() {
       <MobileNav />
 
       {/* Hero Section - Minimal like screenshot */}
-      <div className="bg-white border-b border-slate-200 py-8">
-        <div className="container mx-auto px-6 text-center">
+      <div className="bg-white border-b border-slate-200 py-6 md:py-8">
+        <div className="container mx-auto px-4 md:px-6 text-center">
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
             {locale === 'es' ? 'Vive La Experiencia' : 'Live The Experience'}
           </h1>
@@ -481,7 +548,7 @@ export default function BookExperiencesPage() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
@@ -497,14 +564,14 @@ export default function BookExperiencesPage() {
           </div>
         ) : (
           <div>
-            {/* Category Filter */}
-            <div className="flex flex-wrap gap-1.5 mb-6">
+            {/* Category Filter - Scrollable on mobile */}
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap md:overflow-visible scrollbar-hide">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                className={`px-4 py-2 min-h-[44px] rounded-full text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   selectedCategory === 'all'
                     ? 'bg-slate-900 text-white'
-                    : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'
+                    : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300 active:bg-slate-100'
                 }`}
               >
                 {locale === 'es' ? 'Todas' : 'All'}
@@ -513,10 +580,10 @@ export default function BookExperiencesPage() {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  className={`px-4 py-2 min-h-[44px] rounded-full text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                     selectedCategory === category
                       ? 'bg-slate-900 text-white'
-                      : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'
+                      : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300 active:bg-slate-100'
                   }`}
                 >
                   {category === 'experiences'
@@ -536,7 +603,7 @@ export default function BookExperiencesPage() {
                 <p className="text-slate-500">{locale === 'es' ? 'No se encontraron experiencias.' : 'No experiences found.'}</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 md:gap-5">
                 {filteredExperiences.map((experience) => {
                   const pricingTiers = formatPricingTiers(experience)
                   const isExpanded = expandedCard === experience.id
@@ -642,14 +709,14 @@ export default function BookExperiencesPage() {
                         {/* Book Button */}
                         <button
                           onClick={() => handleToggleBooking(experience.id)}
-                          className={`w-full py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                          className={`w-full min-h-[44px] py-2.5 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] ${
                             isExpanded
                               ? 'bg-slate-200 text-slate-700'
-                              : 'bg-slate-900 text-white hover:bg-slate-800'
+                              : 'bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-700'
                           }`}
                         >
                           {locale === 'es' ? 'Reservar Ahora' : 'Book Now'}
-                          {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </button>
                       </div>
 

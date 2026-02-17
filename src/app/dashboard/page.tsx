@@ -13,6 +13,7 @@ import {
   User, Mail, Phone, Upload, Save, Wallet, FileText, CheckCircle, Eye, EyeOff
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { WhatsAppContactButton } from '@/components/whatsapp-contact-button'
 
 interface Booking {
   id: string
@@ -485,6 +486,23 @@ export default function DashboardPage() {
                       </div>
 
                       <div className="ml-4 flex flex-col space-y-2">
+                        {booking.status !== 'completed' && (
+                          <WhatsAppContactButton
+                            booking={{
+                              id: booking.id,
+                              type: booking.bookingType,
+                              experienceName: booking.experience?.name,
+                              fromLocation: booking.fromLocation || undefined,
+                              toLocation: booking.toLocation || undefined,
+                              scheduledDate: booking.scheduledDate,
+                              scheduledTime: booking.scheduledTime,
+                              passengerCount: booking.passengerCount,
+                              totalPrice: booking.totalPrice,
+                              status: booking.status
+                            }}
+                            variant="icon"
+                          />
+                        )}
                         {booking.status === 'pending' && (
                           <button className="text-red-600 dark:text-red-400 hover:text-red-700 text-sm px-3 py-1 border border-red-300 dark:border-red-700 rounded-soft hover:bg-red-50 dark:hover:bg-red-900/30">
                             Cancel

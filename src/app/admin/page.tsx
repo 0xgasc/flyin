@@ -12,6 +12,7 @@ import {
   Plus, Edit, Trash2, Upload, Download, Image as ImageIcon, Eye, GripVertical
 } from 'lucide-react'
 import IrysUpload from '@/components/IrysUpload'
+import { AdminWhatsAppButton } from '@/components/whatsapp-contact-button'
 import { AdminLayout } from './components/AdminLayout'
 import type { AdminTab } from './types'
 import { HELICOPTER_FLEET } from '@/types/helicopters'
@@ -1999,6 +2000,46 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                         {/* Admin Controls - Always visible */}
                         <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2 space-y-2">
                           <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Admin Actions:</p>
+
+                          {/* WhatsApp quick contact */}
+                          <div className="flex gap-2 flex-wrap">
+                            {booking.client?.phone && (
+                              <AdminWhatsAppButton
+                                targetPhone={booking.client.phone}
+                                targetName={booking.client?.full_name || 'Client'}
+                                role="client"
+                                booking={{
+                                  id: booking.id,
+                                  date: format(new Date(booking.scheduled_date), 'MMM dd, yyyy'),
+                                  time: booking.scheduled_time,
+                                  type: booking.booking_type,
+                                  from: booking.from_location || undefined,
+                                  to: booking.to_location || undefined,
+                                  experienceName: booking.experiences?.name,
+                                  status: booking.status
+                                }}
+                                variant="button"
+                              />
+                            )}
+                            {booking.pilot?.phone && (
+                              <AdminWhatsAppButton
+                                targetPhone={booking.pilot.phone}
+                                targetName={booking.pilot?.full_name || 'Pilot'}
+                                role="pilot"
+                                booking={{
+                                  id: booking.id,
+                                  date: format(new Date(booking.scheduled_date), 'MMM dd, yyyy'),
+                                  time: booking.scheduled_time,
+                                  type: booking.booking_type,
+                                  from: booking.from_location || undefined,
+                                  to: booking.to_location || undefined,
+                                  experienceName: booking.experiences?.name,
+                                  status: booking.status
+                                }}
+                                variant="button"
+                              />
+                            )}
+                          </div>
 
                           {/* Edit Button */}
                           <button

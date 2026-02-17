@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/i18n'
 import { MobileNav } from '@/components/mobile-nav'
 import { Calendar, MapPin, Clock, Users, CheckCircle, AlertCircle, DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
+import { WhatsAppContactButton } from '@/components/whatsapp-contact-button'
 
 interface Booking {
   id: string
@@ -234,8 +235,18 @@ export default function PilotDashboard() {
           </div>
         ) : (
           <div className="space-y-4">
-            {bookings.map((booking) => (
-              <div key={booking.id} className="card-luxury">
+            {bookings.map((booking) => {
+              const isNew = booking.status === 'assigned' &&
+                new Date(booking.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+              return (
+              <div key={booking.id} className={`card-luxury ${isNew ? 'ring-2 ring-blue-400' : ''}`}>
+                {isNew && (
+                  <div className="mb-3">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                      <AlertCircle className="h-3 w-3" /> Nueva Asignación
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <div className="flex items-center space-x-3">
@@ -295,24 +306,42 @@ export default function PilotDashboard() {
                   </div>
                 )}
 
-                {booking.status === 'assigned' && (
-                  <button
-                    onClick={() => acceptMission(booking.id)}
-                    className="btn-primary text-sm"
-                  >
-                    {t('pilot.accept_mission')}
-                  </button>
-                )}
-                {booking.status === 'accepted' && (
-                  <button
-                    onClick={() => markAsCompleted(booking.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition-colors text-sm"
-                  >
-                    {t('pilot.mark_completed')}
-                  </button>
-                )}
+                <div className="flex items-center gap-3 flex-wrap">
+                  {booking.status === 'assigned' && (
+                    <button
+                      onClick={() => acceptMission(booking.id)}
+                      className="btn-primary text-sm"
+                    >
+                      {t('pilot.accept_mission')}
+                    </button>
+                  )}
+                  {booking.status === 'accepted' && (
+                    <button
+                      onClick={() => markAsCompleted(booking.id)}
+                      className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition-colors text-sm"
+                    >
+                      {t('pilot.mark_completed')}
+                    </button>
+                  )}
+                  <WhatsAppContactButton
+                    booking={{
+                      id: booking.id,
+                      type: booking.booking_type,
+                      experienceName: booking.experiences?.name,
+                      fromLocation: booking.from_location || undefined,
+                      toLocation: booking.to_location || undefined,
+                      scheduledDate: booking.scheduled_date,
+                      scheduledTime: booking.scheduled_time,
+                      passengerCount: booking.passenger_count,
+                      totalPrice: booking.total_price,
+                      status: booking.status
+                    }}
+                    variant="link"
+                  />
+                </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

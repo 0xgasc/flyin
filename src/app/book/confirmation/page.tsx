@@ -222,8 +222,8 @@ function ConfirmationContent() {
               </p>
               <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
                 {locale === 'es'
-                  ? 'Recibirás un correo cuando tu reserva sea confirmada.'
-                  : "You'll receive an email when your booking is confirmed."
+                  ? 'Te contactaremos por WhatsApp una vez confirmada tu reserva.'
+                  : "We'll reach out via WhatsApp once your booking is confirmed."
                 }
               </p>
             </div>
