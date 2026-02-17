@@ -62,7 +62,7 @@ export function HeroCarousel({ images }: HeroCarouselProps) {
       {images.length > 1 && (
         <button
           onClick={prev}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/30 hover:bg-black/60 text-white transition-colors backdrop-blur-sm"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/60 text-white transition-colors backdrop-blur-sm"
           aria-label="Previous image"
         >
           <ChevronLeft className="w-6 h-6" />
@@ -73,7 +73,7 @@ export function HeroCarousel({ images }: HeroCarouselProps) {
       {images.length > 1 && (
         <button
           onClick={next}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/30 hover:bg-black/60 text-white transition-colors backdrop-blur-sm"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/60 text-white transition-colors backdrop-blur-sm"
           aria-label="Next image"
         >
           <ChevronRight className="w-6 h-6" />
@@ -82,7 +82,7 @@ export function HeroCarousel({ images }: HeroCarouselProps) {
 
       {/* Dot indicators */}
       {images.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
           {images.map((_, i) => (
             <button
               key={i}
