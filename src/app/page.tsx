@@ -446,7 +446,7 @@ export default function HomePage() {
 
               {/* Right Panel - Map */}
               <div className="lg:col-span-3 order-1 lg:order-2">
-                <div className="relative h-[400px] lg:h-[550px] rounded-soft overflow-hidden border border-gray-300 shadow-lg">
+                <div className="relative rounded-soft border border-gray-300 shadow-lg overflow-visible">
                   <SafeMapWrapper
                     onDepartmentClick={(dept: Department) => {
                       if (selectMode === 'from') {
