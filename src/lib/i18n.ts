@@ -248,6 +248,7 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'admin.no_bookings': { en: 'No bookings found', es: 'No se encontraron reservas' },
     'admin.experiences': { en: 'Experiences', es: 'Experiencias' },
     'admin.destinations': { en: 'Destinations', es: 'Destinos' },
+    'admin.addons': { en: 'Addons', es: 'Complementos' },
     'admin.aircrafts': { en: 'Aircraft', es: 'Aeronaves' },
     'admin.group_operations': { en: 'Operations', es: 'Operaciones' },
     'admin.group_people': { en: 'People', es: 'Personas' },

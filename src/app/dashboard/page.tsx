@@ -152,6 +152,7 @@ export default function DashboardPage() {
           toLocation: b.to_location,
           scheduledDate: b.scheduled_date,
           scheduledTime: b.scheduled_time,
+          passengerCount: b.passenger_count || 1,
           totalPrice: b.total_price,
           paymentStatus: b.payment_status,
           experience: b.experience || b.experiences,
@@ -379,6 +380,27 @@ export default function DashboardPage() {
     }
   }
 
+  const cancelBooking = async (bookingId: string) => {
+    if (!confirm('Cancel this booking? This cannot be undone.')) return
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'cancelled' })
+      })
+      if (res.ok) {
+        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' } : b))
+        toast.success('Booking cancelled.')
+      } else {
+        const d = await res.json()
+        toast.error(d.error || 'Could not cancel booking.')
+      }
+    } catch {
+      toast.error('Could not cancel booking.')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-luxury-black">
       <MobileNav />
@@ -505,7 +527,10 @@ export default function DashboardPage() {
                           />
                         )}
                         {booking.status === 'pending' && (
-                          <button className="text-red-600 dark:text-red-400 hover:text-red-700 text-sm px-3 py-1 border border-red-300 dark:border-red-700 rounded-soft hover:bg-red-50 dark:hover:bg-red-900/30">
+                          <button
+                            onClick={() => cancelBooking(booking.id)}
+                            className="text-red-600 dark:text-red-400 hover:text-red-700 text-sm px-3 py-1 border border-red-300 dark:border-red-700 rounded-soft hover:bg-red-50 dark:hover:bg-red-900/30"
+                          >
                             Cancel
                           </button>
                         )}
