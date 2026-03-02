@@ -1,5 +1,10 @@
-// Runtime environment validation
-function getEnvVar(key: string, fallback?: string): string {
+// Runtime environment validation (server-side only)
+function getServerEnvVar(key: string, fallback?: string): string {
+  // Only validate on server-side
+  if (typeof window !== 'undefined') {
+    return fallback || ''
+  }
+
   const value = process.env[key]
   if (!value && !fallback) {
     throw new Error(`Missing required environment variable: ${key}`)
@@ -8,14 +13,14 @@ function getEnvVar(key: string, fallback?: string): string {
 }
 
 export const config = {
-  // Database
+  // Database (server-only)
   mongodb: {
-    uri: getEnvVar('MONGODB_URI'),
+    uri: getServerEnvVar('MONGODB_URI'),
   },
 
-  // Authentication
+  // Authentication (server-only)
   auth: {
-    jwtSecret: getEnvVar('JWT_SECRET'),
+    jwtSecret: getServerEnvVar('JWT_SECRET'),
   },
 
   // Branding (client-side accessible)
@@ -24,13 +29,13 @@ export const config = {
     whatsappPhone: process.env.NEXT_PUBLIC_WHATSAPP_PHONE || '50255507700',
   },
 
-  // IRYS Upload
+  // IRYS Upload (server-only)
   irys: {
-    privateKey: getEnvVar('PRIVATE_KEY'),
-    sepoliaRpc: getEnvVar('SEPOLIA_RPC'),
+    privateKey: getServerEnvVar('PRIVATE_KEY'),
+    sepoliaRpc: getServerEnvVar('SEPOLIA_RPC'),
   },
 
-  // Feature flags
+  // Feature flags (client-safe)
   features: {
     enableStripe: process.env.NEXT_PUBLIC_ENABLE_STRIPE === 'true',
     enableCrypto: process.env.NEXT_PUBLIC_ENABLE_CRYPTO === 'true',
