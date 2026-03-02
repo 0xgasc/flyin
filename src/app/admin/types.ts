@@ -30,8 +30,17 @@ export interface Booking {
     name: string
     location: string
   } | null
-  passenger_details?: any[]
-  selected_addons?: any[]
+  passenger_details?: Array<{
+    name: string
+    age: number
+    passport?: string | null
+  }>
+  selected_addons?: Array<{
+    addon_id: string
+    name: string
+    quantity: number
+    price: number
+  }> | null
   addon_total_price?: number
   helicopter_id?: string | null
   return_date?: string | null
@@ -39,7 +48,11 @@ export interface Booking {
   is_round_trip?: boolean
   revision_requested?: boolean
   revision_notes?: string | null
-  revision_data?: any
+  revision_data?: {
+    old_date?: string
+    new_date?: string
+    notes?: string
+  } | null
 }
 
 export interface Pilot {
@@ -73,6 +86,10 @@ export interface Transaction {
   processed_at?: string | null
   admin_notes?: string | null
   user?: {
+    full_name: string | null
+    email: string
+  }
+  processed_by?: {
     full_name: string | null
     email: string
   }
@@ -148,3 +165,96 @@ export interface PilotCertification {
 }
 
 export type AdminTab = 'bookings' | 'calendar' | 'users' | 'pilots' | 'transactions' | 'aircrafts' | 'analytics' | 'experiences' | 'destinations' | 'addons'
+
+export interface Helicopter {
+  id: string
+  name: string
+  model: string
+  manufacturer?: string
+  year_manufactured?: number
+  registration_number: string
+  capacity: number
+  hourly_rate?: number
+  max_range_km?: number
+  cruise_speed_kmh?: number
+  fuel_capacity_liters?: number
+  fuel_consumption_lph?: number
+  total_flight_hours?: number
+  last_maintenance_date?: string
+  next_maintenance_due?: string
+  insurance_expiry?: string
+  status: 'active' | 'maintenance' | 'inactive' | 'inspection'
+  location?: string
+  notes?: string
+  created_at?: string
+}
+
+export interface MaintenanceRecord {
+  id: string
+  helicopter_id: string
+  date: string
+  start_date: string
+  type: string
+  maintenance_type: string
+  description: string
+  cost: number
+  performed_by: string
+  status: 'completed' | 'in_progress' | 'scheduled' | 'cancelled'
+  helicopter?: {
+    name: string
+    registration_number: string
+  }
+}
+
+export interface Addon {
+  id: string
+  name: string
+  name_es?: string | null
+  description: string
+  description_es?: string | null
+  price: number
+  category?: string
+  is_active: boolean
+}
+
+export interface FinancialSummary {
+  total_revenue: number
+  total_bookings: number
+  total_users: number
+  pending_transactions: number
+  average_booking_value: number
+  pending_payments: number
+  client_trust_funds?: number
+  total_business_revenue?: number
+  total_operational_costs?: number
+  pending_revenue?: number
+  net_revenue?: number
+}
+
+export interface OperationalCost {
+  id: string
+  date: string
+  category: string
+  amount: number
+  description: string
+  cost_type?: string
+  created_at: string
+  status: string
+  pilot?: {
+    full_name: string
+  }
+}
+
+export interface BusinessRevenue {
+  id: string
+  date: string
+  amount: number
+  source: string
+  revenue_type?: string
+  created_at: string
+  status: string
+  booking?: {
+    from_location: string
+    to_location: string
+  }
+}

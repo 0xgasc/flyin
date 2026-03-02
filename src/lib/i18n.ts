@@ -360,6 +360,13 @@ export const t = (key: string, locale: 'en' | 'es' = 'en'): string => {
     'pilot.client': { en: 'Client', es: 'Cliente' },
     'pilot.phone': { en: 'Phone', es: 'Teléfono' },
     'pilot.notes': { en: 'Notes', es: 'Notas' },
+    'pilot.new_assignment': { en: 'New Assignment', es: 'Nueva Asignación' },
+
+    // Profile
+    'profile.email': { en: 'Email Address', es: 'Correo Electrónico' },
+    'profile.fullName': { en: 'Full Name', es: 'Nombre Completo' },
+    'profile.phone': { en: 'Phone Number', es: 'Número de Teléfono' },
+    'profile.update': { en: 'Update Profile', es: 'Actualizar Perfil' },
 
     // Passenger details
     'passenger.title': { en: 'Passenger Details', es: 'Datos de Pasajeros' },

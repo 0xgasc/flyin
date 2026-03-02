@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/lib/auth-store'
 import { useTranslation } from '@/lib/i18n'
 import { MobileNav } from '@/components/mobile-nav'
-import { Calendar, MapPin, Clock, Users, CheckCircle, AlertCircle, DollarSign } from 'lucide-react'
+import { Calendar, MapPin, Clock, Users, CheckCircle, AlertCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { WhatsAppContactButton } from '@/components/whatsapp-contact-button'
 
@@ -102,6 +102,9 @@ export default function PilotDashboard() {
   }
 
   const acceptMission = async (bookingId: string) => {
+    // Optimistic update — feel instant
+    const prev = bookings
+    setBookings(bs => bs.map(b => b.id === bookingId ? { ...b, status: 'accepted' } : b))
     try {
       const response = await fetch(`/api/bookings/${bookingId}`, {
         method: 'PATCH',
@@ -109,26 +112,20 @@ export default function PilotDashboard() {
         credentials: 'include',
         body: JSON.stringify({ status: 'accepted' })
       })
-
-      if (response.ok) {
-        fetchBookings()
-      } else {
+      if (!response.ok) {
+        setBookings(prev) // rollback
         console.error('Error accepting mission')
-        // Update local state for optimistic UI
-        setBookings(prev => prev.map(b =>
-          b.id === bookingId ? { ...b, status: 'accepted' } : b
-        ))
       }
     } catch (err) {
+      setBookings(prev) // rollback
       console.error('Error accepting mission:', err)
-      // Update local state for optimistic UI
-      setBookings(prev => prev.map(b =>
-        b.id === bookingId ? { ...b, status: 'accepted' } : b
-      ))
     }
   }
 
   const markAsCompleted = async (bookingId: string) => {
+    // Optimistic update — feel instant
+    const prev = bookings
+    setBookings(bs => bs.map(b => b.id === bookingId ? { ...b, status: 'completed' } : b))
     try {
       const response = await fetch(`/api/bookings/${bookingId}`, {
         method: 'PATCH',
@@ -136,22 +133,13 @@ export default function PilotDashboard() {
         credentials: 'include',
         body: JSON.stringify({ status: 'completed' })
       })
-
-      if (response.ok) {
-        fetchBookings()
-      } else {
+      if (!response.ok) {
+        setBookings(prev) // rollback
         console.error('Error completing mission')
-        // Update local state for optimistic UI
-        setBookings(prev => prev.map(b =>
-          b.id === bookingId ? { ...b, status: 'completed' } : b
-        ))
       }
     } catch (err) {
+      setBookings(prev) // rollback
       console.error('Error completing mission:', err)
-      // Update local state for optimistic UI
-      setBookings(prev => prev.map(b =>
-        b.id === bookingId ? { ...b, status: 'completed' } : b
-      ))
     }
   }
 
@@ -280,7 +268,7 @@ export default function PilotDashboard() {
                 {isNew && (
                   <div className="mb-3">
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-                      <AlertCircle className="h-3 w-3" /> Nueva Asignación
+                      <AlertCircle className="h-3 w-3" /> {t('pilot.new_assignment')}
                     </span>
                   </div>
                 )}

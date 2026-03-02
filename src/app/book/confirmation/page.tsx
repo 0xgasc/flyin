@@ -42,6 +42,9 @@ function ConfirmationContent() {
   const [experienceName, setExperienceName] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [shown, setShown] = useState(false)
+
+  useEffect(() => { setTimeout(() => setShown(true), 80) }, [])
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -139,12 +142,29 @@ function ConfirmationContent() {
       <MobileNav />
 
       <div className="container mx-auto px-6 py-12 max-w-2xl">
+        {/* Booking progress */}
+        <div className="flex items-center justify-center gap-0 mb-8">
+          {[
+            { n: 1, label: locale === 'es' ? 'Vuelo' : 'Flight' },
+            { n: 2, label: locale === 'es' ? 'Pasajeros' : 'Passengers' },
+            { n: 3, label: locale === 'es' ? 'Confirmación' : 'Confirmation' },
+          ].map((step, i) => (
+            <div key={step.n} className="flex items-center">
+              {i > 0 && <div className="w-12 sm:w-20 h-0.5 bg-primary-600 dark:bg-gold-500" />}
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-primary-600 dark:bg-gold-500 text-white">✓</div>
+                <span className={`text-xs mt-1 hidden sm:block ${step.n === 3 ? 'text-primary-600 dark:text-gold-400 font-medium' : 'text-gray-400'}`}>{step.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Success Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-            <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+          <div className={`inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4 transition-all duration-500 ease-out ${shown ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+            <CheckCircle className={`h-8 w-8 text-green-600 dark:text-green-400 transition-all duration-300 delay-200 ${shown ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}`} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className={`text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-all duration-500 delay-300 ${shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
             {locale === 'es' ? '¡Reserva Confirmada!' : 'Booking Confirmed!'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">

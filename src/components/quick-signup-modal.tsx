@@ -141,16 +141,16 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
   }
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Modal */}
-      <div className="relative bg-white dark:bg-luxury-charcoal rounded-lg shadow-2xl w-full max-w-md">
-        {/* Close button */}
+      {/* Modal - Full width on mobile, centered on desktop */}
+      <div className="relative bg-white dark:bg-luxury-charcoal rounded-t-2xl sm:rounded-lg shadow-2xl w-full sm:max-w-md max-h-[90vh] overflow-y-auto safe-area-inset">
+        {/* Close button - larger touch target */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500 dark:text-gray-400 transition-colors"
+          className="absolute top-3 right-3 z-10 w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500 dark:text-gray-400 transition-colors active:scale-95"
         >
           <X className="h-5 w-5" />
         </button>
@@ -187,7 +187,7 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
             {/* Full Name (signup only) */}
             {mode === 'signup' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   {t('auth.full_name')} *
                 </label>
                 <input
@@ -196,14 +196,14 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   placeholder={locale === 'es' ? 'Tu nombre completo' : 'Your full name'}
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full min-h-[44px] px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-base"
                 />
               </div>
             )}
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 {t('auth.email')} *
               </label>
               <input
@@ -212,13 +212,13 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder={locale === 'es' ? 'tu@email.com' : 'you@email.com'}
-                className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full min-h-[44px] px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-base"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 {t('auth.password')} *
               </label>
               <div className="relative">
@@ -229,12 +229,12 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
                   required
                   minLength={6}
                   placeholder={locale === 'es' ? 'Mínimo 6 caracteres' : 'Minimum 6 characters'}
-                  className="w-full px-3 py-2.5 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full min-h-[44px] px-3 py-2.5 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-base"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 active:scale-95"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -244,7 +244,7 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
             {/* Phone (signup only) */}
             {mode === 'signup' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   {t('auth.phone')}
                 </label>
                 <input
@@ -252,7 +252,7 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+502 5555-5555"
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full min-h-[44px] px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-base"
                 />
               </div>
             )}
@@ -262,7 +262,7 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full mt-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-6 min-h-[48px] py-3 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
           >
             {isSubmitting
               ? (locale === 'es' ? 'Procesando...' : 'Processing...')
@@ -273,14 +273,14 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
           </button>
 
           {/* Toggle Mode */}
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-4 text-center text-sm pb-2">
             {mode === 'signup' ? (
               <p className="text-gray-600 dark:text-gray-400">
                 {locale === 'es' ? '¿Ya tienes cuenta? ' : 'Already have an account? '}
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setError('') }}
-                  className="text-primary-600 hover:text-primary-700 font-medium"
+                  className="text-primary-600 hover:text-primary-700 active:text-primary-800 font-medium py-2 px-1"
                 >
                   {locale === 'es' ? 'Inicia Sesión' : 'Sign In'}
                 </button>
@@ -291,7 +291,7 @@ export function QuickSignUpModal({ isOpen, onClose, bookingIntent, onSuccess }: 
                 <button
                   type="button"
                   onClick={() => { setMode('signup'); setError('') }}
-                  className="text-primary-600 hover:text-primary-700 font-medium"
+                  className="text-primary-600 hover:text-primary-700 active:text-primary-800 font-medium py-2 px-1"
                 >
                   {locale === 'es' ? 'Crear Cuenta' : 'Sign Up'}
                 </button>

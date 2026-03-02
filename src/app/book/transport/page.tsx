@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
-import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid } from 'lucide-react'
+import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid, Smartphone, ShieldCheck } from 'lucide-react'
 import { MobileNav } from '@/components/mobile-nav'
 import { useTranslation } from '@/lib/i18n'
 import { format } from 'date-fns'
@@ -37,7 +37,7 @@ interface Airport {
 export default function BookTransportPage() {
   const router = useRouter()
   const { profile } = useAuthStore()
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [airports, setAirports] = useState<Airport[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -55,7 +55,7 @@ export default function BookTransportPage() {
     notes: '',
     isRoundTrip: false,
   })
-  const [priceBredown, setPriceBreakdown] = useState<any>(null)
+  const [priceBreakdown, setPriceBreakdown] = useState<any>(null)
   const [selectionMode, setSelectionMode] = useState<'dropdown' | 'map'>('dropdown')
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null)
   const [showDestinationModal, setShowDestinationModal] = useState(false)
@@ -209,7 +209,7 @@ export default function BookTransportPage() {
 
     // Check if user is logged in
     if (!profile?.id) {
-      setError('Please log in to book a flight')
+      setError(locale === 'es' ? 'Inicia sesión para reservar un vuelo' : 'Please log in to book a flight')
       // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push('/login?redirect=/book/transport')
@@ -228,7 +228,7 @@ export default function BookTransportPage() {
     today.setHours(0, 0, 0, 0)
     const selectedDate = new Date(formData.date)
     if (selectedDate < today) {
-      setError('Departure date cannot be in the past')
+      setError(locale === 'es' ? 'La fecha de salida no puede ser en el pasado' : 'Departure date cannot be in the past')
       return
     }
 
@@ -236,7 +236,7 @@ export default function BookTransportPage() {
     if (formData.isRoundTrip && formData.returnDate) {
       const returnDate = new Date(formData.returnDate)
       if (returnDate < selectedDate) {
-        setError('Return date must be on or after departure date')
+        setError(locale === 'es' ? 'La fecha de regreso debe ser igual o posterior a la de salida' : 'Return date must be on or after departure date')
         return
       }
     }
@@ -264,13 +264,13 @@ export default function BookTransportPage() {
           passenger_count: formData.passengers,
           notes: formData.notes,
           total_price: price,
-          price_breakdown: priceBredown ? {
-            distance: priceBredown.distance,
-            flightTime: priceBredown.flightTime,
-            basePrice: priceBredown.basePrice,
-            passengerFee: priceBredown.passengerFee || 0,
-            multiplier: priceBredown.multiplier || null,
-            isRoundTrip: priceBredown.isRoundTrip || false
+          price_breakdown: priceBreakdown ? {
+            distance: priceBreakdown.distance,
+            flightTime: priceBreakdown.flightTime,
+            basePrice: priceBreakdown.basePrice,
+            passengerFee: priceBreakdown.passengerFee || 0,
+            multiplier: priceBreakdown.multiplier || null,
+            isRoundTrip: priceBreakdown.isRoundTrip || false
           } : null
         })
       })
@@ -312,7 +312,7 @@ export default function BookTransportPage() {
       const syntheticEvent = { preventDefault: () => {} } as React.FormEvent
       await handleSubmit(syntheticEvent)
     } catch {
-      setError('Could not save phone number. Please try again.')
+      setError(locale === 'es' ? 'No se pudo guardar el número. Intenta de nuevo.' : 'Could not save phone number. Please try again.')
     } finally {
       setPhoneSaving(false)
     }
@@ -344,6 +344,24 @@ export default function BookTransportPage() {
       />
 
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-3xl">
+        {/* Booking progress */}
+        <div className="flex items-center justify-center gap-0 mb-6 sm:mb-8">
+          {[
+            { n: 1, label: locale === 'es' ? 'Vuelo' : 'Flight' },
+            { n: 2, label: locale === 'es' ? 'Pasajeros' : 'Passengers' },
+            { n: 3, label: locale === 'es' ? 'Confirmación' : 'Confirmation' },
+          ].map((step, i) => (
+            <div key={step.n} className="flex items-center">
+              {i > 0 && <div className="w-12 sm:w-20 h-0.5 bg-gray-300 dark:bg-gray-600" />}
+              <div className="flex flex-col items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step.n === 1 ? 'bg-primary-600 dark:bg-gold-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
+                  {step.n}
+                </div>
+                <span className={`text-xs mt-1 hidden sm:block ${step.n === 1 ? 'text-primary-600 dark:text-gold-400 font-medium' : 'text-gray-400'}`}>{step.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">{t('booking.title.transport')}</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -716,35 +734,35 @@ export default function BookTransportPage() {
               </span>
             </div>
             
-            {priceBredown && (
+            {priceBreakdown && (
               <div className="space-y-2 text-sm text-primary-800 dark:text-gray-300 mb-4">
                 <div className="flex justify-between">
                   <span>{t('pricing.distance')}:</span>
-                  <span>{priceBredown.distance} km {priceBredown.isRoundTrip ? t('booking.form.each_way') : ''}</span>
+                  <span>{priceBreakdown.distance} km {priceBreakdown.isRoundTrip ? t('booking.form.each_way') : ''}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t('pricing.flight_time')}:</span>
-                  <span>{priceBredown.flightTime} minutes {priceBredown.isRoundTrip ? t('booking.form.each_way') : ''}</span>
+                  <span>{priceBreakdown.flightTime} minutes {priceBreakdown.isRoundTrip ? t('booking.form.each_way') : ''}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{priceBredown.isRoundTrip ? t('booking.form.one_way_price') : t('booking.form.estimated_price')}</span>
-                  <span>${Math.round(priceBredown.basePrice / (priceBredown.multiplier || 1))}</span>
+                  <span>{priceBreakdown.isRoundTrip ? t('booking.form.one_way_price') : t('booking.form.estimated_price')}</span>
+                  <span>${Math.round(priceBreakdown.basePrice / (priceBreakdown.multiplier || 1))}</span>
                 </div>
-                {priceBredown.isRoundTrip && (
+                {priceBreakdown.isRoundTrip && (
                   <div className="flex justify-between">
                     <span>Round Trip Multiplier:</span>
-                    <span>×{priceBredown.multiplier} {priceBredown.multiplier === 1.8 ? '(Same Day Discount)' : ''}</span>
+                    <span>×{priceBreakdown.multiplier} {priceBreakdown.multiplier === 1.8 ? '(Same Day Discount)' : ''}</span>
                   </div>
                 )}
-                {priceBredown.passengerFee > 0 && (
+                {priceBreakdown.passengerFee > 0 && (
                   <div className="flex justify-between">
                     <span>{t('pricing.additional_passengers')}:</span>
-                    <span>+${priceBredown.passengerFee}</span>
+                    <span>+${priceBreakdown.passengerFee}</span>
                   </div>
                 )}
                 <div className="border-t border-primary-300 dark:border-gray-600 pt-2 flex justify-between font-semibold">
-                  <span>{t('pricing.total')} {priceBredown.isRoundTrip ? t('booking.form.round_trip') : ''} {t('pricing.base_price')}:</span>
-                  <span>${priceBredown.totalPrice}</span>
+                  <span>{t('pricing.total')} {priceBreakdown.isRoundTrip ? t('booking.form.round_trip') : ''} {t('pricing.base_price')}:</span>
+                  <span>${priceBreakdown.totalPrice}</span>
                 </div>
               </div>
             )}
@@ -784,9 +802,20 @@ export default function BookTransportPage() {
       {showPhoneGate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">WhatsApp Number Required</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              We use WhatsApp to confirm your booking and send flight updates. Enter your number to continue.
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 mb-3">
+              <Smartphone className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              {locale === 'es' ? '¡Casi listo!' : 'Almost there!'}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+              {locale === 'es'
+                ? 'Necesitamos tu WhatsApp para enviarte la confirmación y actualizaciones de vuelo en tiempo real.'
+                : 'We need your WhatsApp to send your booking confirmation and real-time flight updates.'}
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4 flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5 flex-shrink-0" />
+              {locale === 'es' ? 'Tu número nunca se comparte con terceros.' : 'Your number is never shared with third parties.'}
             </p>
             <input
               type="tel"

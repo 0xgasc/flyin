@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import { User } from '@/models'
 import { extractToken, verifyToken } from '@/lib/jwt'
+import { logger } from '@/lib/logger'
+import { getErrorMessage, type MongooseQuery } from '@/types/api.types'
 
 // GET - List all users (admin only)
 export async function GET(request: NextRequest) {
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    const query: any = {}
+    const query: MongooseQuery = {}
     if (role) query.role = role
 
     const [users, total] = await Promise.all([
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
       User.countDocuments(query)
     ])
 
-    const transformedUsers = users.map((u: any) => ({
+    const transformedUsers = users.map((u) => ({
       id: u._id.toString(),
       email: u.email,
       full_name: u.fullName,
@@ -55,9 +57,9 @@ export async function GET(request: NextRequest) {
       limit,
       offset
     })
-  } catch (error: any) {
-    console.error('Get users error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Get users error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }
 
@@ -117,8 +119,8 @@ export async function POST(request: NextRequest) {
         kyc_verified: user.kycVerified
       }
     })
-  } catch (error: any) {
-    console.error('Create user error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Create user error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }

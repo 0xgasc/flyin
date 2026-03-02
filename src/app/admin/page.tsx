@@ -14,7 +14,20 @@ import {
 import IrysUpload from '@/components/IrysUpload'
 import { AdminWhatsAppButton } from '@/components/whatsapp-contact-button'
 import { AdminLayout } from './components/AdminLayout'
-import type { AdminTab } from './types'
+import type {
+  AdminTab,
+  User,
+  Transaction,
+  Experience,
+  Destination,
+  Helicopter,
+  MaintenanceRecord,
+  Addon,
+  FinancialSummary,
+  OperationalCost,
+  BusinessRevenue,
+  PilotCertification
+} from './types'
 import { HELICOPTER_FLEET } from '@/types/helicopters'
 import { format } from 'date-fns'
 import {
@@ -110,10 +123,10 @@ export default function AdminDashboard() {
   }
   const [bookings, setBookings] = useState<Booking[]>([])
   const [pilots, setPilots] = useState<Pilot[]>([])
-  const [users, setUsers] = useState<any[]>([])
-  const [transactions, setTransactions] = useState<any[]>([])
-  const [experiences, setExperiences] = useState<any[]>([])
-  const [destinations, setDestinations] = useState<any[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [experiences, setExperiences] = useState<Experience[]>([])
+  const [destinations, setDestinations] = useState<Destination[]>([])
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0) // 0 = current week, -1 = previous, +1 = next
@@ -123,15 +136,15 @@ export default function AdminDashboard() {
   const [selectedHelicopter, setSelectedHelicopter] = useState<string>('')
   const [selectedPilot, setSelectedPilot] = useState<string>('')
   const [showCreateUserModal, setShowCreateUserModal] = useState(false)
-  const [selectedTransaction, setSelectedTransaction] = useState<any>(null)
-  const [selectedUser, setSelectedUser] = useState<any>(null)
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showEditUserModal, setShowEditUserModal] = useState(false)
   const [selectedBookingForEdit, setSelectedBookingForEdit] = useState<Booking | null>(null)
   const [showEditBookingModal, setShowEditBookingModal] = useState(false)
-  const [financialSummary, setFinancialSummary] = useState<any>(null)
-  const [operationalCosts, setOperationalCosts] = useState<any[]>([])
-  const [businessRevenue, setBusinessRevenue] = useState<any[]>([])
-  const [addons, setAddons] = useState<any[]>([])
+  const [financialSummary, setFinancialSummary] = useState<FinancialSummary | null>(null)
+  const [operationalCosts, setOperationalCosts] = useState<OperationalCost[]>([])
+  const [businessRevenue, setBusinessRevenue] = useState<BusinessRevenue[]>([])
+  const [addons, setAddons] = useState<Addon[]>([])
   const [addonsLoading, setAddonsLoading] = useState(false)
   const [showNewAddonForm, setShowNewAddonForm] = useState(false)
   const [newAddonData, setNewAddonData] = useState({ name: '', description: '', price: 0, category: 'service' })
@@ -166,15 +179,15 @@ export default function AdminDashboard() {
   })
 
   // Helicopter and maintenance state
-  const [helicopters, setHelicopters] = useState<any[]>([])
-  const [maintenanceRecords, setMaintenanceRecords] = useState<any[]>([])
-  const [selectedHelicopterForEdit, setSelectedHelicopterForEdit] = useState<any>(null)
+  const [helicopters, setHelicopters] = useState<Helicopter[]>([])
+  const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>([])
+  const [selectedHelicopterForEdit, setSelectedHelicopterForEdit] = useState<Helicopter | null>(null)
   const [showEditHelicopterModal, setShowEditHelicopterModal] = useState(false)
   const [showAddHelicopterModal, setShowAddHelicopterModal] = useState(false)
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false)
 
   // Pilot-Aircraft Certification state
-  const [certifications, setCertifications] = useState<any[]>([])
+  const [certifications, setCertifications] = useState<PilotCertification[]>([])
   const [showCertificationModal, setShowCertificationModal] = useState(false)
   const [certModalPilotId, setCertModalPilotId] = useState<string | null>(null)
   const [certModalHelicopterId, setCertModalHelicopterId] = useState<string | null>(null)
@@ -439,6 +452,8 @@ export default function AdminDashboard() {
         setFinancialSummary({
           total_revenue: totalRevenue,
           total_bookings: bookingCount,
+          total_users: users.length,
+          pending_transactions: transactions.filter(t => t.status === 'pending').length,
           average_booking_value: bookingCount > 0 ? totalRevenue / bookingCount : 0,
           pending_payments: data.bookings.filter((b: any) => b.payment_status === 'pending').length
         })
@@ -2233,7 +2248,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="mb-4">
                 {(() => {
                   const weekStartDate = new Date()
-                  weekStartDate.setDate(weekStartDate.getDate() + (currentWeekOffset * 7))
+                  const dow = weekStartDate.getDay()
+                  weekStartDate.setDate(weekStartDate.getDate() + (dow === 0 ? -6 : 1 - dow) + (currentWeekOffset * 7))
                   const weekEndDate = new Date(weekStartDate)
                   weekEndDate.setDate(weekEndDate.getDate() + 6)
                   return (
@@ -2254,8 +2270,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="grid grid-cols-8 gap-1 mb-2">
                 <div className="p-2 text-xs font-medium text-gray-600 dark:text-gray-400">Aircraft</div>
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
-                  const dayDate = new Date()
-                  dayDate.setDate(dayDate.getDate() + (currentWeekOffset * 7) + index)
+                  const weekStart = new Date()
+                  const dow = weekStart.getDay()
+                  weekStart.setDate(weekStart.getDate() + (dow === 0 ? -6 : 1 - dow) + (currentWeekOffset * 7))
+                  const dayDate = new Date(weekStart)
+                  dayDate.setDate(weekStart.getDate() + index)
                   return (
                     <div key={day} className="p-2 text-xs font-medium text-gray-600 dark:text-gray-400 text-center border-l">
                       {day}<br/>
@@ -2278,10 +2297,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     </div>
                     
                     {Array.from({ length: 7 }, (_, dayIndex) => {
-                      const currentDate = new Date()
-                      currentDate.setDate(currentDate.getDate() + (currentWeekOffset * 7) + dayIndex)
-                      const dayBookings = bookings.filter(b => 
-                        b.helicopter_id === helicopter.id && 
+                      const weekStart = new Date()
+                      const dow = weekStart.getDay()
+                      weekStart.setDate(weekStart.getDate() + (dow === 0 ? -6 : 1 - dow) + (currentWeekOffset * 7))
+                      const currentDate = new Date(weekStart)
+                      currentDate.setDate(weekStart.getDate() + dayIndex)
+                      const dayBookings = bookings.filter(b =>
+                        b.helicopter_id === helicopter.id &&
                         new Date(b.scheduled_date).toDateString() === currentDate.toDateString()
                       )
                       
@@ -2348,7 +2370,19 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <div className="card-luxury">
                 <h3 className="font-semibold mb-2 text-sm">Revenue This Week</h3>
                 <div className="text-2xl font-bold text-green-600">
-                  ${bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + b.total_price, 0)}
+                  {(() => {
+                    const ws = new Date()
+                    const d = ws.getDay()
+                    ws.setDate(ws.getDate() + (d === 0 ? -6 : 1 - d) + (currentWeekOffset * 7))
+                    const we = new Date(ws); we.setDate(ws.getDate() + 6)
+                    const total = bookings
+                      .filter(b => {
+                        const bd = new Date(b.scheduled_date)
+                        return b.status === 'completed' && bd >= ws && bd <= we
+                      })
+                      .reduce((sum, b) => sum + b.total_price, 0)
+                    return `$${total.toLocaleString()}`
+                  })()}
                 </div>
               </div>
             </div>
@@ -2585,7 +2619,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                                 onClick={() => setSelectedTransaction(transaction)}
                                 className="text-sm text-blue-600 hover:text-blue-800 underline"
                               >
-                                🔍 View Full Size
+                                <Eye className="h-3.5 w-3.5 inline mr-1" />View Full Size
                               </button>
                             </div>
                             <div className="flex space-x-3">
@@ -2596,9 +2630,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                                 onClick={() => setSelectedTransaction(transaction)}
                               />
                               <div className="flex-1 text-xs text-gray-600 dark:text-gray-400">
-                                <p className="mb-1">📄 Payment verification document</p>
+                                <p className="mb-1">Payment verification document</p>
                                 <p className="mb-1">Uploaded with transaction</p>
-                                <p>🔍 Click to enlarge and verify details</p>
+                                <p>Click to enlarge and verify details</p>
                               </div>
                             </div>
                           </div>
@@ -2613,7 +2647,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                               onClick={() => updateTransactionStatus(transaction.id, 'approved')}
                               className="block w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded-none hover:bg-green-700 transition-colors min-h-[44px]"
                             >
-                              ✅ {t('admin.approve_fund_account')}
+                              <CheckCircle className="h-4 w-4 inline mr-1.5" />{t('admin.approve_fund_account')}
                             </button>
                             <button
                               onClick={() => {
@@ -2624,14 +2658,14 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                               }}
                               className="block w-full px-4 py-3 bg-red-600 text-white text-sm font-medium rounded-none hover:bg-red-700 transition-colors min-h-[44px]"
                             >
-                              ❌ {t('admin.reject_request')}
+                              <XCircle className="h-4 w-4 inline mr-1.5" />{t('admin.reject_request')}
                             </button>
                             {transaction.payment_proof_url && (
                               <button
                                 onClick={() => setSelectedTransaction(transaction)}
                                 className="block w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-none hover:bg-blue-700 transition-colors"
                               >
-                                🔍 Review Proof
+                                <Eye className="h-4 w-4 inline mr-1.5" />Review Proof
                               </button>
                             )}
                           </>
@@ -2804,7 +2838,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <div>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">Avg. Rate</p>
                     <p className="text-3xl font-bold text-primary-600">
-                      ${helicopters.length > 0 ? Math.round(helicopters.reduce((sum, h) => sum + h.hourly_rate, 0) / helicopters.length) : 0}
+                      ${helicopters.length > 0 ? Math.round(helicopters.reduce((sum, h) => sum + (h.hourly_rate || 0), 0) / helicopters.length) : 0}
                     </p>
                   </div>
                   <DollarSign className="h-8 w-8 text-primary-600" />
@@ -3771,7 +3805,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     }}
                     className="flex-1 px-4 py-2 bg-green-600 text-white rounded-none hover:bg-green-700"
                   >
-                    ✅ {t('admin.approve_fund_account')}
+                    <CheckCircle className="h-4 w-4 inline mr-1.5" />{t('admin.approve_fund_account')}
                   </button>
                   <button
                     onClick={() => {
@@ -3783,7 +3817,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     }}
                     className="flex-1 px-4 py-2 bg-red-600 text-white rounded-none hover:bg-red-700"
                   >
-                    ❌ {t('admin.reject_request')}
+                    <XCircle className="h-4 w-4 inline mr-1.5" />{t('admin.reject_request')}
                   </button>
                 </>
               )}
@@ -4427,7 +4461,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                   <select
                     value={selectedHelicopterForEdit.status}
-                    onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, status: e.target.value })}
+                    onChange={(e) => setSelectedHelicopterForEdit({ ...selectedHelicopterForEdit, status: e.target.value as 'active' | 'maintenance' | 'inactive' | 'inspection' })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-none"
                   >
                     <option value="active">Active</option>

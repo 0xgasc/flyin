@@ -9,6 +9,7 @@ export interface ITransaction extends Document {
   paymentMethod: 'card' | 'bank' | 'bank_transfer' | 'account_balance' | 'deposit'
   status: 'pending' | 'completed' | 'failed' | 'approved' | 'rejected'
   reference: string | null
+  paymentProofUrl: string | null
   adminNotes: string | null
   processedAt: Date | null
   processedBy: mongoose.Types.ObjectId | null
@@ -48,6 +49,10 @@ const transactionSchema = new Schema<ITransaction>({
     default: 'pending'
   },
   reference: {
+    type: String,
+    default: null
+  },
+  paymentProofUrl: {
     type: String,
     default: null
   },

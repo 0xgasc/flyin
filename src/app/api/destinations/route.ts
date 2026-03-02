@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import { Destination, DestinationImage, Airport } from '@/models'
 import { extractToken, verifyToken } from '@/lib/jwt'
+import { logger } from '@/lib/logger'
+import { getErrorMessage, type MongooseQuery } from '@/types/api.types'
 
 // GET - List all active destinations (public) or all (admin)
 export async function GET(request: NextRequest) {
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const query: any = {}
+    const query: MongooseQuery = {}
     if (!isAdmin || !includeInactive) {
       query.isActive = true
     }
@@ -39,14 +41,14 @@ export async function GET(request: NextRequest) {
     const destinations = await destinationsQuery.lean()
 
     // Fetch images if requested
-    let imagesByDestination: { [key: string]: any[] } = {}
+    let imagesByDestination: Record<string, unknown[]> = {}
     if (includeImages) {
-      const destIds = destinations.map((d: any) => d._id)
+      const destIds = destinations.map((d) => d._id)
       const images = await DestinationImage.find({ destinationId: { $in: destIds } })
         .sort({ orderIndex: 1 })
         .lean()
 
-      images.forEach((img: any) => {
+      images.forEach((img) => {
         const destId = img.destinationId.toString()
         if (!imagesByDestination[destId]) {
           imagesByDestination[destId] = []
@@ -61,13 +63,14 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const transformedDestinations = destinations.map((d: any) => {
+    const transformedDestinations = destinations.map((d) => {
       // Extract airport data if populated
-      const airport = d.airportId && typeof d.airportId === 'object' ? {
-        id: d.airportId._id?.toString(),
-        code: d.airportId.code,
-        name: d.airportId.name,
-        city: d.airportId.city
+      const isAirportPopulated = d.airportId && typeof d.airportId === 'object' && 'code' in d.airportId
+      const airport = isAirportPopulated ? {
+        id: (d.airportId as any)._id?.toString(),
+        code: (d.airportId as any).code,
+        name: (d.airportId as any).name,
+        city: (d.airportId as any).city
       } : null
 
       return {
@@ -105,9 +108,9 @@ export async function GET(request: NextRequest) {
       success: true,
       destinations: transformedDestinations
     }, { headers })
-  } catch (error: any) {
-    console.error('Get destinations error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Get destinations error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }
 
@@ -190,8 +193,8 @@ export async function POST(request: NextRequest) {
         is_active: destination.isActive
       }
     })
-  } catch (error: any) {
-    console.error('Create destination error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Create destination error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }

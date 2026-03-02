@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb'
 import Booking from '@/models/Booking'
 import Experience from '@/models/Experience'  // Required for populate
 import { extractToken, verifyToken } from '@/lib/jwt'
+import { logger } from '@/lib/logger'
+import { getErrorMessage } from '@/types/api.types'
 import mongoose from 'mongoose'
 
 // Ensure Experience model is registered for populate
@@ -81,28 +83,32 @@ export async function GET(request: NextRequest) {
     ])
 
     // Transform for API response
-    const transformedBookings = bookings.map((b: any) => ({
+    const transformedBookings = bookings.map((b) => {
+      const isClientPopulated = b.clientId && typeof b.clientId === 'object' && 'email' in b.clientId
+      const isPilotPopulated = b.pilotId && typeof b.pilotId === 'object' && 'email' in b.pilotId
+      const isExperiencePopulated = b.experienceId && typeof b.experienceId === 'object' && 'name' in b.experienceId
+      return {
       id: b._id.toString(),
-      client_id: b.clientId?._id?.toString() || b.clientId,
-      client: b.clientId ? {
-        id: b.clientId._id?.toString(),
-        email: b.clientId.email,
-        full_name: b.clientId.fullName,
-        phone: b.clientId.phone
+      client_id: isClientPopulated ? (b.clientId as any)._id?.toString() : b.clientId?.toString(),
+      client: isClientPopulated ? {
+        id: (b.clientId as any)._id?.toString(),
+        email: (b.clientId as any).email,
+        full_name: (b.clientId as any).fullName,
+        phone: (b.clientId as any).phone
       } : null,
       booking_type: b.bookingType,
       status: b.status,
       from_location: b.fromLocation,
       to_location: b.toLocation,
-      experience_id: b.experienceId?._id?.toString() || b.experienceId,
-      experience: b.experienceId ? {
-        name: b.experienceId.name,
-        description: b.experienceId.description
+      experience_id: isExperiencePopulated ? (b.experienceId as any)._id?.toString() : b.experienceId?.toString(),
+      experience: isExperiencePopulated ? {
+        name: (b.experienceId as any).name,
+        description: (b.experienceId as any).description
       } : null,
-      experiences: b.experienceId ? {
-        name: b.experienceId.name,
-        location: b.experienceId.location || '',
-        duration_hours: b.experienceId.durationHours || 0
+      experiences: isExperiencePopulated ? {
+        name: (b.experienceId as any).name,
+        location: (b.experienceId as any).location || '',
+        duration_hours: (b.experienceId as any).durationHours || 0
       } : null,
       destination_id: b.destinationId?._id?.toString() || b.destinationId,
       scheduled_date: b.scheduledDate,
@@ -118,11 +124,11 @@ export async function GET(request: NextRequest) {
       total_price: b.totalPrice,
       price_breakdown: b.priceBreakdown || null,
       payment_status: b.paymentStatus,
-      pilot_id: b.pilotId?._id?.toString() || b.pilotId,
-      pilot: b.pilotId ? {
-        id: b.pilotId._id?.toString(),
-        email: b.pilotId.email,
-        full_name: b.pilotId.fullName
+      pilot_id: isPilotPopulated ? (b.pilotId as any)._id?.toString() : b.pilotId?.toString(),
+      pilot: isPilotPopulated ? {
+        id: (b.pilotId as any)._id?.toString(),
+        email: (b.pilotId as any).email,
+        full_name: (b.pilotId as any).fullName
       } : null,
       helicopter_id: b.helicopterId,
       admin_notes: b.adminNotes,
@@ -131,12 +137,13 @@ export async function GET(request: NextRequest) {
       revision_data: b.revisionData,
       created_at: b.createdAt,
       // Add profiles alias for backwards compatibility
-      profiles: b.clientId ? {
-        full_name: b.clientId.fullName,
-        email: b.clientId.email,
-        phone: b.clientId.phone
+      profiles: isClientPopulated ? {
+        full_name: (b.clientId as any).fullName,
+        email: (b.clientId as any).email,
+        phone: (b.clientId as any).phone
       } : null
-    }))
+      }
+    })
 
     return NextResponse.json({
       success: true,
@@ -145,9 +152,9 @@ export async function GET(request: NextRequest) {
       limit,
       offset
     })
-  } catch (error: any) {
-    console.error('Get bookings error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Get bookings error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }
 
@@ -264,8 +271,8 @@ export async function POST(request: NextRequest) {
         created_at: booking.createdAt
       }
     })
-  } catch (error: any) {
-    console.error('Create booking error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Create booking error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }

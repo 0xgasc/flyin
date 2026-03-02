@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import Transaction from '@/models/Transaction'
 import { getAuthUser } from '@/lib/auth-middleware'
+import { logger } from '@/lib/logger'
+import { getErrorMessage } from '@/types/api.types'
 
 // GET /api/transactions - Get user's transactions (or all for admin)
 export async function GET(req: NextRequest) {
@@ -22,14 +24,14 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 })
       .lean()
 
-    const transformedTransactions = transactions.map((t: any) => {
-      const u = t.userId && typeof t.userId === 'object' ? t.userId : null
-      const processor = t.processedBy && typeof t.processedBy === 'object' ? t.processedBy : null
+    const transformedTransactions = transactions.map((t) => {
+      const isUserPopulated = t.userId && typeof t.userId === 'object' && 'email' in t.userId
+      const isProcessorPopulated = t.processedBy && typeof t.processedBy === 'object' && 'email' in t.processedBy
 
       return {
         id: t._id.toString(),
         createdAt: t.createdAt,
-        userId: u ? u._id.toString() : t.userId?.toString(),
+        userId: isUserPopulated ? (t.userId as any)._id.toString() : t.userId?.toString(),
         type: t.type,
         amount: t.amount,
         paymentMethod: t.paymentMethod,
@@ -37,21 +39,21 @@ export async function GET(req: NextRequest) {
         status: t.status,
         adminNotes: t.adminNotes,
         processedAt: t.processedAt,
-        user: u ? {
-          full_name: u.fullName,
-          email: u.email
+        user: isUserPopulated ? {
+          full_name: (t.userId as any).fullName,
+          email: (t.userId as any).email
         } : null,
-        processedBy: processor ? {
-          full_name: processor.fullName,
-          email: processor.email
+        processedBy: isProcessorPopulated ? {
+          full_name: (t.processedBy as any).fullName,
+          email: (t.processedBy as any).email
         } : null
       }
     })
 
     return NextResponse.json({ success: true, transactions: transformedTransactions })
-  } catch (error: any) {
-    console.error('Transactions fetch error:', error)
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Transactions fetch error', error)
+    return NextResponse.json({ success: false, error: getErrorMessage(error) }, { status: 500 })
   }
 }
 
@@ -64,7 +66,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { type, amount, paymentMethod, reference } = body
+    const { type, amount, paymentMethod, reference, payment_proof_url } = body
 
     if (!type || !amount || !paymentMethod) {
       return NextResponse.json(
@@ -81,6 +83,7 @@ export async function POST(req: NextRequest) {
       amount,
       paymentMethod,
       reference: reference || null,
+      paymentProofUrl: payment_proof_url || null,
       status: 'pending'
     })
 
@@ -95,8 +98,8 @@ export async function POST(req: NextRequest) {
         status: transaction.status
       }
     })
-  } catch (error: any) {
-    console.error('Transaction create error:', error)
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Transaction create error', error)
+    return NextResponse.json({ success: false, error: getErrorMessage(error) }, { status: 500 })
   }
 }

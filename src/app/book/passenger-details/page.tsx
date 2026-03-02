@@ -8,6 +8,10 @@ import { useToast } from '@/lib/toast-store'
 import { Users, Plus, Trash2, ShoppingCart, DollarSign } from 'lucide-react'
 import { MobileNav } from '@/components/mobile-nav'
 import { useTranslation } from '@/lib/i18n'
+import { FormInput } from '@/components/form-input'
+import { logger } from '@/lib/logger'
+import { validateRequired, validateNumberRange } from '@/lib/validation'
+import { getErrorMessage } from '@/types/api.types'
 
 interface PassengerDetails {
   name: string
@@ -39,7 +43,7 @@ function PassengerDetailsContent() {
   const searchParams = useSearchParams()
   const { profile, user } = useAuthStore()
   const toast = useToast()
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
 
   // Get booking ID from URL params
   const bookingId = searchParams.get('booking_id')
@@ -61,6 +65,7 @@ function PassengerDetailsContent() {
   const [loading, setLoading] = useState(true) // Start loading
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   // Fetch booking from database to get actual price (prevents price manipulation)
   useEffect(() => {
@@ -109,8 +114,8 @@ function PassengerDetailsContent() {
           special_requests: ''
         }))
         setPassengers(initialPassengers)
-      } catch (err: any) {
-        setError(err.message || 'Failed to load booking')
+      } catch (err) {
+        setError(getErrorMessage(err))
       } finally {
         setLoading(false)
       }
@@ -126,7 +131,7 @@ function PassengerDetailsContent() {
       const data = await response.json()
 
       if (data.success && data.addons) {
-        const addonsWithQuantity = data.addons.map((addon: any) => ({ ...addon, quantity: 0 }))
+        const addonsWithQuantity = data.addons.map((addon: Omit<Addon, 'quantity'>) => ({ ...addon, quantity: 0 }))
         setAvailableAddons(addonsWithQuantity)
       } else {
         // Use placeholder addons if API not ready
@@ -139,7 +144,7 @@ function PassengerDetailsContent() {
         ])
       }
     } catch (err) {
-      console.warn('Addons fetch error:', err)
+      logger.warn('Addons fetch error:', err)
       // Use placeholder addons if API fails
       setAvailableAddons([
         { id: 'priority-boarding', name: 'Priority Boarding', description: 'Skip the queue with priority boarding access', price: 25, category: 'service', quantity: 0 },
@@ -155,6 +160,37 @@ function PassengerDetailsContent() {
     const updated = [...passengers]
     updated[index] = { ...updated[index], [field]: value }
     setPassengers(updated)
+
+    // Real-time validation
+    validatePassengerField(index, field, value)
+  }
+
+  const validatePassengerField = (index: number, field: keyof PassengerDetails, value: string | number) => {
+    const key = `passenger-${index}-${field}`
+
+    if (field === 'name') {
+      const result = validateRequired(value as string, `Passenger ${index + 1} name`)
+      if (!result.isValid) {
+        setFieldErrors(prev => ({ ...prev, [key]: result.errors[0] }))
+      } else {
+        setFieldErrors(prev => {
+          const { [key]: _, ...rest } = prev
+          return rest
+        })
+      }
+    }
+
+    if (field === 'age') {
+      const result = validateNumberRange(value as number, 1, 120, 'Age')
+      if (!result.isValid) {
+        setFieldErrors(prev => ({ ...prev, [key]: result.errors[0] }))
+      } else {
+        setFieldErrors(prev => {
+          const { [key]: _, ...rest } = prev
+          return rest
+        })
+      }
+    }
   }
 
   const updateAddonQuantity = (addonId: string, quantity: number) => {
@@ -242,8 +278,8 @@ function PassengerDetailsContent() {
       toast.success('Passenger details saved! Proceeding to payment...')
       router.push(`/dashboard?highlight=${bookingData.booking_id}`)
 
-    } catch (error: any) {
-      setError(error.message || 'Failed to save passenger details')
+    } catch (error) {
+      setError(getErrorMessage(error))
     } finally {
       setSubmitting(false)
     }
@@ -298,6 +334,24 @@ function PassengerDetailsContent() {
       <MobileNav />
 
       <div className="container mx-auto px-6 py-8 max-w-4xl">
+        {/* Booking progress */}
+        <div className="flex items-center justify-center gap-0 mb-8">
+          {[
+            { n: 1, label: locale === 'es' ? 'Vuelo' : 'Flight' },
+            { n: 2, label: locale === 'es' ? 'Pasajeros' : 'Passengers' },
+            { n: 3, label: locale === 'es' ? 'Confirmación' : 'Confirmation' },
+          ].map((step, i) => (
+            <div key={step.n} className="flex items-center">
+              {i > 0 && <div className={`w-12 sm:w-20 h-0.5 ${step.n <= 2 ? 'bg-primary-600 dark:bg-gold-500' : 'bg-gray-300 dark:bg-gray-600'}`} />}
+              <div className="flex flex-col items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step.n <= 2 ? 'bg-primary-600 dark:bg-gold-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
+                  {step.n === 1 ? '✓' : step.n}
+                </div>
+                <span className={`text-xs mt-1 hidden sm:block ${step.n === 2 ? 'text-primary-600 dark:text-gold-400 font-medium' : step.n === 1 ? 'text-gray-400' : 'text-gray-400'}`}>{step.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('passenger.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -327,99 +381,62 @@ function PassengerDetailsContent() {
                   </h3>
                   
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.name')} *
-                      </label>
-                      <input
-                        type="text"
-                        value={passenger.name}
-                        onChange={(e) => updatePassenger(index, 'name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        required
-                        placeholder="Enter full name"
-                      />
-                    </div>
+                    <FormInput
+                      label={t('passenger.name')}
+                      value={passenger.name}
+                      onChange={(e) => updatePassenger(index, 'name', e.target.value)}
+                      error={fieldErrors[`passenger-${index}-name`]}
+                      required
+                      placeholder={locale === 'es' ? 'Ej: Juan García' : 'e.g., John Smith'}
+                    />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.age')} *
-                      </label>
-                      <input
-                        type="number"
-                        value={passenger.age}
-                        onChange={(e) => updatePassenger(index, 'age', parseInt(e.target.value) || 0)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        required
-                        min="1"
-                        max="120"
-                      />
-                    </div>
+                    <FormInput
+                      type="number"
+                      label={t('passenger.age')}
+                      value={passenger.age.toString()}
+                      onChange={(e) => updatePassenger(index, 'age', parseInt(e.target.value) || 0)}
+                      error={fieldErrors[`passenger-${index}-age`]}
+                      min={1}
+                      max={120}
+                      required
+                      hint={locale === 'es' ? 'Entre 1 y 120 años' : 'Between 1 and 120 years'}
+                    />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.passport')}
-                      </label>
-                      <input
-                        type="text"
-                        value={passenger.passport}
-                        onChange={(e) => updatePassenger(index, 'passport', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        placeholder="Passport or ID number"
-                      />
-                    </div>
+                    <FormInput
+                      label={t('passenger.passport')}
+                      value={passenger.passport}
+                      onChange={(e) => updatePassenger(index, 'passport', e.target.value)}
+                      placeholder={locale === 'es' ? 'Número de pasaporte o ID' : 'Passport or ID number'}
+                    />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.emergency_contact')} — Name
-                      </label>
-                      <input
-                        type="text"
-                        value={passenger.emergency_contact_name}
-                        onChange={(e) => updatePassenger(index, 'emergency_contact_name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        placeholder="Full name"
-                      />
-                    </div>
+                    <FormInput
+                      label={`${t('passenger.emergency_contact')} — ${locale === 'es' ? 'Nombre' : 'Name'}`}
+                      value={passenger.emergency_contact_name}
+                      onChange={(e) => updatePassenger(index, 'emergency_contact_name', e.target.value)}
+                      placeholder={locale === 'es' ? 'Nombre completo' : 'Full name'}
+                    />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.emergency_contact')} — Phone
-                      </label>
-                      <input
-                        type="tel"
-                        value={passenger.emergency_contact_phone}
-                        onChange={(e) => updatePassenger(index, 'emergency_contact_phone', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        placeholder="+502 5550-0000"
-                      />
-                    </div>
+                    <FormInput
+                      type="tel"
+                      label={`${t('passenger.emergency_contact')} — ${locale === 'es' ? 'Teléfono' : 'Phone'}`}
+                      value={passenger.emergency_contact_phone}
+                      onChange={(e) => updatePassenger(index, 'emergency_contact_phone', e.target.value)}
+                      placeholder="+502 5550-0000"
+                    />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.dietary')}
-                      </label>
-                      <input
-                        type="text"
-                        value={passenger.dietary_restrictions}
-                        onChange={(e) => updatePassenger(index, 'dietary_restrictions', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        placeholder="Allergies, vegetarian, etc."
-                      />
-                    </div>
+                    <FormInput
+                      label={t('passenger.dietary')}
+                      value={passenger.dietary_restrictions}
+                      onChange={(e) => updatePassenger(index, 'dietary_restrictions', e.target.value)}
+                      placeholder={locale === 'es' ? 'Alergias, vegetariano, etc.' : 'Allergies, vegetarian, etc.'}
+                    />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('passenger.special_requests')}
-                      </label>
-                      <input
-                        type="text"
-                        value={passenger.special_requests}
-                        onChange={(e) => updatePassenger(index, 'special_requests', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
-                        placeholder="Mobility assistance, etc."
-                      />
-                    </div>
+                    <FormInput
+                      label={t('passenger.special_requests')}
+                      value={passenger.special_requests}
+                      onChange={(e) => updatePassenger(index, 'special_requests', e.target.value)}
+                      placeholder={locale === 'es' ? 'Asistencia de movilidad, etc.' : 'Mobility assistance, etc.'}
+                    />
                   </div>
                 </div>
               ))}
@@ -455,14 +472,17 @@ function PassengerDetailsContent() {
                             <button
                               type="button"
                               onClick={() => updateAddonQuantity(addon.id, Math.max(0, addon.quantity - 1))}
-                              className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600"
+                              aria-label={`Decrease ${addon.name} quantity`}
+                              disabled={addon.quantity === 0}
+                              className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               -
                             </button>
-                            <span className="w-8 text-center font-medium text-gray-900 dark:text-white">{addon.quantity}</span>
+                            <span className="w-8 text-center font-medium text-gray-900 dark:text-white" aria-live="polite">{addon.quantity}</span>
                             <button
                               type="button"
                               onClick={() => updateAddonQuantity(addon.id, addon.quantity + 1)}
+                              aria-label={`Increase ${addon.name} quantity`}
                               className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700"
                             >
                               +
@@ -530,6 +550,7 @@ function PassengerDetailsContent() {
             <button
               type="submit"
               disabled={submitting}
+              aria-busy={submitting}
               className="flex-1 btn-luxury disabled:opacity-50"
             >
               {submitting ? t('common.loading') : t('passenger.continue')}

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Shield, Clock, Star, MapPin, ChevronDown, Plane, DollarSign, Facebook, Instagram, Phone } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { config } from '@/lib/config'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useAuthStore } from '@/lib/auth-store'
@@ -14,9 +15,6 @@ import { PhotoGallery } from '@/components/PhotoGallery'
 import { HeroCarousel } from '@/components/HeroCarousel'
 import { guatemalaDepartments, type Department } from '@/lib/guatemala-departments'
 import dynamic from 'next/dynamic'
-
-/** FlyInGuate brand logo hosted on wsimg CDN. */
-const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
 /** Hero carousel images — uploaded to Irys devnet. */
 const HERO_IMAGES = [

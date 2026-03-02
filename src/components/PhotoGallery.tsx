@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
+import { logger } from '@/lib/logger'
 
 interface GalleryImage {
   id: string
@@ -37,7 +38,7 @@ export function PhotoGallery() {
       const shuffled = images.sort(() => Math.random() - 0.5)
       setAllImages(shuffled)
     } catch (error) {
-      console.error('Error fetching gallery images:', error)
+      logger.error('Error fetching gallery images:', error)
     } finally {
       setLoading(false)
     }
@@ -152,6 +153,7 @@ export function PhotoGallery() {
         <div className="flex items-center justify-center gap-4 mt-6">
           <button
             onClick={shuffleImages}
+            aria-label="Shuffle gallery images"
             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-soft transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
@@ -161,6 +163,7 @@ export function PhotoGallery() {
           {displayCount < allImages.length && (
             <button
               onClick={showMore}
+              aria-label={`Load ${allImages.length - displayCount} more images`}
               className="px-6 py-2 bg-gold-500 text-gray-900 font-semibold rounded-soft hover:bg-gold-400 transition-colors"
             >
               Show More ({allImages.length - displayCount} remaining)
@@ -178,6 +181,7 @@ export function PhotoGallery() {
         <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center">
           <button
             onClick={closeGallery}
+            aria-label="Close image gallery"
             className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
           >
             <X className="h-8 w-8" />
@@ -185,6 +189,7 @@ export function PhotoGallery() {
 
           <button
             onClick={goPrev}
+            aria-label="Previous image"
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-2"
           >
             <ChevronLeft className="h-8 w-8" />
@@ -205,6 +210,7 @@ export function PhotoGallery() {
 
           <button
             onClick={goNext}
+            aria-label="Next image"
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-2"
           >
             <ChevronRight className="h-8 w-8" />

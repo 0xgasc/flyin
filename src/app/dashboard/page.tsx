@@ -10,7 +10,8 @@ import { getAuthHeaders } from '@/lib/auth-client'
 import { useToast } from '@/lib/toast-store'
 import {
   Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
-  User, Mail, Phone, Upload, Save, Wallet, FileText, CheckCircle, Eye, EyeOff
+  User, Mail, Phone, Save, Wallet, FileText, CheckCircle, Eye, EyeOff, MessageCircle,
+  Plane, Globe, AlertTriangle
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { WhatsAppContactButton } from '@/components/whatsapp-contact-button'
@@ -30,6 +31,19 @@ interface Booking {
   experience: {
     name: string
     location: string
+  } | null
+  revisionRequested?: boolean
+  revisionNotes?: string | null
+  priceBreakdown?: {
+    base_price?: number
+    passengers?: number
+    per_person?: number
+    distance?: number
+    flight_time?: number
+    passenger_fee?: number
+    multiplier?: number
+    is_round_trip?: boolean
+    addon_total?: number
   } | null
 }
 
@@ -52,6 +66,7 @@ export default function DashboardPage() {
 
   // Tab management
   const [activeTab, setActiveTab] = useState<'bookings' | 'profile' | 'payments'>('bookings')
+  const [expandedPriceIds, setExpandedPriceIds] = useState<Set<string>>(new Set())
   
   // Bookings state
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -77,7 +92,6 @@ export default function DashboardPage() {
     amount: '',
     payment_method: 'bank_transfer',
     reference: '',
-    proof_image: null as File | null,
   })
 
   // Auth timeout to prevent infinite spinning
@@ -156,6 +170,9 @@ export default function DashboardPage() {
           totalPrice: b.total_price,
           paymentStatus: b.payment_status,
           experience: b.experience || b.experiences,
+          revisionRequested: b.revision_requested || false,
+          revisionNotes: b.revision_notes || null,
+          priceBreakdown: b.price_breakdown || null,
         }))
         setBookings(transformed)
       }
@@ -254,7 +271,6 @@ export default function DashboardPage() {
         amount: '',
         payment_method: 'bank_transfer',
         reference: '',
-        proof_image: null,
       })
       setShowTopUpModal(false)
       fetchPaymentProofs()
@@ -273,13 +289,17 @@ export default function DashboardPage() {
   }
 
   const handlePayBooking = async (bookingId: string, amount: number) => {
-    const confirmPayment = confirm(`Confirm payment of $${amount} for this flight?\n\nThis will:\n• Process payment from your account balance\n• Confirm your booking\n• Final booking confirmation will be sent`)
+    const confirmPayment = confirm(locale === 'es'
+      ? `¿Confirmar pago de $${amount} por este vuelo?\n\nEsto:\n• Procesará el pago desde tu saldo\n• Confirmará tu reserva\n• Se enviará confirmación final`
+      : `Confirm payment of $${amount} for this flight?\n\nThis will:\n• Process payment from your account balance\n• Confirm your booking\n• Final booking confirmation will be sent`)
 
     if (!confirmPayment) return
 
     // Check if user has sufficient balance
     if (!profile?.accountBalance || profile.accountBalance < amount) {
-      const topUpConfirm = confirm(`Insufficient balance. Current balance: $${profile?.accountBalance?.toFixed(2) || '0.00'}\n\nWould you like to top up your account first?`)
+      const topUpConfirm = confirm(locale === 'es'
+        ? `Saldo insuficiente. Saldo actual: $${profile?.accountBalance?.toFixed(2) || '0.00'}\n\n¿Deseas recargar tu cuenta primero?`
+        : `Insufficient balance. Current balance: $${profile?.accountBalance?.toFixed(2) || '0.00'}\n\nWould you like to top up your account first?`)
       if (topUpConfirm) {
         setActiveTab('payments')
         setShowTopUpModal(true)
@@ -320,7 +340,7 @@ export default function DashboardPage() {
 
     } catch (error: any) {
       console.error('Payment error:', error)
-      toast.error('Payment failed: ' + error.message)
+      toast.error(locale === 'es' ? 'Pago fallido: ' + error.message : 'Payment failed: ' + error.message)
     } finally {
       setPaymentLoading(false)
     }
@@ -354,7 +374,7 @@ export default function DashboardPage() {
 
     } catch (error: any) {
       console.error('Bank deposit error:', error)
-      toast.error('Bank deposit failed: ' + error.message)
+      toast.error(locale === 'es' ? 'Depósito fallido: ' + error.message : 'Bank deposit failed: ' + error.message)
     } finally {
       setPaymentLoading(false)
     }
@@ -381,7 +401,7 @@ export default function DashboardPage() {
   }
 
   const cancelBooking = async (bookingId: string) => {
-    if (!confirm('Cancel this booking? This cannot be undone.')) return
+    if (!confirm(locale === 'es' ? '¿Cancelar esta reserva? Esta acción no se puede deshacer.' : 'Cancel this booking? This cannot be undone.')) return
     try {
       const res = await fetch(`/api/bookings/${bookingId}`, {
         method: 'PATCH',
@@ -391,13 +411,13 @@ export default function DashboardPage() {
       })
       if (res.ok) {
         setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' } : b))
-        toast.success('Booking cancelled.')
+        toast.success(locale === 'es' ? 'Reserva cancelada.' : 'Booking cancelled.')
       } else {
         const d = await res.json()
-        toast.error(d.error || 'Could not cancel booking.')
+        toast.error(d.error || (locale === 'es' ? 'No se pudo cancelar la reserva.' : 'Could not cancel booking.'))
       }
     } catch {
-      toast.error('Could not cancel booking.')
+      toast.error(locale === 'es' ? 'No se pudo cancelar la reserva.' : 'Could not cancel booking.')
     }
   }
 
@@ -463,9 +483,25 @@ export default function DashboardPage() {
               </div>
             ) : bookings.length === 0 ? (
               <div className="card-luxury text-center py-12">
-                <Calendar className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No bookings yet</h3>
-                <p className="text-gray-500 dark:text-gray-400">Start your journey by booking a flight or experience</p>
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary-50 dark:bg-gold-500/10 mb-4">
+                  <Plane className="h-10 w-10 text-primary-600 dark:text-gold-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  {locale === 'es' ? '¡Tu primer vuelo te espera!' : 'Your first flight awaits!'}
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-8">
+                  {locale === 'es' ? 'Explora Guatemala desde las alturas.' : 'Explore Guatemala from above.'}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-sm mx-auto">
+                  <Link href="/book/transport" className="flex-1 btn-primary text-center py-3 flex items-center justify-center gap-2">
+                    <Plane className="h-4 w-4" />
+                    {locale === 'es' ? 'Reservar Transporte' : 'Book Transport'}
+                  </Link>
+                  <Link href="/book/experiences" className="flex-1 btn-ghost text-center py-3 flex items-center justify-center gap-2">
+                    <Globe className="h-4 w-4" />
+                    {locale === 'es' ? 'Ver Experiencias' : 'Explore Experiences'}
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -503,9 +539,69 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex items-center">
                             <DollarSign className="h-4 w-4 mr-2 text-primary-600 dark:text-gold-500" />
-                            ${booking.totalPrice}
+                            <button
+                              onClick={() => setExpandedPriceIds(prev => {
+                                const next = new Set(prev)
+                                next.has(booking.id) ? next.delete(booking.id) : next.add(booking.id)
+                                return next
+                              })}
+                              className="text-left hover:text-primary-700 dark:hover:text-gold-400"
+                            >
+                              ${booking.totalPrice.toLocaleString()}
+                              {booking.priceBreakdown && <span className="ml-1 text-xs opacity-60">{expandedPriceIds.has(booking.id) ? '▲' : '▼'}</span>}
+                            </button>
                           </div>
                         </div>
+                        {/* Price breakdown */}
+                        {booking.priceBreakdown && expandedPriceIds.has(booking.id) && (
+                          <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-soft border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                            {booking.priceBreakdown.base_price !== undefined && (
+                              <div className="flex justify-between">
+                                <span>{locale === 'es' ? 'Precio base' : 'Base price'}</span>
+                                <span>${booking.priceBreakdown.base_price.toLocaleString()}</span>
+                              </div>
+                            )}
+                            {booking.priceBreakdown.per_person !== undefined && booking.priceBreakdown.passengers && (
+                              <div className="flex justify-between">
+                                <span>{locale === 'es' ? 'Pasajeros' : 'Passengers'} ×{booking.priceBreakdown.passengers}</span>
+                                <span>${booking.priceBreakdown.per_person}/pax</span>
+                              </div>
+                            )}
+                            {booking.priceBreakdown.passenger_fee !== undefined && booking.priceBreakdown.passenger_fee > 0 && (
+                              <div className="flex justify-between">
+                                <span>{locale === 'es' ? 'Tarifa por pasajero' : 'Passenger fee'}</span>
+                                <span>+${booking.priceBreakdown.passenger_fee.toLocaleString()}</span>
+                              </div>
+                            )}
+                            {booking.priceBreakdown.distance !== undefined && (
+                              <div className="flex justify-between">
+                                <span>{locale === 'es' ? 'Distancia' : 'Distance'}</span>
+                                <span>{booking.priceBreakdown.distance} km</span>
+                              </div>
+                            )}
+                            {booking.priceBreakdown.multiplier && booking.priceBreakdown.multiplier !== 1 && (
+                              <div className="flex justify-between">
+                                <span>{locale === 'es' ? 'Multiplicador' : 'Rate multiplier'}</span>
+                                <span>×{booking.priceBreakdown.multiplier}</span>
+                              </div>
+                            )}
+                            {booking.priceBreakdown.addon_total !== undefined && booking.priceBreakdown.addon_total > 0 && (
+                              <div className="flex justify-between">
+                                <span>{locale === 'es' ? 'Extras' : 'Add-ons'}</span>
+                                <span>+${booking.priceBreakdown.addon_total.toLocaleString()}</span>
+                              </div>
+                            )}
+                            {booking.priceBreakdown.is_round_trip && (
+                              <div className="text-center text-primary-600 dark:text-gold-500 font-medium pt-1">
+                                {locale === 'es' ? 'Vuelo de ida y vuelta' : 'Round trip'}
+                              </div>
+                            )}
+                            <div className="flex justify-between font-semibold text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-600 pt-1 mt-1">
+                              <span>Total</span>
+                              <span>${booking.totalPrice.toLocaleString()}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       <div className="ml-4 flex flex-col space-y-2">
@@ -526,12 +622,38 @@ export default function DashboardPage() {
                             variant="icon"
                           />
                         )}
+                        {booking.revisionRequested && (
+                          <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-soft">
+                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-300 mb-1 flex items-center gap-1">
+                              <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+                              {locale === 'es' ? 'El administrador solicitó un cambio:' : 'Admin requested a change:'}
+                            </p>
+                            {booking.revisionNotes && (
+                              <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">{booking.revisionNotes}</p>
+                            )}
+                            <button
+                              onClick={() => {
+                                const ref = booking.id.slice(-6).toUpperCase()
+                                const msg = encodeURIComponent(
+                                  locale === 'es'
+                                    ? `Hola FlyInGuate! Tengo una pregunta sobre la revisión solicitada para mi reserva #${ref}.`
+                                    : `Hi FlyInGuate! I have a question about the revision requested for booking #${ref}.`
+                                )
+                                window.open(`https://wa.me/50255507700?text=${msg}`, '_blank', 'noopener,noreferrer')
+                              }}
+                              className="text-xs text-amber-700 dark:text-amber-400 underline hover:text-amber-900"
+                            >
+                              {locale === 'es' ? 'Contactar por WhatsApp →' : 'Contact via WhatsApp →'}
+                            </button>
+                          </div>
+                        )}
+
                         {booking.status === 'pending' && (
                           <button
                             onClick={() => cancelBooking(booking.id)}
                             className="text-red-600 dark:text-red-400 hover:text-red-700 text-sm px-3 py-1 border border-red-300 dark:border-red-700 rounded-soft hover:bg-red-50 dark:hover:bg-red-900/30"
                           >
-                            Cancel
+                            {locale === 'es' ? 'Cancelar' : 'Cancel'}
                           </button>
                         )}
 
@@ -566,8 +688,43 @@ export default function DashboardPage() {
                             <p className="text-xs text-green-800 dark:text-green-400 font-medium text-center">
                               Completed
                             </p>
-                            <button className="text-xs text-green-600 dark:text-green-500 hover:text-green-700 underline">
-                              Leave Review
+                            <button
+                              onClick={() => {
+                                const ref = booking.id.slice(-6).toUpperCase()
+                                const msg = encodeURIComponent(
+                                  locale === 'es'
+                                    ? `Hola FlyInGuate! Quisiera dejar un comentario sobre mi vuelo #${ref}. `
+                                    : `Hi FlyInGuate! I'd like to leave feedback about my flight #${ref}. `
+                                )
+                                window.open(`https://wa.me/50255507700?text=${msg}`, '_blank', 'noopener,noreferrer')
+                              }}
+                              className="text-xs text-green-600 dark:text-green-500 hover:text-green-700 underline flex items-center gap-1 mx-auto"
+                            >
+                              <MessageCircle className="h-3 w-3" />
+                              {locale === 'es' ? 'Dejar comentario' : 'Leave feedback'}
+                            </button>
+                          </div>
+                        )}
+
+                        {booking.status === 'cancelled' && booking.paymentStatus === 'paid' && (
+                          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-soft p-2">
+                            <p className="text-xs text-orange-800 dark:text-orange-300 font-medium text-center mb-1">
+                              {locale === 'es' ? 'Reserva cancelada' : 'Booking cancelled'}
+                            </p>
+                            <button
+                              onClick={() => {
+                                const ref = booking.id.slice(-6).toUpperCase()
+                                const msg = encodeURIComponent(
+                                  locale === 'es'
+                                    ? `Hola FlyInGuate! Quisiera solicitar el reembolso de mi reserva #${ref} por $${booking.totalPrice}. Ya fue pagada.`
+                                    : `Hi FlyInGuate! I'd like to request a refund for booking #${ref} ($${booking.totalPrice}). Payment was already made.`
+                                )
+                                window.open(`https://wa.me/50255507700?text=${msg}`, '_blank', 'noopener,noreferrer')
+                              }}
+                              className="text-xs text-orange-700 dark:text-orange-400 underline hover:text-orange-900 flex items-center gap-1 mx-auto"
+                            >
+                              <MessageCircle className="h-3 w-3" />
+                              {locale === 'es' ? 'Solicitar reembolso →' : 'Request refund →'}
                             </button>
                           </div>
                         )}
@@ -764,25 +921,54 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Payment Proof
-                </label>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => setTopUpData({...topUpData, proof_image: e.target.files?.[0] || null})}
-                  className="w-full text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-soft file:border-0 file:bg-primary-100 dark:file:bg-primary-900 file:text-primary-700 dark:file:text-primary-300 hover:file:bg-primary-200 dark:hover:file:bg-primary-800"
-                />
+              <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-soft">
+                <p className="text-xs font-medium text-green-800 dark:text-green-300 mb-2 flex items-start gap-1.5">
+                  <MessageCircle className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+                  {locale === 'es'
+                    ? 'Después de transferir, envíanos el comprobante por WhatsApp para agilizar la aprobación:'
+                    : 'After transferring, send your payment proof via WhatsApp for faster approval:'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const amt = topUpData.amount ? `$${topUpData.amount}` : ''
+                    const ref = topUpData.reference ? ` (ref: ${topUpData.reference})` : ''
+                    const msg = encodeURIComponent(
+                      locale === 'es'
+                        ? `Hola FlyInGuate! Acabo de hacer una transferencia de ${amt}${ref} para recargar mi cuenta. Adjunto el comprobante.`
+                        : `Hi FlyInGuate! I just made a bank transfer of ${amt}${ref} to top up my account. Sending proof of payment.`
+                    )
+                    window.open(`https://wa.me/50255507700?text=${msg}`, '_blank', 'noopener,noreferrer')
+                  }}
+                  className="flex items-center gap-2 text-xs px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-soft font-medium transition-colors"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  {locale === 'es' ? 'Enviar comprobante por WhatsApp' : 'Send proof via WhatsApp'}
+                </button>
               </div>
 
               <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-soft border border-blue-200 dark:border-blue-800">
-                <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Bank Transfer Details</h4>
-                <div className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
-                  <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
-                  <p><strong>Account Number:</strong> 1234567890</p>
-                  <p><strong>Bank:</strong> Banco Industrial</p>
-                </div>
+                <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
+                  {locale === 'es' ? 'Transferencia Bancaria' : 'Bank Transfer'}
+                </h4>
+                <p className="text-sm text-blue-800 dark:text-blue-400 mb-3">
+                  {locale === 'es'
+                    ? 'Contáctanos por WhatsApp para recibir nuestros datos bancarios actualizados de forma segura.'
+                    : 'Contact us via WhatsApp to receive our current bank account details securely.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const msg = encodeURIComponent(locale === 'es'
+                      ? 'Hola FlyInGuate! Necesito los datos bancarios para hacer una transferencia.'
+                      : 'Hi FlyInGuate! I need your bank account details to make a transfer.')
+                    window.open(`https://wa.me/50255507700?text=${msg}`, '_blank', 'noopener,noreferrer')
+                  }}
+                  className="flex items-center gap-2 text-xs px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-soft font-medium transition-colors"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  {locale === 'es' ? 'Obtener datos bancarios' : 'Get bank details'}
+                </button>
               </div>
 
               <div className="flex space-x-3">
@@ -914,59 +1100,28 @@ function PaymentModal({
 
         </div>
 
-        {/* Coming Soon Payment Methods - Collapsible */}
-        <details className="mb-4">
-          <summary className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 py-2">
-            More payment options coming soon...
-          </summary>
-          <div className="mt-2 space-y-2 opacity-60">
-            <div className="p-3 rounded-soft border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-              <div className="flex items-center">
-                <CreditCard className="w-5 h-5 text-gray-400 mr-3" />
-                <div>
-                  <div className="font-medium text-gray-600 dark:text-gray-400">Credit Card</div>
-                  <div className="text-xs text-gray-400 dark:text-gray-500">Coming Soon</div>
-                </div>
-              </div>
-            </div>
-            <div className="p-3 rounded-soft border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-              <div className="flex items-center">
-                <Coins className="w-5 h-5 text-gray-400 mr-3" />
-                <div>
-                  <div className="font-medium text-gray-600 dark:text-gray-400">Cryptocurrency</div>
-                  <div className="text-xs text-gray-400 dark:text-gray-500">USDC, USDT via StablePay - Coming Soon</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </details>
-
         {/* Bank Deposit Details */}
         {selectedPaymentMethod === 'bank' && (
           <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-soft border border-blue-200 dark:border-blue-800">
-            <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3">Bank Transfer Instructions</h4>
-            <div className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
-              <p><strong>Account Name:</strong> FlyInGuate S.A.</p>
-              <p><strong>Account Number:</strong> 1234567890</p>
-              <p><strong>Bank:</strong> Banco Industrial</p>
+            <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Bank Transfer</h4>
+            <div className="text-sm text-blue-800 dark:text-blue-400 space-y-1 mb-3">
               <p><strong>Amount:</strong> ${booking.totalPrice}</p>
               <p><strong>Reference:</strong> Booking {booking.id.slice(0, 8)}</p>
             </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
-                Upload Payment Proof
-              </label>
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                onChange={(e) => setProofFile(e.target.files?.[0] || null)}
-                className="w-full text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-soft file:border-0 file:bg-blue-100 dark:file:bg-blue-900 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-200 dark:hover:file:bg-blue-800"
-              />
-              {proofFile && (
-                <p className="text-xs text-green-600 dark:text-green-400 mt-1">{proofFile.name}</p>
-              )}
-            </div>
+            <p className="text-sm text-blue-800 dark:text-blue-400 mb-3">
+              Contact us via WhatsApp to receive our current bank account details.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                const msg = encodeURIComponent(`Hi FlyInGuate! I need bank details for booking ${booking.id.slice(0, 8)} — amount $${booking.totalPrice}.`)
+                window.open(`https://wa.me/50255507700?text=${msg}`, '_blank', 'noopener,noreferrer')
+              }}
+              className="flex items-center gap-2 text-xs px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-soft font-medium transition-colors"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              Get bank details via WhatsApp
+            </button>
           </div>
         )}
 

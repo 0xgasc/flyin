@@ -232,15 +232,15 @@ function TransactionCard({
             <>
               <button
                 onClick={() => onApprove(transaction.id)}
-                className="w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition-colors min-h-[44px]"
+                className="w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition-colors min-h-[44px] flex items-center justify-center gap-2"
               >
-                ✅ {t('admin.approve_fund_account')}
+                <CheckCircle className="h-4 w-4" /> {t('admin.approve_fund_account')}
               </button>
               <button
                 onClick={() => onReject(transaction.id)}
-                className="w-full px-4 py-3 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition-colors min-h-[44px]"
+                className="w-full px-4 py-3 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition-colors min-h-[44px] flex items-center justify-center gap-2"
               >
-                ❌ {t('admin.reject_request')}
+                <XCircle className="h-4 w-4" /> {t('admin.reject_request')}
               </button>
               {transaction.payment_proof_url && (
                 <button

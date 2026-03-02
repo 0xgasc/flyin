@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Experience from '@/models/Experience'
 import { extractToken, verifyToken } from '@/lib/jwt'
+import { logger } from '@/lib/logger'
+import { getErrorMessage, type MongooseQuery } from '@/types/api.types'
 
 // GET - List all active experiences (public) or all (admin)
 export async function GET(request: NextRequest) {
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const query: any = {}
+    const query: MongooseQuery = {}
     if (!isAdmin || !includeInactive) {
       query.isActive = true
     }
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest) {
       .sort({ name: 1 })
       .lean()
 
-    const transformedExperiences = experiences.map((e: any) => ({
+    const transformedExperiences = experiences.map((e) => ({
       id: e._id.toString(),
       name: e.name,
       name_es: e.nameEs,
@@ -54,8 +56,8 @@ export async function GET(request: NextRequest) {
       category_name_es: e.categoryNameEs,
       image_url: e.imageUrl,
       order_index: e.orderIndex,
-      pricing_tiers: (e.pricingTiers || []).map((t: any) => ({
-        id: t._id?.toString() || `tier-${t.minPassengers}-${t.maxPassengers}`,
+      pricing_tiers: (e.pricingTiers || []).map((t) => ({
+        id: (t as any)._id?.toString() || `tier-${t.minPassengers}-${t.maxPassengers}`,
         min_passengers: t.minPassengers,
         max_passengers: t.maxPassengers,
         price: t.price
@@ -76,9 +78,9 @@ export async function GET(request: NextRequest) {
       success: true,
       experiences: transformedExperiences
     }, { headers })
-  } catch (error: any) {
-    console.error('Get experiences error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Get experiences error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }
 
@@ -126,7 +128,7 @@ export async function POST(request: NextRequest) {
       includes: includes || [],
       location: location.trim(),
       imageUrl: image_url || null,
-      pricingTiers: (pricing_tiers || []).map((tier: any) => ({
+      pricingTiers: (pricing_tiers || []).map((tier: { min_passengers: number; max_passengers: number; price: number }) => ({
         minPassengers: tier.min_passengers,
         maxPassengers: tier.max_passengers,
         price: tier.price
@@ -151,8 +153,8 @@ export async function POST(request: NextRequest) {
         is_active: experience.isActive
       }
     })
-  } catch (error: any) {
-    console.error('Create experience error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    logger.error('Create experience error', error)
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }

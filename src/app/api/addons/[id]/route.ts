@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import { Addon } from '@/models'
 import { extractToken, verifyToken } from '@/lib/jwt'
+import { getErrorMessage } from '@/types/api.types'
 
 function requireAdmin(request: NextRequest) {
   const token = extractToken(request)
@@ -12,17 +13,18 @@ function requireAdmin(request: NextRequest) {
 }
 
 // PATCH - Update addon (toggle active, update fields)
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     if (!requireAdmin(request)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
+    const { id } = await params
     await connectDB()
     const body = await request.json()
     const { name, description, price, category, is_active } = body
 
-    const updates: any = {}
+    const updates: Record<string, unknown> = {}
     if (name !== undefined) updates.name = name.trim()
     if (description !== undefined) updates.description = description
     if (price !== undefined) updates.price = price
@@ -30,10 +32,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     if (is_active !== undefined) updates.isActive = is_active
 
     const addon = await Addon.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: updates },
       { new: true }
-    ).lean() as any
+    ).lean()
 
     if (!addon) {
       return NextResponse.json({ error: 'Addon not found' }, { status: 404 })
@@ -50,27 +52,28 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
         is_active: addon.isActive
       }
     })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }
 
 // DELETE - Delete addon
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     if (!requireAdmin(request)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
+    const { id } = await params
     await connectDB()
-    const addon = await Addon.findByIdAndDelete(params.id)
+    const addon = await Addon.findByIdAndDelete(id)
 
     if (!addon) {
       return NextResponse.json({ error: 'Addon not found' }, { status: 404 })
     }
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 })
   }
 }

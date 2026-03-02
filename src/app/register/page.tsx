@@ -5,10 +5,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { register } from '@/lib/auth-client'
+import { config } from '@/lib/config'
 import { useTranslation } from '@/lib/i18n'
 import { Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react'
-
-const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
+import { logger } from '@/lib/logger'
+import { getErrorMessage } from '@/types/api.types'
 
 // Email validation regex
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -88,9 +89,9 @@ export default function RegisterPage() {
       } else {
         router.push('/dashboard')
       }
-    } catch (error: any) {
-      console.error('Registration error:', error)
-      setError(error.message || 'Failed to register')
+    } catch (error) {
+      logger.error('Registration error:', error)
+      setError(getErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -102,7 +103,7 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
             <Image
-              src={LOGO_URL}
+              src={config.branding.logoUrl}
               alt="FlyInGuate"
               width={200}
               height={70}
@@ -117,7 +118,7 @@ export default function RegisterPage() {
         <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6 shadow-luxury">
           <form onSubmit={handleRegister} className="space-y-6">
             {error && (
-              <div className="bg-red-900/30 border border-red-800 text-red-400 px-4 py-3 rounded-soft text-sm">
+              <div className="bg-red-900/30 border border-red-800 text-red-400 px-4 py-3 rounded-soft text-sm" role="alert">
                 {error}
               </div>
             )}
@@ -165,6 +166,7 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  aria-required="true"
                   className="w-full pl-10 pr-3 py-3 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="John Doe"
                   required
@@ -183,6 +185,7 @@ export default function RegisterPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  aria-required="true"
                   className="w-full pl-10 pr-3 py-3 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="you@example.com"
                   required
@@ -220,6 +223,9 @@ export default function RegisterPage() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   onFocus={() => setShowPasswordRequirements(true)}
                   onBlur={() => setShowPasswordRequirements(false)}
+                  aria-required="true"
+                  aria-invalid={formData.password ? !passwordValidation.isValid : undefined}
+                  aria-describedby="password-requirements"
                   className={`w-full pl-10 pr-3 py-3 border rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent ${
                     formData.password && !passwordValidation.isValid
                       ? 'border-amber-500'
@@ -234,23 +240,27 @@ export default function RegisterPage() {
               </div>
               {/* Password requirements */}
               {(showPasswordRequirements || formData.password) && (
-                <div className="mt-2 p-3 bg-luxury-black/50 border border-gray-800 rounded-soft text-sm">
+                <div id="password-requirements" className="mt-2 p-3 bg-luxury-black/50 border border-gray-800 rounded-soft text-sm" aria-live="polite">
                   <p className="font-medium text-gray-300 mb-2">Password must have:</p>
-                  <ul className="space-y-1">
+                  <ul className="space-y-1" role="list">
                     <li className={`flex items-center ${passwordValidation.checks.length ? 'text-green-400' : 'text-gray-500'}`}>
-                      {passwordValidation.checks.length ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      {passwordValidation.checks.length ? <CheckCircle className="h-4 w-4 mr-2" aria-hidden="true" /> : <AlertCircle className="h-4 w-4 mr-2" aria-hidden="true" />}
+                      <span className="sr-only">{passwordValidation.checks.length ? 'Complete' : 'Incomplete'}:</span>
                       At least 8 characters
                     </li>
                     <li className={`flex items-center ${passwordValidation.checks.uppercase ? 'text-green-400' : 'text-gray-500'}`}>
-                      {passwordValidation.checks.uppercase ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      {passwordValidation.checks.uppercase ? <CheckCircle className="h-4 w-4 mr-2" aria-hidden="true" /> : <AlertCircle className="h-4 w-4 mr-2" aria-hidden="true" />}
+                      <span className="sr-only">{passwordValidation.checks.uppercase ? 'Complete' : 'Incomplete'}:</span>
                       One uppercase letter
                     </li>
                     <li className={`flex items-center ${passwordValidation.checks.lowercase ? 'text-green-400' : 'text-gray-500'}`}>
-                      {passwordValidation.checks.lowercase ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      {passwordValidation.checks.lowercase ? <CheckCircle className="h-4 w-4 mr-2" aria-hidden="true" /> : <AlertCircle className="h-4 w-4 mr-2" aria-hidden="true" />}
+                      <span className="sr-only">{passwordValidation.checks.lowercase ? 'Complete' : 'Incomplete'}:</span>
                       One lowercase letter
                     </li>
                     <li className={`flex items-center ${passwordValidation.checks.number ? 'text-green-400' : 'text-gray-500'}`}>
-                      {passwordValidation.checks.number ? <CheckCircle className="h-4 w-4 mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
+                      {passwordValidation.checks.number ? <CheckCircle className="h-4 w-4 mr-2" aria-hidden="true" /> : <AlertCircle className="h-4 w-4 mr-2" aria-hidden="true" />}
+                      <span className="sr-only">{passwordValidation.checks.number ? 'Complete' : 'Incomplete'}:</span>
                       One number
                     </li>
                   </ul>
@@ -261,6 +271,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading || !passwordValidation.isValid || !formData.email || !formData.fullName}
+              aria-busy={loading}
               className="w-full bg-gold-500 text-luxury-black font-semibold py-3 rounded-soft hover:bg-gold-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t('auth.creating_account') : t('auth.create_account')}

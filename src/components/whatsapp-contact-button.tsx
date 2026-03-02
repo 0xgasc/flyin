@@ -2,6 +2,7 @@
 
 import { MessageCircle } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { config } from '@/lib/config'
 import { format } from 'date-fns'
 import { es as esLocale, enUS as enLocale } from 'date-fns/locale'
 
@@ -25,8 +26,6 @@ interface WhatsAppContactButtonProps {
   /** Override target phone (e.g. admin messaging a client directly) */
   targetPhone?: string
 }
-
-const WHATSAPP_PHONE = '50255507700' // +502 5550-7700
 
 export function WhatsAppContactButton({ booking, variant = 'button', className = '', targetPhone }: WhatsAppContactButtonProps) {
   const { locale } = useTranslation()
@@ -98,7 +97,7 @@ My question is: `
 
   const handleClick = () => {
     const message = encodeURIComponent(generateMessage())
-    const phone = targetPhone ? targetPhone.replace(/\D/g, '') : WHATSAPP_PHONE
+    const phone = targetPhone ? targetPhone.replace(/\D/g, '') : config.branding.whatsappPhone
     const url = `https://wa.me/${phone}?text=${message}`
     window.open(url, '_blank', 'noopener,noreferrer')
   }
@@ -234,7 +233,7 @@ export function SimpleWhatsAppButton({ message, variant = 'button', className = 
 
   const handleClick = () => {
     const finalMessage = encodeURIComponent(message || defaultMessage)
-    const url = `https://wa.me/${WHATSAPP_PHONE}?text=${finalMessage}`
+    const url = `https://wa.me/${config.branding.whatsappPhone}?text=${finalMessage}`
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 

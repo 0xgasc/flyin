@@ -194,6 +194,22 @@
     @apply w-8 h-8 border-[3px] border-current border-t-transparent rounded-full animate-spin;
   }
 
+  /* Hide scrollbar utility for horizontal scroll areas */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-area-inset {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
 }
 
 

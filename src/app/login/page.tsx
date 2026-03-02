@@ -5,10 +5,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { login } from '@/lib/auth-client'
+import { config } from '@/lib/config'
 import { useTranslation } from '@/lib/i18n'
 import { Mail, Lock } from 'lucide-react'
-
-const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
+import { logger } from '@/lib/logger'
+import { getErrorMessage } from '@/types/api.types'
 
 // Validate redirect URL to prevent open redirect attacks
 const getSafeRedirect = (redirect: string | null): string => {
@@ -59,9 +60,9 @@ function LoginContent() {
       await new Promise(resolve => setTimeout(resolve, 150))
 
       window.location.replace(targetUrl)
-    } catch (error: any) {
-      console.error('Login error:', error)
-      setError(error.message || 'Failed to login')
+    } catch (error) {
+      logger.error('Login error:', error)
+      setError(getErrorMessage(error))
       setLoading(false)
     }
   }
@@ -72,7 +73,7 @@ function LoginContent() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
             <Image
-              src={LOGO_URL}
+              src={config.branding.logoUrl}
               alt="FlyInGuate"
               width={200}
               height={70}
@@ -87,7 +88,7 @@ function LoginContent() {
         <div className="bg-luxury-charcoal border border-gray-800 rounded-soft p-6 shadow-luxury">
           <form onSubmit={handleLogin} className="space-y-6">
             {error && (
-              <div className="bg-red-900/30 border border-red-800 text-red-400 px-4 py-3 rounded-soft text-sm">
+              <div className="bg-red-900/30 border border-red-800 text-red-400 px-4 py-3 rounded-soft text-sm" role="alert">
                 {error}
               </div>
             )}
@@ -103,6 +104,7 @@ function LoginContent() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  aria-required="true"
                   className="w-full pl-10 pr-3 py-3 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="you@example.com"
                   required
@@ -122,6 +124,7 @@ function LoginContent() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  aria-required="true"
                   className="w-full pl-10 pr-3 py-3 border border-gray-700 rounded-soft bg-luxury-black text-white placeholder-gray-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                   placeholder="••••••••"
                   required
@@ -133,6 +136,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
+              aria-busy={loading}
               className="w-full bg-gold-500 text-luxury-black font-semibold py-3 rounded-soft hover:bg-gold-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t('auth.signing_in') : t('auth.sign_in')}

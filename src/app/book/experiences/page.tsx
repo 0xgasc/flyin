@@ -79,6 +79,14 @@ function BookingCard({
   const [showPhoneGate, setShowPhoneGate] = useState(false)
   const [phoneInput, setPhoneInput] = useState('')
   const [phoneSaving, setPhoneSaving] = useState(false)
+  const [availableAddons, setAvailableAddons] = useState<{ id: string; name: string; description: string; price: number; category: string }[]>([])
+  const [selectedAddons, setSelectedAddons] = useState<Record<string, number>>({}) // addonId -> quantity
+
+  useEffect(() => {
+    fetch('/api/addons').then(r => r.json()).then(d => {
+      if (d.success && d.addons) setAvailableAddons(d.addons)
+    }).catch(() => {})
+  }, [])
 
   const getDisplayName = () => {
     return locale === 'es' && experience.name_es ? experience.name_es : experience.name
@@ -101,8 +109,10 @@ function BookingCard({
     return experience.base_price * passengers
   }
 
-  const totalPrice = calculatePrice(passengerCount)
-  const pricePerPerson = Math.round(totalPrice / passengerCount)
+  const basePrice = calculatePrice(passengerCount)
+  const addonTotal = availableAddons.reduce((sum, a) => sum + (selectedAddons[a.id] || 0) * a.price, 0)
+  const totalPrice = basePrice + addonTotal
+  const pricePerPerson = Math.round(basePrice / passengerCount)
 
   const handlePassengerChange = (delta: number) => {
     const newCount = passengerCount + delta
@@ -156,10 +166,18 @@ function BookingCard({
           passenger_count: passengerCount,
           total_price: totalPrice,
           price_breakdown: {
-            base_price: totalPrice,
+            base_price: basePrice,
             passengers: passengerCount,
-            per_person: pricePerPerson
-          }
+            per_person: pricePerPerson,
+            addon_total: addonTotal
+          },
+          selected_addons: Object.entries(selectedAddons)
+            .filter(([, qty]) => qty > 0)
+            .map(([id, quantity]) => {
+              const addon = availableAddons.find(a => a.id === id)
+              return { addon_id: id, quantity, unit_price: addon?.price || 0 }
+            }),
+          addon_total_price: addonTotal
         })
       })
 
@@ -259,7 +277,10 @@ function BookingCard({
             ${totalPrice.toLocaleString()} <span className="text-sm font-normal text-slate-500">USD</span>
           </div>
           <div className="text-xs text-slate-400">
-            ${pricePerPerson} {locale === 'es' ? 'por persona' : 'per person'}
+            {addonTotal > 0
+              ? `$${basePrice.toLocaleString()} + $${addonTotal.toLocaleString()} ${locale === 'es' ? 'extras' : 'extras'}`
+              : `$${pricePerPerson} ${locale === 'es' ? 'por persona' : 'per person'}`
+            }
           </div>
         </div>
       </div>
@@ -320,6 +341,50 @@ function BookingCard({
           </select>
         </div>
       </div>
+
+      {/* Addons */}
+      {availableAddons.length > 0 && (
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">
+            {locale === 'es' ? 'Extras opcionales' : 'Optional extras'}
+          </label>
+          <div className="space-y-2">
+            {availableAddons.map(addon => {
+              const qty = selectedAddons[addon.id] || 0
+              return (
+                <div key={addon.id} className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-3 py-2">
+                  <div className="flex-1 min-w-0 mr-3">
+                    <div className="text-sm font-medium text-slate-800 truncate">{addon.name}</div>
+                    <div className="text-xs text-slate-400">${addon.price} {locale === 'es' ? 'c/u' : 'each'}</div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {qty > 0 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedAddons(prev => ({ ...prev, [addon.id]: Math.max(0, qty - 1) }))}
+                          className="w-7 h-7 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-700 text-sm font-bold"
+                        >−</button>
+                        <span className="w-5 text-center text-sm font-semibold text-slate-900">{qty}</span>
+                      </>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAddons(prev => ({ ...prev, [addon.id]: qty + 1 }))}
+                      className="w-7 h-7 rounded-full bg-slate-900 hover:bg-slate-700 flex items-center justify-center text-white text-sm font-bold"
+                    >+</button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {addonTotal > 0 && (
+            <div className="text-xs text-right text-slate-500 mt-1">
+              {locale === 'es' ? 'Extras:' : 'Extras:'} +${addonTotal.toLocaleString()}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Error */}
       {error && (

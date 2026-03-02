@@ -7,9 +7,8 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Menu, X, Home, User, Users, Calendar, Settings, LogOut, Globe, Briefcase, HelpCircle, Plane, MapPin, ChevronDown } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 import { logout } from '@/lib/auth-client'
+import { config } from '@/lib/config'
 import { useI18n, useTranslation } from '@/lib/i18n'
-
-const LOGO_URL = 'https://isteam.wsimg.com/ip/5d044532-96be-44dc-9d52-5a4c26b5b2e3/Logo_FlyInGuatemala_c03.png'
 
 interface NavItem {
   href: string
@@ -141,7 +140,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
             {/* Center: Logo - bigger, banner style */}
             <Link href="/" className="absolute left-1/2 transform -translate-x-1/2">
               <Image
-                src={LOGO_URL}
+                src={config.branding.logoUrl}
                 alt="FlyInGuate"
                 width={200}
                 height={60}
@@ -190,7 +189,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
               {/* Center: Logo */}
               <Link href="/" className="flex-shrink-0 mx-12">
                 <Image
-                  src={LOGO_URL}
+                  src={config.branding.logoUrl}
                   alt="FlyInGuate"
                   width={200}
                   height={60}
@@ -321,7 +320,7 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
           {/* Menu header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-800">
             <Image
-              src={LOGO_URL}
+              src={config.branding.logoUrl}
               alt="FlyInGuate"
               width={120}
               height={40}
@@ -348,30 +347,44 @@ export function MobileNav({ title = 'FlyInGuate', showBackButton = false, custom
 
           {/* Nav items */}
           <div className="flex-1 overflow-y-auto py-2">
-            {navItems.filter(item => item.show).map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 transition-colors"
-              >
-                <span className="text-gray-400">{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {navItems.filter(item => item.show).map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 transition-colors border-l-2 ${
+                    isActive
+                      ? 'bg-gray-800 text-gold-400 border-gold-500'
+                      : 'border-transparent hover:bg-gray-800 text-white'
+                  }`}
+                >
+                  <span className={isActive ? 'text-gold-400' : 'text-gray-400'}>{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              )
+            })}
 
             {/* Additional items passed by page */}
-            {additionalMobileItems.filter(item => item.show !== false).map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 transition-colors"
-              >
-                <span className="text-gray-400">{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {additionalMobileItems.filter(item => item.show !== false).map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 transition-colors border-l-2 ${
+                    isActive
+                      ? 'bg-gray-800 text-gold-400 border-gold-500'
+                      : 'border-transparent hover:bg-gray-800 text-white'
+                  }`}
+                >
+                  <span className={isActive ? 'text-gold-400' : 'text-gray-400'}>{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              )
+            })}
 
             <div className="my-2 border-t border-gray-800" />
 
