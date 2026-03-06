@@ -346,12 +346,20 @@ export function ExperienceBookingModal({ experience, isOpen, onClose, onSignUpRe
 
           {/* Price Display */}
           <div className="bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg p-4 mb-5 text-center">
-            <div className="text-3xl font-bold text-gray-900">
-              ${totalPrice.toLocaleString()} <span className="text-lg font-normal">USD</span>
-            </div>
-            <div className="text-sm text-gray-800">
-              (${pricePerPerson} {locale === 'es' ? 'por persona' : 'per person'})
-            </div>
+            {totalPrice > 0 ? (
+              <>
+                <div className="text-3xl font-bold text-gray-900">
+                  ${totalPrice.toLocaleString()} <span className="text-lg font-normal">USD</span>
+                </div>
+                <div className="text-sm text-gray-800">
+                  (${pricePerPerson} {locale === 'es' ? 'por persona' : 'per person'})
+                </div>
+              </>
+            ) : (
+              <div className="text-xl font-bold text-gray-900">
+                {locale === 'es' ? 'Contáctenos para cotización' : 'Contact us for a quote'}
+              </div>
+            )}
           </div>
 
           {/* Date and Time */}
@@ -396,12 +404,14 @@ export function ExperienceBookingModal({ experience, isOpen, onClose, onSignUpRe
           <div className="flex flex-col gap-3">
             <button
               onClick={handleContinueBooking}
-              disabled={isSubmitting}
+              disabled={isSubmitting || totalPrice === 0}
               className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting
                 ? (locale === 'es' ? 'Procesando...' : 'Processing...')
-                : (locale === 'es' ? 'Continuar Reserva' : 'Continue Booking')
+                : totalPrice === 0
+                  ? (locale === 'es' ? 'Contáctenos' : 'Contact Us')
+                  : (locale === 'es' ? 'Continuar Reserva' : 'Continue Booking')
               }
             </button>
             <a

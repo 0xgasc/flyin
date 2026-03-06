@@ -273,15 +273,23 @@ function BookingCard({
       {/* Price Display */}
       <div className="bg-white rounded-lg p-3 border border-slate-200">
         <div className="text-center">
-          <div className="text-xl font-bold text-slate-900">
-            ${totalPrice.toLocaleString()} <span className="text-sm font-normal text-slate-500">USD</span>
-          </div>
-          <div className="text-xs text-slate-400">
-            {addonTotal > 0
-              ? `$${basePrice.toLocaleString()} + $${addonTotal.toLocaleString()} ${locale === 'es' ? 'extras' : 'extras'}`
-              : `$${pricePerPerson} ${locale === 'es' ? 'por persona' : 'per person'}`
-            }
-          </div>
+          {totalPrice > 0 ? (
+            <>
+              <div className="text-xl font-bold text-slate-900">
+                ${totalPrice.toLocaleString()} <span className="text-sm font-normal text-slate-500">USD</span>
+              </div>
+              <div className="text-xs text-slate-400">
+                {addonTotal > 0
+                  ? `$${basePrice.toLocaleString()} + $${addonTotal.toLocaleString()} ${locale === 'es' ? 'extras' : 'extras'}`
+                  : `$${pricePerPerson} ${locale === 'es' ? 'por persona' : 'per person'}`
+                }
+              </div>
+            </>
+          ) : (
+            <div className="text-base font-bold text-slate-900">
+              {locale === 'es' ? 'Contáctenos para cotización' : 'Contact us for a quote'}
+            </div>
+          )}
         </div>
       </div>
 
@@ -397,12 +405,14 @@ function BookingCard({
       <div className="flex gap-2">
         <button
           onClick={handleBook}
-          disabled={isSubmitting}
+          disabled={isSubmitting || totalPrice === 0}
           className="flex-1 min-h-[44px] py-2.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 active:scale-[0.98]"
         >
           {isSubmitting
             ? (locale === 'es' ? 'Procesando...' : 'Processing...')
-            : (locale === 'es' ? 'Confirmar Reserva' : 'Confirm Booking')
+            : totalPrice === 0
+              ? (locale === 'es' ? 'Contáctenos' : 'Contact Us')
+              : (locale === 'es' ? 'Confirmar Reserva' : 'Confirm Booking')
           }
         </button>
         <button
@@ -720,9 +730,9 @@ export default function BookExperiencesPage() {
                         </div>
 
                         {/* Pricing Tiers - Display like in screenshot */}
-                        {pricingTiers && pricingTiers.length > 0 ? (
+                        {pricingTiers && pricingTiers.filter(t => t.price > 0).length > 0 ? (
                           <div className="space-y-0.5 mb-3 text-xs">
-                            {pricingTiers.map((tier, idx) => (
+                            {pricingTiers.filter(tier => tier.price > 0).map((tier, idx) => (
                               <div key={idx} className="flex justify-between">
                                 <span className="text-slate-900 font-medium">
                                   $ {tier.price.toLocaleString()} USD
