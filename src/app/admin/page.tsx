@@ -85,6 +85,7 @@ interface Booking {
   selected_addons?: any[]
   addon_total_price?: number
   helicopter_id?: string | null
+  aircraft_preference?: string | null
   return_date?: string | null
   return_time?: string | null
   is_round_trip?: boolean
@@ -330,6 +331,7 @@ export default function AdminDashboard() {
           selected_addons: b.selected_addons,
           addon_total_price: b.addon_total_price,
           helicopter_id: b.helicopter_id,
+          aircraft_preference: b.aircraft_preference,
           return_date: b.return_date,
           return_time: b.return_time,
           is_round_trip: b.is_round_trip,
@@ -2024,6 +2026,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                             {booking.pilot && (
                               <p><span className="font-medium">Pilot:</span> {booking.pilot?.full_name || 'N/A'}</p>
                             )}
+                            {booking.aircraft_preference && (
+                              <p><span className="font-medium">Aircraft Pref:</span> {HELICOPTER_FLEET.find(h => h.id === booking.aircraft_preference)?.name || booking.aircraft_preference}</p>
+                            )}
                             {booking.notes && (
                               <p><span className="font-medium">Notes:</span> {booking.notes}</p>
                             )}
@@ -3394,7 +3399,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <span> | Add-ons: ${selectedBooking.addon_total_price} | Total: ${selectedBooking.total_price}</span>
                 )}
               </p>
-              
+              {selectedBooking.aircraft_preference && (
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Aircraft Preference: <span className="font-medium text-primary-600 dark:text-gold-400">{HELICOPTER_FLEET.find(h => h.id === selectedBooking.aircraft_preference)?.name || selectedBooking.aircraft_preference}</span>
+                </p>
+              )}
+
               {/* Passenger Details */}
               {selectedBooking.passenger_details && selectedBooking.passenger_details.length > 0 && (
                 <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">

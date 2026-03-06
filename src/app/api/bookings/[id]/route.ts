@@ -93,6 +93,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
           full_name: b.pilotId.fullName
         } : null,
         helicopter_id: b.helicopterId,
+        aircraft_preference: b.aircraftPreference,
         admin_notes: b.adminNotes,
         revision_requested: b.revisionRequested,
         revision_notes: b.revisionNotes,

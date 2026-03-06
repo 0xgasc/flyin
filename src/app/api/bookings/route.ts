@@ -131,6 +131,7 @@ export async function GET(request: NextRequest) {
         full_name: (b.pilotId as any).fullName
       } : null,
       helicopter_id: b.helicopterId,
+      aircraft_preference: b.aircraftPreference,
       admin_notes: b.adminNotes,
       revision_requested: b.revisionRequested,
       revision_notes: b.revisionNotes,
@@ -191,7 +192,8 @@ export async function POST(request: NextRequest) {
       addon_total_price,
       notes,
       total_price,
-      price_breakdown
+      price_breakdown,
+      aircraft_preference
     } = body
 
     // Validate required fields
@@ -245,6 +247,7 @@ export async function POST(request: NextRequest) {
       notes: notes || null,
       totalPrice: total_price,
       priceBreakdown: price_breakdown || null,
+      aircraftPreference: aircraft_preference || null,
       status: 'pending',
       paymentStatus: 'pending'
     })
@@ -267,6 +270,7 @@ export async function POST(request: NextRequest) {
         notes: booking.notes,
         total_price: booking.totalPrice,
         price_breakdown: booking.priceBreakdown || null,
+        aircraft_preference: booking.aircraftPreference,
         payment_status: booking.paymentStatus,
         created_at: booking.createdAt
       }

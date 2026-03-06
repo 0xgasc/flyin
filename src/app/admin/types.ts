@@ -43,6 +43,7 @@ export interface Booking {
   }> | null
   addon_total_price?: number
   helicopter_id?: string | null
+  aircraft_preference?: string | null
   return_date?: string | null
   return_time?: string | null
   is_round_trip?: boolean

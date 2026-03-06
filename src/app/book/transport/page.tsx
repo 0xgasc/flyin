@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { login as authLogin, register as authRegister } from '@/lib/auth-client'
-import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid, Smartphone, ShieldCheck, Mail, Lock } from 'lucide-react'
+import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid, Smartphone, ShieldCheck, Mail, Lock, Plane, Check } from 'lucide-react'
 import { MobileNav } from '@/components/mobile-nav'
 import { useTranslation } from '@/lib/i18n'
 import { format } from 'date-fns'
-// Helicopter selection moved to admin assignment workflow
+import { HELICOPTER_FLEET } from '@/types/helicopters'
 import { getDistanceBetweenLocations, calculateTransportPrice, LOCATION_COORDINATES } from '@/lib/distance-calculator'
 import dynamic from 'next/dynamic'
 
@@ -175,6 +175,7 @@ export default function BookTransportPage() {
   const [showDestinationModal, setShowDestinationModal] = useState(false)
   const [modalType, setModalType] = useState<'from' | 'to'>('from')
   const [mapCollapsed, setMapCollapsed] = useState(false)
+  const [selectedAircraft, setSelectedAircraft] = useState('')
   const [showPhoneGate, setShowPhoneGate] = useState(false)
   const [phoneInput, setPhoneInput] = useState('')
   const [phoneSaving, setPhoneSaving] = useState(false)
@@ -215,6 +216,20 @@ export default function BookTransportPage() {
       ...(passengers ? { passengers: Math.min(6, Math.max(1, parseInt(passengers) || 1)) } : {}),
     }))
   }, [])
+
+  // Filter aircraft by passenger capacity and auto-select smallest suitable one
+  const availableAircraft = HELICOPTER_FLEET.filter(h => h.is_available && h.capacity >= formData.passengers)
+  useEffect(() => {
+    const suitable = HELICOPTER_FLEET.filter(h => h.is_available && h.capacity >= formData.passengers)
+    if (suitable.length > 0) {
+      // Auto-select the smallest suitable aircraft (most cost-effective)
+      if (!selectedAircraft || !suitable.find(h => h.id === selectedAircraft)) {
+        setSelectedAircraft(suitable[0].id)
+      }
+    } else {
+      setSelectedAircraft('')
+    }
+  }, [formData.passengers, selectedAircraft])
 
   // Auto-collapse map when both locations are selected
   useEffect(() => {
@@ -300,9 +315,9 @@ export default function BookTransportPage() {
 
     try {
       const distance = getDistanceBetweenLocations(fromLoc, toLoc)
-      // Use standard rate since helicopter selection is now handled by admin
-      const standardRate = 600 // Standard hourly rate for pricing estimates
-      const pricing = calculateTransportPrice(distance, standardRate, formData.passengers)
+      const aircraft = HELICOPTER_FLEET.find(h => h.id === selectedAircraft)
+      const hourlyRate = aircraft?.hourly_rate || 600
+      const pricing = calculateTransportPrice(distance, hourlyRate, formData.passengers)
       
       // Apply round trip multiplier (same day round trip is 1.8x, different day is 2x)
       if (formData.isRoundTrip && formData.date && formData.returnDate) {
@@ -330,7 +345,7 @@ export default function BookTransportPage() {
       setPriceBreakdown(null)
       return 0
     }
-  }, [formData.fromLocation, formData.toLocation, formData.fromCustom, formData.toCustom, formData.passengers, formData.isRoundTrip, formData.date, formData.returnDate])
+  }, [formData.fromLocation, formData.toLocation, formData.fromCustom, formData.toCustom, formData.passengers, formData.isRoundTrip, formData.date, formData.returnDate, selectedAircraft])
 
   const [price, setPrice] = useState(0)
 
@@ -410,13 +425,20 @@ export default function BookTransportPage() {
           passenger_count: formData.passengers,
           notes: formData.notes,
           total_price: price,
+          aircraft_preference: selectedAircraft || null,
           price_breakdown: priceBreakdown ? {
             distance: priceBreakdown.distance,
             flightTime: priceBreakdown.flightTime,
             basePrice: priceBreakdown.basePrice,
             passengerFee: priceBreakdown.passengerFee || 0,
             multiplier: priceBreakdown.multiplier || null,
-            isRoundTrip: priceBreakdown.isRoundTrip || false
+            isRoundTrip: priceBreakdown.isRoundTrip || false,
+            aircraftPreference: selectedAircraft ? {
+              id: selectedAircraft,
+              name: HELICOPTER_FLEET.find(h => h.id === selectedAircraft)?.name || '',
+              model: HELICOPTER_FLEET.find(h => h.id === selectedAircraft)?.model || '',
+              hourlyRate: HELICOPTER_FLEET.find(h => h.id === selectedAircraft)?.hourly_rate || 0
+            } : null
           } : null
         })
       })
@@ -922,6 +944,77 @@ export default function BookTransportPage() {
             </div>
           </div>
 
+          {/* Aircraft Selection */}
+          <div className="card-luxury space-y-6">
+            <h2 className="text-xl font-semibold flex items-center">
+              <Plane className="h-5 w-5 mr-2 text-primary-600" />
+              {locale === 'es' ? 'Selecciona tu aeronave' : 'Select Your Aircraft'}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 -mt-4">
+              {locale === 'es'
+                ? `Modelos disponibles para ${formData.passengers} ${formData.passengers === 1 ? 'pasajero' : 'pasajeros'}. Sujeto a disponibilidad.`
+                : `Available models for ${formData.passengers} ${formData.passengers === 1 ? 'passenger' : 'passengers'}. Subject to availability.`}
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              {availableAircraft.map((aircraft) => (
+                <button
+                  key={aircraft.id}
+                  type="button"
+                  onClick={() => setSelectedAircraft(aircraft.id)}
+                  className={`relative text-left p-4 rounded-lg border-2 transition-all ${
+                    selectedAircraft === aircraft.id
+                      ? 'border-primary-500 dark:border-gold-400 bg-primary-50 dark:bg-gold-500/10 shadow-md'
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+                  }`}
+                >
+                  {selectedAircraft === aircraft.id && (
+                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary-500 dark:bg-gold-500 flex items-center justify-center">
+                      <Check className="h-4 w-4 text-white" />
+                    </div>
+                  )}
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Plane className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                        {aircraft.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {aircraft.model}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                        {aircraft.description}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {aircraft.features.map((feat, i) => (
+                          <span
+                            key={i}
+                            className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                          >
+                            {feat}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {availableAircraft.length === 0 && (
+              <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+                <Plane className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">
+                  {locale === 'es'
+                    ? 'No hay aeronaves disponibles para este número de pasajeros. Contáctenos para opciones especiales.'
+                    : 'No aircraft available for this passenger count. Contact us for special options.'}
+                </p>
+              </div>
+            )}
+          </div>
+
           <div className="card-luxury bg-primary-50 dark:bg-gray-900 border-primary-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
@@ -937,6 +1030,12 @@ export default function BookTransportPage() {
             
             {priceBreakdown && (
               <div className="space-y-2 text-sm text-primary-800 dark:text-gray-300 mb-4">
+                {selectedAircraft && (
+                  <div className="flex justify-between">
+                    <span>{locale === 'es' ? 'Aeronave' : 'Aircraft'}:</span>
+                    <span className="font-medium">{HELICOPTER_FLEET.find(h => h.id === selectedAircraft)?.name || ''}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>{t('pricing.distance')}:</span>
                   <span>{priceBreakdown.distance} km {priceBreakdown.isRoundTrip ? t('booking.form.each_way') : ''}</span>

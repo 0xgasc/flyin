@@ -48,6 +48,7 @@ export interface IBooking extends Document {
   paymentStatus: 'pending' | 'processing' | 'paid' | 'refunded'
   pilotId: mongoose.Types.ObjectId | null
   helicopterId: string | null
+  aircraftPreference: string | null
   adminNotes: string | null
   revisionRequested: boolean
   revisionNotes: string | null
@@ -174,6 +175,10 @@ const bookingSchema = new Schema<IBooking>({
     default: null
   },
   helicopterId: {
+    type: String,
+    default: null
+  },
+  aircraftPreference: {
     type: String,
     default: null
   },
