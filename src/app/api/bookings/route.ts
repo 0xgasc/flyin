@@ -11,7 +11,7 @@ import mongoose from 'mongoose'
 void Experience
 
 // Valid enum values for query parameter validation (prevents NoSQL injection)
-const VALID_STATUSES = ['pending', 'approved', 'assigned', 'accepted', 'completed', 'cancelled'] as const
+const VALID_STATUSES = ['pending', 'approved', 'assigned', 'accepted', 'completed', 'cancelled', 'needs_revision'] as const
 const VALID_BOOKING_TYPES = ['transport', 'experience'] as const
 
 type BookingStatus = typeof VALID_STATUSES[number]

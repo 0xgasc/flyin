@@ -273,11 +273,11 @@ function BookingCard({
 
   if (showPhoneGate) {
     return (
-      <div className="border-t border-slate-200 bg-slate-50 p-5 space-y-4">
-        <p className="text-sm font-semibold text-slate-800">
+      <div className="border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 p-5 space-y-4">
+        <p className="text-sm font-semibold text-slate-800 dark:text-gray-200">
           {locale === 'es' ? '¿Tu número de WhatsApp?' : 'Your WhatsApp number?'}
         </p>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-gray-400">
           {locale === 'es'
             ? 'Lo necesitamos para enviarte confirmaciones de tu vuelo.'
             : 'We need it to send you your flight confirmations.'}
@@ -302,7 +302,7 @@ function BookingCard({
           </button>
           <button
             onClick={() => setShowPhoneGate(false)}
-            className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700"
+            className="px-4 py-2 text-sm text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200"
           >
             {locale === 'es' ? 'Atrás' : 'Back'}
           </button>
@@ -312,16 +312,16 @@ function BookingCard({
   }
 
   return (
-    <div className="border-t border-slate-200 bg-slate-50 p-4 space-y-3">
+    <div className="border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 p-4 space-y-3">
       {/* Price Display */}
-      <div className="bg-white rounded-lg p-3 border border-slate-200">
+      <div className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-slate-200 dark:border-gray-600">
         <div className="text-center">
           {totalPrice > 0 ? (
             <>
-              <div className="text-xl font-bold text-slate-900">
+              <div className="text-xl font-bold text-slate-900 dark:text-white">
                 ${totalPrice.toLocaleString()} <span className="text-sm font-normal text-slate-500">USD</span>
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-slate-400 dark:text-gray-500">
                 {addonTotal > 0
                   ? `$${basePrice.toLocaleString()} + $${addonTotal.toLocaleString()} ${locale === 'es' ? 'extras' : 'extras'}`
                   : `$${pricePerPerson} ${locale === 'es' ? 'por persona' : 'per person'}`
@@ -329,7 +329,7 @@ function BookingCard({
               </div>
             </>
           ) : (
-            <div className="text-base font-bold text-slate-900">
+            <div className="text-base font-bold text-slate-900 dark:text-white">
               {locale === 'es' ? 'Contáctenos para cotización' : 'Contact us for a quote'}
             </div>
           )}
@@ -338,24 +338,24 @@ function BookingCard({
 
       {/* Passengers */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1.5">
+        <label className="block text-xs font-medium text-slate-600 dark:text-gray-300 mb-1.5">
           {locale === 'es' ? 'Pasajeros' : 'Passengers'}
         </label>
-        <div className="flex items-center justify-center gap-4 bg-white rounded-lg border border-slate-200 p-2">
+        <div className="flex items-center justify-center gap-4 bg-white dark:bg-gray-700 rounded-lg border border-slate-200 dark:border-gray-600 p-2">
           <button
             onClick={() => handlePassengerChange(-1)}
             disabled={passengerCount <= experience.min_passengers}
-            className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
+            className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-gray-600 hover:bg-slate-300 dark:hover:bg-gray-500 active:bg-slate-400 text-slate-700 dark:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
           >
             <Minus className="h-5 w-5" />
           </button>
-          <span className="text-xl font-bold text-slate-900 min-w-[2.5rem] text-center">
+          <span className="text-xl font-bold text-slate-900 dark:text-white min-w-[2.5rem] text-center">
             {passengerCount}
           </span>
           <button
             onClick={() => handlePassengerChange(1)}
             disabled={passengerCount >= effectiveMaxPassengers}
-            className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
+            className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-gray-600 hover:bg-slate-300 dark:hover:bg-gray-500 active:bg-slate-400 text-slate-700 dark:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -372,7 +372,7 @@ function BookingCard({
       {/* Date & Time */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">
+          <label className="block text-xs font-medium text-slate-600 dark:text-gray-300 mb-1.5">
             {locale === 'es' ? 'Fecha' : 'Date'}
           </label>
           <input
@@ -380,17 +380,17 @@ function BookingCard({
             value={scheduledDate}
             onChange={(e) => setScheduledDate(e.target.value)}
             min={today}
-            className="w-full min-h-[44px] px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full min-h-[44px] px-3 py-2.5 border border-slate-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">
+          <label className="block text-xs font-medium text-slate-600 dark:text-gray-300 mb-1.5">
             {locale === 'es' ? 'Hora' : 'Time'}
           </label>
           <select
             value={scheduledTime}
             onChange={(e) => setScheduledTime(e.target.value)}
-            className="w-full min-h-[44px] px-3 py-2.5 border border-slate-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-no-repeat bg-right"
+            className="w-full min-h-[44px] px-3 py-2.5 border border-slate-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-no-repeat bg-right"
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M3 5l3 3 3-3'/%3E%3C/svg%3E")`, backgroundPosition: 'right 12px center' }}
           >
             {timeOptions.map(time => (
@@ -403,17 +403,17 @@ function BookingCard({
       {/* Addons */}
       {availableAddons.length > 0 && (
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1.5">
+          <label className="block text-xs font-medium text-slate-600 dark:text-gray-300 mb-1.5">
             {locale === 'es' ? 'Extras opcionales' : 'Optional extras'}
           </label>
           <div className="space-y-2">
             {availableAddons.map(addon => {
               const qty = selectedAddons[addon.id] || 0
               return (
-                <div key={addon.id} className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-3 py-2">
+                <div key={addon.id} className="flex items-center justify-between bg-white dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2">
                   <div className="flex-1 min-w-0 mr-3">
-                    <div className="text-sm font-medium text-slate-800 truncate">{addon.name}</div>
-                    <div className="text-xs text-slate-400">${addon.price} {locale === 'es' ? 'c/u' : 'each'}</div>
+                    <div className="text-sm font-medium text-slate-800 dark:text-gray-200 truncate">{addon.name}</div>
+                    <div className="text-xs text-slate-400 dark:text-gray-500">${addon.price} {locale === 'es' ? 'c/u' : 'each'}</div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {qty > 0 && (
@@ -421,15 +421,15 @@ function BookingCard({
                         <button
                           type="button"
                           onClick={() => setSelectedAddons(prev => ({ ...prev, [addon.id]: Math.max(0, qty - 1) }))}
-                          className="w-7 h-7 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-700 text-sm font-bold"
+                          className="w-7 h-7 rounded-full bg-slate-200 dark:bg-gray-600 hover:bg-slate-300 dark:hover:bg-gray-500 flex items-center justify-center text-slate-700 text-sm font-bold"
                         >−</button>
-                        <span className="w-5 text-center text-sm font-semibold text-slate-900">{qty}</span>
+                        <span className="w-5 text-center text-sm font-semibold text-slate-900 dark:text-white">{qty}</span>
                       </>
                     )}
                     <button
                       type="button"
                       onClick={() => setSelectedAddons(prev => ({ ...prev, [addon.id]: qty + 1 }))}
-                      className="w-7 h-7 rounded-full bg-slate-900 hover:bg-slate-700 flex items-center justify-center text-white text-sm font-bold"
+                      className="w-7 h-7 rounded-full bg-slate-900 dark:bg-gold-500 hover:bg-slate-700 dark:hover:bg-gold-600 flex items-center justify-center text-white text-sm font-bold"
                     >+</button>
                   </div>
                 </div>
@@ -456,7 +456,7 @@ function BookingCard({
         <button
           onClick={handleBook}
           disabled={isSubmitting || totalPrice === 0}
-          className="flex-1 min-h-[44px] py-2.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 active:scale-[0.98]"
+          className="flex-1 min-h-[44px] py-2.5 bg-slate-900 dark:bg-gold-500 hover:bg-slate-800 dark:hover:bg-gold-600 active:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 active:scale-[0.98]"
         >
           {isSubmitting
             ? (locale === 'es' ? 'Procesando...' : 'Processing...')
@@ -467,7 +467,7 @@ function BookingCard({
         </button>
         <button
           onClick={onClose}
-          className="px-4 min-h-[44px] py-2.5 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors active:scale-[0.98]"
+          className="px-4 min-h-[44px] py-2.5 border border-slate-200 dark:border-gray-600 text-slate-600 dark:text-gray-400 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700 active:bg-slate-200 dark:active:bg-gray-600 transition-colors active:scale-[0.98]"
         >
           {locale === 'es' ? 'Cerrar' : 'Close'}
         </button>
@@ -657,16 +657,16 @@ export default function BookExperiencesPage() {
     : experiences.filter(exp => exp.category === selectedCategory)
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-luxury-black">
       <MobileNav />
 
       {/* Hero Section - Minimal like screenshot */}
-      <div className="bg-white border-b border-slate-200 py-6 md:py-8">
+      <div className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-800 py-6 md:py-8">
         <div className="container mx-auto px-4 md:px-6 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">
             {locale === 'es' ? 'Vive La Experiencia' : 'Live The Experience'}
           </h1>
-          <p className="text-slate-400 text-xs">
+          <p className="text-slate-400 dark:text-gray-500 text-xs">
             {locale === 'es'
               ? 'El cielo a hora del despegue quedará a tu elección.'
               : 'The sky at takeoff time will be your choice.'
@@ -698,8 +698,8 @@ export default function BookExperiencesPage() {
                 onClick={() => setSelectedCategory('all')}
                 className={`px-4 py-2 min-h-[44px] rounded-full text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   selectedCategory === 'all'
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300 active:bg-slate-100'
+                    ? 'bg-slate-900 dark:bg-gold-500 text-white'
+                    : 'bg-white dark:bg-gray-800 text-slate-500 dark:text-gray-400 border border-slate-200 dark:border-gray-700 hover:border-slate-300 dark:hover:border-gray-500 active:bg-slate-100 dark:active:bg-gray-700'
                 }`}
               >
                 {locale === 'es' ? 'Todas' : 'All'}
@@ -740,12 +740,12 @@ export default function BookExperiencesPage() {
                   return (
                     <div
                       key={experience.id}
-                      className={`bg-white rounded-xl border overflow-hidden transition-all duration-300 ${
-                        isExpanded ? 'border-slate-300 shadow-lg' : 'border-slate-200 hover:shadow-md'
+                      className={`bg-white dark:bg-gray-900 rounded-xl border overflow-hidden transition-all duration-300 ${
+                        isExpanded ? 'border-slate-300 dark:border-gray-600 shadow-lg' : 'border-slate-200 dark:border-gray-700 hover:shadow-md'
                       }`}
                     >
                       {/* Image Carousel */}
-                      <div className="aspect-[4/3] bg-slate-100 relative group">
+                      <div className="aspect-[4/3] bg-slate-100 dark:bg-gray-800 relative group">
                         {(() => {
                           const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images
                           const allImages: string[] = []
@@ -775,7 +775,7 @@ export default function BookExperiencesPage() {
                       <div className="p-4">
                         <div className="flex items-start justify-between gap-3 mb-2">
                           <div>
-                            <h3 className="text-sm font-semibold text-slate-900">
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                               {getDisplayName(experience)}
                               {experience.type === 'experience' && experience.duration_minutes && (
                                 <span className="text-slate-400 font-normal"> - {experience.duration_minutes} Min</span>
@@ -790,22 +790,22 @@ export default function BookExperiencesPage() {
                         {/* Price hint - details shown when booking */}
                         {hasValidPrice(experience) ? (
                           <div className="mb-3">
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs text-slate-500 dark:text-gray-400">
                               {locale === 'es' ? 'Desde' : 'From'}{' '}
                             </span>
-                            <span className="text-sm font-semibold text-slate-900">
+                            <span className="text-sm font-semibold text-slate-900 dark:text-white">
                               ${getDisplayPrice(experience).toLocaleString()} USD
                             </span>
                           </div>
                         ) : (
-                          <div className="mb-3 text-xs text-slate-400">
+                          <div className="mb-3 text-xs text-slate-400 dark:text-gray-500">
                             {locale === 'es' ? 'Cotización personalizada' : 'Custom quote'}
                           </div>
                         )}
 
                         {/* Includes */}
                         {includes && includes.length > 0 && (
-                          <ul className="space-y-0.5 mb-3 text-xs text-slate-500">
+                          <ul className="space-y-0.5 mb-3 text-xs text-slate-500 dark:text-gray-400">
                             {includes.slice(0, 3).map((item, idx) => (
                               <li key={idx} className="flex items-start gap-1.5">
                                 <Check className="h-3 w-3 text-slate-400 flex-shrink-0 mt-0.5" />

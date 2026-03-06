@@ -3417,11 +3417,20 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <div className="space-y-2">
                     {selectedBooking.passenger_details.map((passenger: any, index: number) => (
                       <div key={index} className="text-xs bg-white dark:bg-gray-800 rounded-none p-2 text-gray-900 dark:text-white">
-                        <div className="font-medium">{passenger.name} (Age: {passenger.age})</div>
+                        <div className="font-medium">
+                          {passenger.name} (Age: {passenger.age})
+                          {(passenger.weightLbs || passenger.weight_lbs) ? ` — ${passenger.weightLbs || passenger.weight_lbs} lb` : ''}
+                        </div>
                         {passenger.passport && <div>ID: {passenger.passport}</div>}
-                        {passenger.emergency_contact && <div>Emergency: {passenger.emergency_contact}</div>}
-                        {passenger.dietary_restrictions && <div>Dietary: {passenger.dietary_restrictions}</div>}
-                        {passenger.special_requests && <div>Special: {passenger.special_requests}</div>}
+                        {(passenger.emergencyContact || passenger.emergency_contact) && <div>Emergency: {passenger.emergencyContact || passenger.emergency_contact}</div>}
+                        {(passenger.baggageType || passenger.baggage_type) && (passenger.baggageType || passenger.baggage_type) !== 'none' && (
+                          <div>Baggage: {(passenger.baggageType || passenger.baggage_type).replace(/_/g, ' ')}
+                            {(passenger.baggageWeightLbs || passenger.baggage_weight_lbs) ? ` (~${passenger.baggageWeightLbs || passenger.baggage_weight_lbs} lb)` : ''}
+                          </div>
+                        )}
+                        {(passenger.baggageNotes || passenger.baggage_notes) && <div>Baggage notes: {passenger.baggageNotes || passenger.baggage_notes}</div>}
+                        {(passenger.dietaryRestrictions || passenger.dietary_restrictions) && <div>Dietary: {passenger.dietaryRestrictions || passenger.dietary_restrictions}</div>}
+                        {(passenger.specialRequests || passenger.special_requests) && <div>Special: {passenger.specialRequests || passenger.special_requests}</div>}
                       </div>
                     ))}
                   </div>
@@ -3435,8 +3444,8 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   <div className="space-y-1">
                     {selectedBooking.selected_addons.map((addon: any, index: number) => (
                       <div key={index} className="text-xs flex justify-between bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-none p-2">
-                        <span>{addon.addon_id} × {addon.quantity}</span>
-                        <span>${(addon.quantity * addon.unit_price).toFixed(2)}</span>
+                        <span>{addon.addonId || addon.addon_id} × {addon.quantity}</span>
+                        <span>${(addon.quantity * (addon.unitPrice || addon.unit_price || 0)).toFixed(2)}</span>
                       </div>
                     ))}
                   </div>

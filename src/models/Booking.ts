@@ -32,7 +32,7 @@ export interface IBooking extends Document {
   _id: mongoose.Types.ObjectId
   clientId: mongoose.Types.ObjectId
   bookingType: 'transport' | 'experience'
-  status: 'pending' | 'approved' | 'assigned' | 'accepted' | 'completed' | 'cancelled'
+  status: 'pending' | 'approved' | 'assigned' | 'accepted' | 'completed' | 'cancelled' | 'needs_revision'
   fromLocation: string | null
   toLocation: string | null
   experienceId: mongoose.Types.ObjectId | null
@@ -93,7 +93,7 @@ const bookingSchema = new Schema<IBooking>({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'assigned', 'accepted', 'completed', 'cancelled'],
+    enum: ['pending', 'approved', 'assigned', 'accepted', 'completed', 'cancelled', 'needs_revision'],
     default: 'pending'
   },
   fromLocation: {

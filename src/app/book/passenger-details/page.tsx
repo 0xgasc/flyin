@@ -55,10 +55,12 @@ function PassengerDetailsContent() {
   // State for actual booking data from database
   const [bookingData, setBookingData] = useState<{
     booking_id: string | null
+    booking_type: string
     passenger_count: number
     base_price: number // Actual price from database - NOT from URL
     from_location: string
     to_location: string
+    experience_name: string
     date: string
     time: string
   } | null>(null)
@@ -99,10 +101,12 @@ function PassengerDetailsContent() {
 
         setBookingData({
           booking_id: booking.id,
+          booking_type: booking.booking_type || 'transport',
           passenger_count: booking.passenger_count || 1,
           base_price: booking.total_price, // Use price from database, NOT URL
           from_location: booking.from_location || '',
           to_location: booking.to_location || '',
+          experience_name: booking.experience?.name || '',
           date: booking.scheduled_date || '',
           time: booking.scheduled_time || ''
         })
@@ -263,14 +267,35 @@ function PassengerDetailsContent() {
       const addonTotal = calculateAddonTotal()
       const grandTotal = bookingData.base_price + addonTotal
 
+      // Transform passenger fields from frontend snake_case to DB camelCase
+      const transformedPassengers = passengers.map(p => ({
+        name: p.name,
+        age: p.age,
+        weightLbs: p.weight_lbs,
+        passport: p.passport,
+        emergencyContact: [p.emergency_contact_name, p.emergency_contact_phone].filter(Boolean).join(' — '),
+        dietaryRestrictions: p.dietary_restrictions,
+        specialRequests: p.special_requests,
+        baggageType: p.baggage_type,
+        baggageWeightLbs: p.baggage_weight_lbs,
+        baggageNotes: p.baggage_notes
+      }))
+
+      // Transform addon fields from frontend snake_case to DB camelCase
+      const transformedAddons = selectedAddons.map(a => ({
+        addonId: a.addon_id,
+        quantity: a.quantity,
+        unitPrice: a.unit_price
+      }))
+
       // Update booking with passenger details and addons
       const response = await fetch(`/api/bookings/${bookingData.booking_id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          passenger_details: passengers,
-          selected_addons: selectedAddons,
+          passenger_details: transformedPassengers,
+          selected_addons: transformedAddons,
           addon_total_price: addonTotal,
           total_price: grandTotal // Calculated from database base_price, not URL
         })
@@ -363,7 +388,10 @@ function PassengerDetailsContent() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('passenger.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Flight: {bookingData.from_location} → {bookingData.to_location} on {bookingData.date} at {bookingData.time}
+            {bookingData.booking_type === 'experience'
+              ? `${bookingData.experience_name} — ${bookingData.date ? new Date(bookingData.date).toLocaleDateString() : ''} at ${bookingData.time}`
+              : `Flight: ${bookingData.from_location} → ${bookingData.to_location} — ${bookingData.date ? new Date(bookingData.date).toLocaleDateString() : ''} at ${bookingData.time}`
+            }
           </p>
         </div>
 

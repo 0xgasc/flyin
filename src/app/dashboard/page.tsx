@@ -35,15 +35,16 @@ interface Booking {
   revisionRequested?: boolean
   revisionNotes?: string | null
   priceBreakdown?: {
-    base_price?: number
+    // Support both camelCase (from DB) and snake_case (legacy)
+    base_price?: number; basePrice?: number
     passengers?: number
-    per_person?: number
+    per_person?: number; perPerson?: number
     distance?: number
-    flight_time?: number
-    passenger_fee?: number
+    flight_time?: number; flightTime?: number
+    passenger_fee?: number; passengerFee?: number
     multiplier?: number
-    is_round_trip?: boolean
-    addon_total?: number
+    is_round_trip?: boolean; isRoundTrip?: boolean
+    addon_total?: number; addonTotal?: number
   } | null
 }
 
@@ -396,6 +397,7 @@ export default function DashboardPage() {
       case 'confirmed': return 'bg-green-100 text-green-800'
       case 'completed': return 'bg-green-100 text-green-800'
       case 'cancelled': return 'bg-red-100 text-red-800'
+      case 'needs_revision': return 'bg-orange-100 text-orange-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
@@ -553,45 +555,53 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         {/* Price breakdown */}
-                        {booking.priceBreakdown && expandedPriceIds.has(booking.id) && (
+                        {booking.priceBreakdown && expandedPriceIds.has(booking.id) && (() => {
+                          const pb = booking.priceBreakdown!
+                          const basePrice = pb.basePrice ?? pb.base_price
+                          const perPerson = pb.perPerson ?? pb.per_person
+                          const passengerFee = pb.passengerFee ?? pb.passenger_fee
+                          const flightTime = pb.flightTime ?? pb.flight_time
+                          const addonTotal = pb.addonTotal ?? pb.addon_total
+                          const isRoundTrip = pb.isRoundTrip ?? pb.is_round_trip
+                          return (
                           <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-soft border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                            {booking.priceBreakdown.base_price !== undefined && (
+                            {basePrice !== undefined && (
                               <div className="flex justify-between">
                                 <span>{locale === 'es' ? 'Precio base' : 'Base price'}</span>
-                                <span>${booking.priceBreakdown.base_price.toLocaleString()}</span>
+                                <span>${basePrice.toLocaleString()}</span>
                               </div>
                             )}
-                            {booking.priceBreakdown.per_person !== undefined && booking.priceBreakdown.passengers && (
+                            {perPerson !== undefined && pb.passengers && (
                               <div className="flex justify-between">
-                                <span>{locale === 'es' ? 'Pasajeros' : 'Passengers'} ×{booking.priceBreakdown.passengers}</span>
-                                <span>${booking.priceBreakdown.per_person}/pax</span>
+                                <span>{locale === 'es' ? 'Pasajeros' : 'Passengers'} ×{pb.passengers}</span>
+                                <span>${perPerson}/pax</span>
                               </div>
                             )}
-                            {booking.priceBreakdown.passenger_fee !== undefined && booking.priceBreakdown.passenger_fee > 0 && (
+                            {passengerFee !== undefined && passengerFee > 0 && (
                               <div className="flex justify-between">
                                 <span>{locale === 'es' ? 'Tarifa por pasajero' : 'Passenger fee'}</span>
-                                <span>+${booking.priceBreakdown.passenger_fee.toLocaleString()}</span>
+                                <span>+${passengerFee.toLocaleString()}</span>
                               </div>
                             )}
-                            {booking.priceBreakdown.distance !== undefined && (
+                            {pb.distance !== undefined && (
                               <div className="flex justify-between">
                                 <span>{locale === 'es' ? 'Distancia' : 'Distance'}</span>
-                                <span>{booking.priceBreakdown.distance} km</span>
+                                <span>{pb.distance} km</span>
                               </div>
                             )}
-                            {booking.priceBreakdown.multiplier && booking.priceBreakdown.multiplier !== 1 && (
+                            {pb.multiplier && pb.multiplier !== 1 && (
                               <div className="flex justify-between">
                                 <span>{locale === 'es' ? 'Multiplicador' : 'Rate multiplier'}</span>
-                                <span>×{booking.priceBreakdown.multiplier}</span>
+                                <span>×{pb.multiplier}</span>
                               </div>
                             )}
-                            {booking.priceBreakdown.addon_total !== undefined && booking.priceBreakdown.addon_total > 0 && (
+                            {addonTotal !== undefined && addonTotal > 0 && (
                               <div className="flex justify-between">
                                 <span>{locale === 'es' ? 'Extras' : 'Add-ons'}</span>
-                                <span>+${booking.priceBreakdown.addon_total.toLocaleString()}</span>
+                                <span>+${addonTotal.toLocaleString()}</span>
                               </div>
                             )}
-                            {booking.priceBreakdown.is_round_trip && (
+                            {isRoundTrip && (
                               <div className="text-center text-primary-600 dark:text-gold-500 font-medium pt-1">
                                 {locale === 'es' ? 'Vuelo de ida y vuelta' : 'Round trip'}
                               </div>
@@ -601,7 +611,8 @@ export default function DashboardPage() {
                               <span>${booking.totalPrice.toLocaleString()}</span>
                             </div>
                           </div>
-                        )}
+                          )
+                        })()}
                       </div>
 
                       <div className="ml-4 flex flex-col space-y-2">
