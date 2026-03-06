@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Experience from '@/models/Experience'
+import ExperienceImage from '@/models/ExperienceImage'
 import { extractToken, verifyToken } from '@/lib/jwt'
 import { logger } from '@/lib/logger'
 import { getErrorMessage, type MongooseQuery } from '@/types/api.types'
@@ -32,6 +33,20 @@ export async function GET(request: NextRequest) {
       .sort({ name: 1 })
       .lean()
 
+    // Fetch all experience images in one query for efficiency
+    const experienceIds = experiences.map(e => e._id)
+    const allImages = await ExperienceImage.find({ experienceId: { $in: experienceIds } })
+      .sort({ orderIndex: 1 })
+      .lean()
+
+    // Group images by experience ID
+    const imagesByExperience = new Map<string, typeof allImages>()
+    for (const img of allImages) {
+      const key = img.experienceId.toString()
+      if (!imagesByExperience.has(key)) imagesByExperience.set(key, [])
+      imagesByExperience.get(key)!.push(img)
+    }
+
     const transformedExperiences = experiences.map((e) => ({
       id: e._id.toString(),
       name: e.name,
@@ -61,6 +76,13 @@ export async function GET(request: NextRequest) {
         min_passengers: t.minPassengers,
         max_passengers: t.maxPassengers,
         price: t.price
+      })),
+      experience_images: (imagesByExperience.get(e._id.toString()) || []).map((img: any) => ({
+        id: img._id.toString(),
+        image_url: img.imageUrl,
+        caption: img.caption,
+        is_primary: img.isPrimary,
+        order_index: img.orderIndex
       })),
       is_active: e.isActive,
       content_edited_at: e.contentEditedAt,

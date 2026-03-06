@@ -32,6 +32,17 @@ export const LOCATION_COORDINATES: Record<string, { lat: number; lng: number; na
   'CUSTOM003': { lat: 17.2222, lng: -89.6228, name: 'Tikal Airstrip' },
   'CUSTOM004': { lat: 15.5333, lng: -89.9667, name: 'Semuc Champey Landing' },
   
+  // Helipads (aliases for main destinations)
+  'ANT': { lat: 14.5586, lng: -90.7295, name: 'Antigua Helipad' },
+  'ATI': { lat: 14.7394, lng: -91.1583, name: 'Lake Atitlán Helipad' },
+  'TIK': { lat: 17.2220, lng: -89.6237, name: 'Tikal Helipad' },
+
+  // Regional airports
+  'CBV': { lat: 15.4689, lng: -90.4067, name: 'Cobán Airport' },
+  'HUG': { lat: 15.3272, lng: -91.4628, name: 'Huehuetenango Airport' },
+  'ZAC': { lat: 14.9650, lng: -89.5281, name: 'Zacapa Airport' },
+  'AAZ': { lat: 15.0122, lng: -91.1508, name: 'Quiché Airport' },
+
   // Additional major cities and tourist destinations
   'ANTIGUA': { lat: 14.5586, lng: -90.7339, name: 'Antigua Guatemala' },
   'ATITLAN': { lat: 14.7406, lng: -91.1581, name: 'Lake Atitlán' },
@@ -42,7 +53,8 @@ export const LOCATION_COORDINATES: Record<string, { lat: number; lng: number; na
   'MONTERRICO': { lat: 13.9333, lng: -90.8333, name: 'Monterrico Beach' },
   'COBAN': { lat: 15.4689, lng: -90.4067, name: 'Cobán' },
   'HUEHUE': { lat: 15.3197, lng: -91.4711, name: 'Huehuetenango' },
-  'ESCUINTLA': { lat: 14.3056, lng: -90.7850, name: 'Escuintla' }
+  'ESCUINTLA': { lat: 14.3056, lng: -90.7850, name: 'Escuintla' },
+  'RIO_DULCE': { lat: 15.6500, lng: -88.9833, name: 'Río Dulce' }
 }
 
 export function getDistanceBetweenLocations(from: string, to: string): number {

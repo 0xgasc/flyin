@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
-import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid, Smartphone, ShieldCheck } from 'lucide-react'
+import { login as authLogin, register as authRegister } from '@/lib/auth-client'
+import { MapPin, Calendar, Users, DollarSign, Navigation, Map, Grid, Smartphone, ShieldCheck, Mail, Lock } from 'lucide-react'
 import { MobileNav } from '@/components/mobile-nav'
 import { useTranslation } from '@/lib/i18n'
 import { format } from 'date-fns'
@@ -32,6 +33,119 @@ interface Airport {
   code: string
   name: string
   city: string
+}
+
+// Map department IDs from homepage map to transport booking location codes
+const DEPARTMENT_TO_LOCATION: Record<string, string> = {
+  'guatemala': 'GUA',
+  'sacatepequez': 'ANTIGUA',
+  'solola': 'ATITLAN',
+  'peten': 'FRS',
+  'izabal': 'LIVINGSTON',
+  'escuintla': 'MONTERRICO',
+  'retalhuleu': 'RER',
+  'alta-verapaz': 'SEMUC',
+  'quetzaltenango': 'XELA',
+  'huehuetenango': 'HUEHUE',
+  'zacapa': 'ZAC',
+  'quiche': 'AAZ',
+}
+
+// Map destination/airport names from map modal to location codes for price calculator
+const DESTINATION_TO_CODE: Record<string, string> = {
+  // Airport names → codes
+  'La Aurora International Airport': 'GUA',
+  'Mundo Maya International Airport': 'FRS',
+  'Puerto Barrios Airport': 'PBR',
+  'Retalhuleu Airport': 'RER',
+  'Cobán Airport': 'COBAN',
+  'Huehuetenango Airport': 'HUEHUE',
+  'Zacapa Airport': 'ZAC',
+  'Quiché Airport': 'AAZ',
+  // Helipads → main destination codes (same location, dropdown-compatible)
+  'Antigua Helipad': 'ANTIGUA',
+  'Lake Atitlán Helipad': 'ATITLAN',
+  'Tikal Helipad': 'TIKAL',
+  // Destination names → codes
+  'Guatemala City': 'GUA',
+  'Mixco': 'GUA',
+  'Villa Nueva': 'GUA',
+  'Antigua Guatemala': 'ANTIGUA',
+  'Ciudad Vieja': 'ANTIGUA',
+  'San Lucas': 'ANTIGUA',
+  'Alotenango': 'ANTIGUA',
+  'Panajachel': 'ATITLAN',
+  'San Pedro La Laguna': 'ATITLAN',
+  'Santiago Atitlán': 'ATITLAN',
+  'Flores': 'FRS',
+  'Tikal': 'TIKAL',
+  'Yaxha': 'FRS',
+  'El Remate': 'FRS',
+  'El Mirador': 'FRS',
+  'Puerto Barrios': 'PBR',
+  'Río Dulce': 'RIO_DULCE',
+  'Livingston': 'LIVINGSTON',
+  'El Estor': 'PBR',
+  'Quetzaltenango': 'XELA',
+  'Zunil': 'XELA',
+  'Almolonga': 'XELA',
+  'Retalhuleu': 'RER',
+  'Champerico': 'RER',
+  'El Asintal': 'RER',
+  'Cobán': 'COBAN',
+  'Lanquín': 'SEMUC',
+  'Semuc Champey': 'SEMUC',
+  'Huehuetenango': 'HUEHUE',
+  'Todos Santos': 'HUEHUE',
+  'Nentón': 'HUEHUE',
+  'Escuintla': 'ESCUINTLA',
+  'Puerto San José': 'ESCUINTLA',
+  'Monterrico': 'MONTERRICO',
+  'El Paredón': 'MONTERRICO',
+  // Remaining departments mapped to nearest airport/hub
+  'Zacapa': 'ZAC',
+  'Estanzuela': 'ZAC',
+  'Río Hondo': 'ZAC',
+  'Chiquimula': 'ZAC',
+  'Esquipulas': 'ZAC',
+  'Jocotán': 'ZAC',
+  'Jalapa': 'GUA',
+  'Monjas': 'GUA',
+  'Mataquescuintla': 'GUA',
+  'Cuilapa': 'ESCUINTLA',
+  'Barberena': 'ESCUINTLA',
+  'Guazacapán': 'ESCUINTLA',
+  'Salamá': 'COBAN',
+  'Rabinal': 'COBAN',
+  'Cubulco': 'COBAN',
+  'Jutiapa': 'ESCUINTLA',
+  'Asunción Mita': 'ESCUINTLA',
+  'Atescatempa': 'ESCUINTLA',
+  'Guastatoya': 'GUA',
+  'Sanarate': 'GUA',
+  'Morazán': 'GUA',
+  'Totonicapán': 'XELA',
+  'San Cristóbal': 'XELA',
+  'San Francisco El Alto': 'XELA',
+  'Santa Cruz del Quiché': 'AAZ',
+  'Chichicastenango': 'AAZ',
+  'Nebaj': 'AAZ',
+  'Mazatenango': 'RER',
+  'San Antonio': 'RER',
+  'Chicacao': 'RER',
+  'Chimaltenango': 'GUA',
+  'San Martín Jilotepeque': 'GUA',
+  'Patzún': 'GUA',
+  'San Marcos': 'XELA',
+  'San Pedro Sacatepéquez': 'XELA',
+  'Malacatán': 'XELA',
+}
+
+// Resolve a destination name or airport name to a location code
+function resolveToCode(destination: string): string {
+  if (DESTINATION_TO_CODE[destination]) return DESTINATION_TO_CODE[destination]
+  if (LOCATION_COORDINATES[destination.toUpperCase()]) return destination.toUpperCase()
+  return destination
 }
 
 export default function BookTransportPage() {
@@ -65,8 +179,41 @@ export default function BookTransportPage() {
   const [phoneInput, setPhoneInput] = useState('')
   const [phoneSaving, setPhoneSaving] = useState(false)
 
+  // Auth gate state (inline sign-up/login at checkout)
+  const [showAuthGate, setShowAuthGate] = useState(false)
+  const [authMode, setAuthMode] = useState<'register' | 'login'>('register')
+  const [authName, setAuthName] = useState('')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authPhone, setAuthPhone] = useState('')
+  const [authError, setAuthError] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
+
   useEffect(() => {
     fetchAirports()
+  }, [])
+
+  // Pre-populate form from URL search params (e.g., homepage map selection)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const from = params.get('from')
+    const to = params.get('to')
+    const passengers = params.get('passengers')
+
+    if (!from && !to && !passengers) return
+
+    const resolveLocation = (param: string): string => {
+      if (DEPARTMENT_TO_LOCATION[param]) return DEPARTMENT_TO_LOCATION[param]
+      if (LOCATION_COORDINATES[param.toUpperCase()]) return param.toUpperCase()
+      return ''
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      ...(from ? { fromLocation: resolveLocation(from) } : {}),
+      ...(to ? { toLocation: resolveLocation(to) } : {}),
+      ...(passengers ? { passengers: Math.min(6, Math.max(1, parseInt(passengers) || 1)) } : {}),
+    }))
   }, [])
 
   // Auto-collapse map when both locations are selected
@@ -107,23 +254,23 @@ export default function BookTransportPage() {
   // Helicopter selection moved to admin workflow
 
   const handleMapLocationSelect = (location: string, type: 'from' | 'to') => {
+    const code = resolveToCode(location)
     setFormData(prev => ({
       ...prev,
-      [type === 'from' ? 'fromLocation' : 'toLocation']: location
+      [type === 'from' ? 'fromLocation' : 'toLocation']: code
     }))
   }
 
   const handleDepartmentClick = (dept: Department) => {
     // If department has only one destination, select it directly
     if (dept.destinations.length === 1) {
-      const destination = dept.destinations[0]
+      const code = resolveToCode(dept.destinations[0])
       if (!formData.fromLocation) {
-        setFormData(prev => ({ ...prev, fromLocation: destination }))
+        setFormData(prev => ({ ...prev, fromLocation: code }))
       } else if (!formData.toLocation) {
-        setFormData(prev => ({ ...prev, toLocation: destination }))
+        setFormData(prev => ({ ...prev, toLocation: code }))
       } else {
-        // Both filled, replace from location
-        setFormData(prev => ({ ...prev, fromLocation: destination }))
+        setFormData(prev => ({ ...prev, fromLocation: code }))
       }
       return
     }
@@ -207,18 +354,17 @@ export default function BookTransportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Check if user is logged in
-    if (!profile?.id) {
-      setError(locale === 'es' ? 'Inicia sesión para reservar un vuelo' : 'Please log in to book a flight')
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        router.push('/login?redirect=/book/transport')
-      }, 2000)
+    // Use getState() to always get the latest profile (important after auth gate or phone gate)
+    const currentProfile = useAuthStore.getState().profile
+
+    // Show inline auth gate instead of redirecting to login page
+    if (!currentProfile?.id) {
+      setShowAuthGate(true)
       return
     }
 
     // Require phone number before booking
-    if (!profile.phone) {
+    if (!currentProfile.phone) {
       setShowPhoneGate(true)
       return
     }
@@ -305,16 +451,61 @@ export default function BookTransportPage() {
         body: JSON.stringify({ phone: phoneInput.trim() })
       })
       if (!res.ok) throw new Error('Failed to save phone')
-      // Patch the store profile so the gate won't re-fire
-      useAuthStore.getState().setProfile({ ...profile!, phone: phoneInput.trim() })
+      const currentProfile = useAuthStore.getState().profile
+      useAuthStore.getState().setProfile({ ...currentProfile!, phone: phoneInput.trim() })
       setShowPhoneGate(false)
-      // Submit the form now that phone is saved
       const syntheticEvent = { preventDefault: () => {} } as React.FormEvent
       await handleSubmit(syntheticEvent)
     } catch {
       setError(locale === 'es' ? 'No se pudo guardar el número. Intenta de nuevo.' : 'Could not save phone number. Please try again.')
     } finally {
       setPhoneSaving(false)
+    }
+  }
+
+  const handleAuthSubmit = async () => {
+    setAuthLoading(true)
+    setAuthError('')
+
+    try {
+      let result
+      if (authMode === 'register') {
+        if (!authName.trim()) {
+          setAuthError(locale === 'es' ? 'Nombre requerido' : 'Name is required')
+          setAuthLoading(false)
+          return
+        }
+        result = await authRegister({
+          email: authEmail.trim(),
+          password: authPassword,
+          fullName: authName.trim(),
+          phone: authPhone.trim() || undefined,
+          role: 'client'
+        })
+      } else {
+        result = await authLogin(authEmail.trim(), authPassword)
+      }
+
+      if (!result.success || !result.user) {
+        throw new Error(result.error || (locale === 'es' ? 'Error de autenticación' : 'Authentication failed'))
+      }
+
+      // Update auth store
+      useAuthStore.getState().setUser(result.user)
+      useAuthStore.getState().setProfile(result.user)
+
+      // Wait for cookie to be processed
+      await new Promise(resolve => setTimeout(resolve, 150))
+
+      setShowAuthGate(false)
+
+      // Auto-submit the booking form
+      const syntheticEvent = { preventDefault: () => {} } as React.FormEvent
+      await handleSubmit(syntheticEvent)
+    } catch (err: any) {
+      setAuthError(err.message || (locale === 'es' ? 'Error de autenticación' : 'Authentication failed'))
+    } finally {
+      setAuthLoading(false)
     }
   }
 
@@ -434,6 +625,11 @@ export default function BookTransportPage() {
                     <option value="SEMUC">Semuc Champey</option>
                     <option value="MONTERRICO">Monterrico Beach</option>
                     <option value="LIVINGSTON">Livingston</option>
+                    <option value="RIO_DULCE">Río Dulce</option>
+                    <option value="COBAN">Cobán</option>
+                    <option value="XELA">Quetzaltenango</option>
+                    <option value="HUEHUE">Huehuetenango</option>
+                    <option value="ESCUINTLA">Escuintla</option>
                   </optgroup>
                   <option value="custom">{t('booking.form.custom_location')}</option>
                 </select>
@@ -474,6 +670,11 @@ export default function BookTransportPage() {
                     <option value="SEMUC">Semuc Champey</option>
                     <option value="MONTERRICO">Monterrico Beach</option>
                     <option value="LIVINGSTON">Livingston</option>
+                    <option value="RIO_DULCE">Río Dulce</option>
+                    <option value="COBAN">Cobán</option>
+                    <option value="XELA">Quetzaltenango</option>
+                    <option value="HUEHUE">Huehuetenango</option>
+                    <option value="ESCUINTLA">Escuintla</option>
                   </optgroup>
                   <option value="custom">{t('booking.form.custom_location')}</option>
                 </select>
@@ -530,13 +731,13 @@ export default function BookTransportPage() {
                       <div>
                         <span className="text-gray-400">From:</span>
                         <p className="font-medium text-brand-accent">
-                          {formData.fromLocation || 'Not selected'}
+                          {formData.fromLocation ? getLocationName(formData.fromLocation, formData.fromCustom) : 'Not selected'}
                         </p>
                       </div>
                       <div>
                         <span className="text-gray-400">To:</span>
                         <p className="font-medium text-amber-400">
-                          {formData.toLocation || 'Not selected'}
+                          {formData.toLocation ? getLocationName(formData.toLocation, formData.toCustom) : 'Not selected'}
                         </p>
                       </div>
                     </div>
@@ -797,6 +998,110 @@ export default function BookTransportPage() {
           </div>
         </form>
       </div>
+
+      {/* Auth Gate Modal - inline sign-up/login at checkout */}
+      {showAuthGate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-sm w-full shadow-xl">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-100 dark:bg-gold-500/20 mb-3">
+              <Lock className="h-6 w-6 text-primary-600 dark:text-gold-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              {authMode === 'register'
+                ? (locale === 'es' ? 'Crear cuenta para reservar' : 'Create account to book')
+                : (locale === 'es' ? 'Iniciar sesión' : 'Sign in to book')}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              {locale === 'es'
+                ? 'Crea tu cuenta para completar la reserva y recibir confirmación.'
+                : 'Create your account to complete booking and receive confirmation.'}
+            </p>
+
+            {authError && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm mb-3">
+                {authError}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {authMode === 'register' && (
+                <input
+                  type="text"
+                  value={authName}
+                  onChange={(e) => setAuthName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
+                  placeholder={locale === 'es' ? 'Nombre completo' : 'Full name'}
+                />
+              )}
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="email"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
+                  placeholder={locale === 'es' ? 'Correo electrónico' : 'Email address'}
+                  autoFocus
+                />
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="password"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
+                  placeholder={locale === 'es' ? 'Contraseña' : 'Password'}
+                />
+              </div>
+              {authMode === 'register' && (
+                <div className="relative">
+                  <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="tel"
+                    value={authPhone}
+                    onChange={(e) => setAuthPhone(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
+                    placeholder="+502 5550-0000 (WhatsApp)"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-4">
+              <button
+                type="button"
+                onClick={() => { setShowAuthGate(false); setAuthError('') }}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 text-sm"
+              >
+                {locale === 'es' ? 'Cancelar' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={handleAuthSubmit}
+                disabled={authLoading || !authEmail.trim() || !authPassword.trim()}
+                className="flex-1 px-4 py-2 btn-luxury text-sm disabled:opacity-50"
+              >
+                {authLoading ? '...' : authMode === 'register'
+                  ? (locale === 'es' ? 'Crear y reservar' : 'Create & book')
+                  : (locale === 'es' ? 'Entrar y reservar' : 'Sign in & book')}
+              </button>
+            </div>
+
+            <div className="text-center mt-3">
+              <button
+                type="button"
+                onClick={() => { setAuthMode(authMode === 'register' ? 'login' : 'register'); setAuthError('') }}
+                className="text-xs text-primary-600 dark:text-gold-400 hover:underline"
+              >
+                {authMode === 'register'
+                  ? (locale === 'es' ? '¿Ya tienes cuenta? Inicia sesión' : 'Already have an account? Sign in')
+                  : (locale === 'es' ? '¿No tienes cuenta? Regístrate' : "Don't have an account? Sign up")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Phone Gate Modal */}
       {showPhoneGate && (
