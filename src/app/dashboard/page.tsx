@@ -11,7 +11,7 @@ import { useToast } from '@/lib/toast-store'
 import {
   Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
   User, Mail, Phone, Save, Wallet, FileText, CheckCircle, Eye, EyeOff, MessageCircle,
-  Plane, Globe, AlertTriangle
+  Plane, Globe, AlertTriangle, Upload, Copy
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { WhatsAppContactButton } from '@/components/whatsapp-contact-button'
@@ -346,7 +346,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handleBankDepositPayment = async (bookingId: string, amount: number, proofFile: File | null) => {
+  const handleBankDepositPayment = async (bookingId: string, amount: number, proofFile: File | null, reference?: string) => {
     setPaymentLoading(true)
     try {
       // Create transaction and update booking via API
@@ -359,7 +359,7 @@ export default function DashboardPage() {
         credentials: 'include',
         body: JSON.stringify({
           paymentMethod: 'bank_transfer',
-          reference: `Booking payment - ${bookingId}`
+          reference: reference || `Booking payment - ${bookingId}`
         })
       })
 
@@ -870,7 +870,7 @@ export default function DashboardPage() {
           booking={selectedBooking}
           onClose={() => setShowPaymentModal(false)}
           onPayAccountBalance={() => handlePayBooking(selectedBooking.id, selectedBooking.totalPrice)}
-          onPayBankDeposit={(proofFile) => handleBankDepositPayment(selectedBooking.id, selectedBooking.totalPrice, proofFile)}
+          onPayBankDeposit={(proofFile, reference) => handleBankDepositPayment(selectedBooking.id, selectedBooking.totalPrice, proofFile, reference)}
           onPayCreditCard={handleCreditCardPayment}
           onPayCrypto={handleCryptoPayment}
           loading={paymentLoading}
@@ -1009,7 +1009,7 @@ function PaymentModal({
   booking: Booking
   onClose: () => void
   onPayAccountBalance: () => void
-  onPayBankDeposit: (proofFile: File | null) => void
+  onPayBankDeposit: (proofFile: File | null, reference: string) => void
   onPayCreditCard: () => void
   onPayCrypto: () => void
   loading: boolean
@@ -1017,14 +1017,15 @@ function PaymentModal({
 }) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'balance' | 'bank'>('balance')
   const [proofFile, setProofFile] = useState<File | null>(null)
+  const [bankReference, setBankReference] = useState('')
   const toast = useToast()
 
   const handleBankDepositSubmit = () => {
-    if (!proofFile) {
-      toast.warning('Please upload payment proof before submitting.')
+    if (!bankReference.trim()) {
+      toast.warning('Please enter the bank confirmation / reference number.')
       return
     }
-    onPayBankDeposit(proofFile)
+    onPayBankDeposit(proofFile, bankReference.trim())
   }
 
   return (
@@ -1102,26 +1103,79 @@ function PaymentModal({
 
         {/* Bank Deposit Details */}
         {selectedPaymentMethod === 'bank' && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-soft border border-blue-200 dark:border-blue-800">
-            <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Bank Transfer</h4>
-            <div className="text-sm text-blue-800 dark:text-blue-400 space-y-1 mb-3">
-              <p><strong>Amount:</strong> ${booking.totalPrice}</p>
-              <p><strong>Reference:</strong> Booking {booking.id.slice(0, 8)}</p>
+          <div className="mb-6 space-y-4">
+            {/* Bank Account Info */}
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-soft border border-blue-200 dark:border-blue-800">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3">Bank Account Details</h4>
+              <div className="text-sm text-blue-800 dark:text-blue-400 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span><strong>Bank:</strong> Banco Industrial</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span><strong>Account Name:</strong> FlyInGuate S.A.</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span><strong>Account #:</strong> 001-123456-7</span>
+                  <button
+                    type="button"
+                    onClick={() => { navigator.clipboard.writeText('001-123456-7'); toast.success('Account number copied!') }}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span><strong>Type:</strong> Monetaria (USD)</span>
+                </div>
+                <div className="border-t border-blue-200 dark:border-blue-700 pt-2 mt-2">
+                  <p><strong>Amount to deposit:</strong> <span className="text-lg font-bold">${booking.totalPrice}</span></p>
+                  <p><strong>Reference:</strong> Booking {booking.id.slice(0, 8)}</p>
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-blue-800 dark:text-blue-400 mb-3">
-              Contact us via WhatsApp to receive our current bank account details.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                const msg = encodeURIComponent(`Hi FlyInGuate! I need bank details for booking ${booking.id.slice(0, 8)} — amount $${booking.totalPrice}.`)
-                window.open(`https://wa.me/50255507700?text=${msg}`, '_blank', 'noopener,noreferrer')
-              }}
-              className="flex items-center gap-2 text-xs px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-soft font-medium transition-colors"
-            >
-              <MessageCircle className="h-3.5 w-3.5" />
-              Get bank details via WhatsApp
-            </button>
+
+            {/* Bank Reference / Confirmation ID */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Bank Confirmation / Reference # *
+              </label>
+              <input
+                type="text"
+                value={bankReference}
+                onChange={(e) => setBankReference(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-soft bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                placeholder="e.g., TRX-20250305-12345"
+                required
+              />
+            </div>
+
+            {/* Proof Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Upload Proof of Payment (optional)
+              </label>
+              <label className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-soft cursor-pointer hover:border-primary-400 dark:hover:border-gold-500 transition-colors bg-white dark:bg-gray-800">
+                <Upload className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {proofFile ? proofFile.name : 'Click to upload screenshot or PDF'}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null
+                    setProofFile(file)
+                  }}
+                />
+              </label>
+              {proofFile && (
+                <div className="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <span>{(proofFile.size / 1024).toFixed(0)} KB</span>
+                  <button type="button" onClick={() => setProofFile(null)} className="text-red-500 hover:text-red-700">Remove</button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -1143,11 +1197,11 @@ function PaymentModal({
                 handleBankDepositSubmit()
               }
             }}
-            disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.accountBalance || profile.accountBalance < booking.totalPrice))}
+            disabled={loading || (selectedPaymentMethod === 'balance' && (!profile?.accountBalance || profile.accountBalance < booking.totalPrice)) || (selectedPaymentMethod === 'bank' && !bankReference.trim())}
             className="flex-1 btn-primary"
           >
             {loading ? 'Processing...' :
-             selectedPaymentMethod === 'balance' ? 'Pay Now' : 'Submit Proof'
+             selectedPaymentMethod === 'balance' ? 'Pay Now' : 'Confirm Deposit'
             }
           </button>
         </div>
