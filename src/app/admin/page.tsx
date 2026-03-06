@@ -965,12 +965,17 @@ export default function AdminDashboard() {
 
   const openEditBookingModal = (booking: Booking) => {
     setSelectedBookingForEdit(booking)
+    // Format dates for date inputs (need yyyy-MM-dd, not ISO)
+    const formatDateForInput = (d: string | null | undefined) => {
+      if (!d) return ''
+      try { return new Date(d).toISOString().split('T')[0] } catch { return d }
+    }
     setEditBookingData({
       from_location: booking.from_location || '',
       to_location: booking.to_location || '',
-      scheduled_date: booking.scheduled_date || '',
+      scheduled_date: formatDateForInput(booking.scheduled_date),
       scheduled_time: booking.scheduled_time || '',
-      return_date: booking.return_date || '',
+      return_date: formatDateForInput(booking.return_date),
       return_time: booking.return_time || '',
       passenger_count: booking.passenger_count || 1,
       is_round_trip: booking.is_round_trip || false,
@@ -4053,9 +4058,9 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Original Booking:</h4>
               <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div>
-                  <p><span className="font-medium">Client:</span> {selectedBookingForEdit.client?.full_name}</p>
-                  <p><span className="font-medium">Route:</span> {selectedBookingForEdit.from_location} → {selectedBookingForEdit.to_location}</p>
-                  <p><span className="font-medium">Date:</span> {selectedBookingForEdit.scheduled_date}</p>
+                  <p><span className="font-medium">Client:</span> {selectedBookingForEdit.client?.full_name || selectedBookingForEdit.client?.email || 'Unknown'}</p>
+                  <p><span className="font-medium">Route:</span> {selectedBookingForEdit.from_location && selectedBookingForEdit.to_location ? `${selectedBookingForEdit.from_location} → ${selectedBookingForEdit.to_location}` : selectedBookingForEdit.experiences?.name || 'N/A'}</p>
+                  <p><span className="font-medium">Date:</span> {selectedBookingForEdit.scheduled_date ? new Date(selectedBookingForEdit.scheduled_date).toLocaleDateString() : 'N/A'}</p>
                 </div>
                 <div>
                   <p><span className="font-medium">Time:</span> {selectedBookingForEdit.scheduled_time}</p>
@@ -4076,11 +4081,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={editBookingData.from_location}
                     onChange={(e) => setEditBookingData({ ...editBookingData, from_location: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     To Location
@@ -4089,12 +4094,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="text"
                     value={editBookingData.to_location}
                     onChange={(e) => setEditBookingData({ ...editBookingData, to_location: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
               </div>
-              
+
               {/* Date and Time */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -4105,11 +4110,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="date"
                     value={editBookingData.scheduled_date}
                     onChange={(e) => setEditBookingData({ ...editBookingData, scheduled_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Departure Time
@@ -4118,7 +4123,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     type="time"
                     value={editBookingData.scheduled_time}
                     onChange={(e) => setEditBookingData({ ...editBookingData, scheduled_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                     required
                   />
                 </div>
@@ -4126,12 +4131,12 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
 
               {/* Round Trip Toggle */}
               <div className="flex items-center space-x-4">
-                <label className="flex items-center">
+                <label className="flex items-center text-gray-700 dark:text-gray-300">
                   <input
                     type="checkbox"
                     checked={editBookingData.is_round_trip}
-                    onChange={(e) => setEditBookingData({ 
-                      ...editBookingData, 
+                    onChange={(e) => setEditBookingData({
+                      ...editBookingData,
                       is_round_trip: e.target.checked,
                       return_date: e.target.checked ? editBookingData.return_date : '',
                       return_time: e.target.checked ? editBookingData.return_time : ''
@@ -4153,11 +4158,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       type="date"
                       value={editBookingData.return_date}
                       onChange={(e) => setEditBookingData({ ...editBookingData, return_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Return Time
@@ -4166,13 +4171,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                       type="time"
                       value={editBookingData.return_time}
                       onChange={(e) => setEditBookingData({ ...editBookingData, return_time: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                       required
                     />
                   </div>
                 </div>
               )}
-              
+
               {/* Passengers */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -4181,7 +4186,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                 <select
                   value={editBookingData.passenger_count}
                   onChange={(e) => setEditBookingData({ ...editBookingData, passenger_count: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                 >
                   {[1, 2, 3, 4, 5, 6].map((num) => (
                     <option key={num} value={num}>
@@ -4190,7 +4195,7 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   ))}
                 </select>
               </div>
-              
+
               {/* Notes */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -4200,11 +4205,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   value={editBookingData.notes}
                   onChange={(e) => setEditBookingData({ ...editBookingData, notes: e.target.value })}
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                   placeholder="Special requests or preferences..."
                 />
               </div>
-              
+
               {/* Revision Notes */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -4214,15 +4219,15 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   value={editBookingData.revision_notes}
                   onChange={(e) => setEditBookingData({ ...editBookingData, revision_notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                   placeholder="Explain the changes you're making and why (client will see this)..."
                   required
                 />
               </div>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-none p-3">
-                <p className="text-sm text-blue-800">
-                  💡 <strong>How this works:</strong> Your changes will be sent to the client for review. They can accept the changes and proceed with payment, or request further modifications.
+
+              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-none p-3">
+                <p className="text-sm text-blue-800 dark:text-blue-300">
+                  <strong>How this works:</strong> Your changes will be sent to the client for review. They can accept the changes and proceed with payment, or request further modifications.
                 </p>
               </div>
               

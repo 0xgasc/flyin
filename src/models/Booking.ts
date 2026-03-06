@@ -3,10 +3,14 @@ import mongoose, { Schema, Document, Model } from 'mongoose'
 export interface IPassengerDetails {
   name: string
   age: number
+  weightLbs: number
   passport: string
   emergencyContact: string
   dietaryRestrictions: string
   specialRequests: string
+  baggageType: string
+  baggageWeightLbs: number
+  baggageNotes: string
 }
 
 export interface ISelectedAddon {
@@ -60,10 +64,14 @@ export interface IBooking extends Document {
 const passengerDetailsSchema = new Schema({
   name: { type: String, required: true },
   age: { type: Number, required: true },
+  weightLbs: { type: Number, default: 0 },
   passport: { type: String, default: '' },
   emergencyContact: { type: String, default: '' },
   dietaryRestrictions: { type: String, default: '' },
-  specialRequests: { type: String, default: '' }
+  specialRequests: { type: String, default: '' },
+  baggageType: { type: String, default: 'none' },
+  baggageWeightLbs: { type: Number, default: 0 },
+  baggageNotes: { type: String, default: '' }
 }, { _id: false })
 
 const selectedAddonSchema = new Schema({

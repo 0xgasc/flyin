@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/auth-store'
 import { useToast } from '@/lib/toast-store'
-import { Users, Plus, Trash2, ShoppingCart, DollarSign } from 'lucide-react'
+import { Users, Plus, Trash2, ShoppingCart, DollarSign, AlertTriangle, Briefcase } from 'lucide-react'
 import { MobileNav } from '@/components/mobile-nav'
 import { useTranslation } from '@/lib/i18n'
 import { FormInput } from '@/components/form-input'
@@ -16,11 +16,15 @@ import { getErrorMessage } from '@/types/api.types'
 interface PassengerDetails {
   name: string
   age: number
+  weight_lbs: number
   passport: string
   emergency_contact_name: string
   emergency_contact_phone: string
   dietary_restrictions: string
   special_requests: string
+  baggage_type: string
+  baggage_weight_lbs: number
+  baggage_notes: string
 }
 
 interface Addon {
@@ -107,11 +111,15 @@ function PassengerDetailsContent() {
         const initialPassengers = Array.from({ length: booking.passenger_count || 1 }, (_, i) => ({
           name: i === 0 ? profile?.fullName || '' : '',
           age: 25,
+          weight_lbs: 0,
           passport: '',
           emergency_contact_name: '',
           emergency_contact_phone: '',
           dietary_restrictions: '',
-          special_requests: ''
+          special_requests: '',
+          baggage_type: 'none',
+          baggage_weight_lbs: 0,
+          baggage_notes: ''
         }))
         setPassengers(initialPassengers)
       } catch (err) {
@@ -375,11 +383,11 @@ function PassengerDetailsContent() {
 
             <div className="space-y-6">
               {passengers.map((passenger, index) => (
-                <div key={index} className="bg-gray-50 dark:bg-gray-900 rounded p-4">
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-4">
-                    Passenger {index + 1} {index === 0 && '(Primary)'}
+                <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-4 text-lg">
+                    {locale === 'es' ? 'Pasajero' : 'Passenger'} {index + 1} {index === 0 && (locale === 'es' ? '(Principal)' : '(Primary)')}
                   </h3>
-                  
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <FormInput
                       label={t('passenger.name')}
@@ -399,14 +407,25 @@ function PassengerDetailsContent() {
                       min={1}
                       max={120}
                       required
-                      hint={locale === 'es' ? 'Entre 1 y 120 años' : 'Between 1 and 120 years'}
+                    />
+
+                    <FormInput
+                      type="number"
+                      label={locale === 'es' ? 'Peso (LB)' : 'Weight (LB)'}
+                      value={passenger.weight_lbs ? passenger.weight_lbs.toString() : ''}
+                      onChange={(e) => updatePassenger(index, 'weight_lbs', parseInt(e.target.value) || 0)}
+                      min={1}
+                      max={400}
+                      required
+                      placeholder="e.g., 175"
+                      hint={locale === 'es' ? 'Requerido para seguridad de vuelo' : 'Required for flight safety'}
                     />
 
                     <FormInput
                       label={t('passenger.passport')}
                       value={passenger.passport}
                       onChange={(e) => updatePassenger(index, 'passport', e.target.value)}
-                      placeholder={locale === 'es' ? 'Número de pasaporte o ID' : 'Passport or ID number'}
+                      placeholder={locale === 'es' ? 'Pasaporte o DPI' : 'Passport or ID number'}
                     />
 
                     <FormInput
@@ -423,14 +442,106 @@ function PassengerDetailsContent() {
                       onChange={(e) => updatePassenger(index, 'emergency_contact_phone', e.target.value)}
                       placeholder="+502 5550-0000"
                     />
+                  </div>
 
+                  {/* Baggage Section */}
+                  <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <Briefcase className="h-4 w-4 text-primary-600 dark:text-gold-400" />
+                      {locale === 'es' ? 'Equipaje' : 'Baggage'}
+                    </h4>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          {locale === 'es' ? 'Tipo de equipaje' : 'Baggage type'}
+                        </label>
+                        <select
+                          value={passenger.baggage_type}
+                          onChange={(e) => updatePassenger(index, 'baggage_type', e.target.value)}
+                          className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500"
+                        >
+                          <option value="none">{locale === 'es' ? 'Sin equipaje' : 'No baggage'}</option>
+                          <option value="small_backpack">{locale === 'es' ? 'Mochila pequeña / bolsa personal' : 'Small backpack / personal bag'}</option>
+                          <option value="duffel_bag">{locale === 'es' ? 'Bolsa de lona / duffel bag' : 'Duffel bag / soft bag'}</option>
+                          <option value="hiking_gear">{locale === 'es' ? 'Equipo de senderismo' : 'Hiking / outdoor gear'}</option>
+                          <option value="instrument">{locale === 'es' ? 'Instrumento musical' : 'Musical instrument'}</option>
+                          <option value="large_suitcase">{locale === 'es' ? 'Maleta grande / rígida' : 'Large / hard-shell suitcase'}</option>
+                          <option value="oversized">{locale === 'es' ? 'Equipaje sobredimensionado' : 'Oversized item'}</option>
+                        </select>
+                      </div>
+
+                      {passenger.baggage_type !== 'none' && (
+                        <FormInput
+                          type="number"
+                          label={locale === 'es' ? 'Peso estimado (LB)' : 'Estimated weight (LB)'}
+                          value={passenger.baggage_weight_lbs ? passenger.baggage_weight_lbs.toString() : ''}
+                          onChange={(e) => updatePassenger(index, 'baggage_weight_lbs', parseInt(e.target.value) || 0)}
+                          min={1}
+                          max={200}
+                          placeholder="e.g., 30"
+                        />
+                      )}
+                    </div>
+
+                    {/* Baggage warnings */}
+                    {passenger.baggage_type === 'large_suitcase' && (
+                      <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex items-start gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-800 dark:text-amber-300">
+                          {locale === 'es'
+                            ? 'Las maletas rígidas/grandes NO caben en la mayoría de helicópteros. Se recomienda bolsa de lona (duffel bag). Si necesita enviar su maleta, podemos organizarla vía transporte terrestre por un costo adicional.'
+                            : 'Hard-shell / large suitcases do NOT fit in most helicopters. We strongly recommend soft duffel bags instead. If you need your suitcase transported, we can arrange ground shipping for an additional fee.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {passenger.baggage_type === 'oversized' && (
+                      <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex items-start gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-800 dark:text-amber-300">
+                          {locale === 'es'
+                            ? 'Artículos sobredimensionados pueden requerir un asiento adicional o transporte terrestre separado. Nuestro equipo le contactará para coordinar la logística.'
+                            : 'Oversized items may require an extra seat or separate ground transport. Our team will contact you to coordinate logistics.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {passenger.baggage_weight_lbs > 50 && (
+                      <div className="mt-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-start gap-2">
+                        <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-blue-800 dark:text-blue-300">
+                          {locale === 'es'
+                            ? 'Equipaje de más de 50 lb solo es posible en aeronaves Robinson R66 o superiores. Esto será considerado en su cotización.'
+                            : 'Baggage over 50 lb is only possible on Robinson R66 or larger aircraft. This will be factored into your quote.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {passenger.baggage_type !== 'none' && (
+                      <div className="mt-3">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          {locale === 'es' ? 'Notas sobre equipaje' : 'Baggage notes'}
+                        </label>
+                        <input
+                          type="text"
+                          value={passenger.baggage_notes}
+                          onChange={(e) => updatePassenger(index, 'baggage_notes', e.target.value)}
+                          className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500"
+                          placeholder={locale === 'es' ? 'Describa su equipaje, dimensiones, contenido especial...' : 'Describe your baggage, dimensions, special contents...'}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Special requests */}
+                  <div className="mt-4 grid md:grid-cols-2 gap-4">
                     <FormInput
                       label={t('passenger.dietary')}
                       value={passenger.dietary_restrictions}
                       onChange={(e) => updatePassenger(index, 'dietary_restrictions', e.target.value)}
                       placeholder={locale === 'es' ? 'Alergias, vegetariano, etc.' : 'Allergies, vegetarian, etc.'}
                     />
-
                     <FormInput
                       label={t('passenger.special_requests')}
                       value={passenger.special_requests}
@@ -440,6 +551,21 @@ function PassengerDetailsContent() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Helicopter baggage guidelines */}
+            <div className="mt-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                {locale === 'es' ? 'Lineamientos de equipaje para helicóptero' : 'Helicopter Baggage Guidelines'}
+              </h4>
+              <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• {locale === 'es' ? 'Bolsas de lona / duffel bags recomendadas (son flexibles y caben mejor)' : 'Duffel bags / soft bags recommended (flexible, fit better in cargo)'}</li>
+                <li>• {locale === 'es' ? 'Maletas rígidas grandes NO caben — use transporte terrestre' : 'Large hard-shell suitcases do NOT fit — use ground transport instead'}</li>
+                <li>• {locale === 'es' ? 'Máximo ~50 lb por pasajero en la mayoría de helicópteros' : 'Max ~50 lb per passenger in most helicopters'}</li>
+                <li>• {locale === 'es' ? 'Equipaje de más de 50 lb requiere aeronave R66 o superior' : 'Baggage over 50 lb requires R66 or larger aircraft'}</li>
+                <li>• {locale === 'es' ? 'Instrumentos musicales y equipo de senderismo: OK con nota previa' : 'Musical instruments & hiking gear: OK with advance notice'}</li>
+                <li>• {locale === 'es' ? 'Artículos sobredimensionados pueden requerir un asiento extra' : 'Oversized items may need an extra seat or separate ground shipping'}</li>
+              </ul>
             </div>
           </div>
 
@@ -459,7 +585,7 @@ function PassengerDetailsContent() {
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     {addons.map((addon) => (
-                      <div key={addon.id} className="bg-gray-50 rounded p-4 flex justify-between items-start">
+                      <div key={addon.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-medium text-gray-900 dark:text-white">{addon.name}</h4>
@@ -498,42 +624,42 @@ function PassengerDetailsContent() {
           </div>
 
           {/* Price Summary */}
-          <div className="card-luxury bg-primary-50 border-primary-200">
-            <h2 className="text-xl font-semibold flex items-center mb-4">
-              <DollarSign className="h-5 w-5 mr-2 text-primary-600" />
-              Price Summary
+          <div className="card-luxury bg-primary-50 dark:bg-gray-800 border-primary-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold flex items-center mb-4 text-gray-900 dark:text-white">
+              <DollarSign className="h-5 w-5 mr-2 text-primary-600 dark:text-gold-400" />
+              {locale === 'es' ? 'Resumen de precio' : 'Price Summary'}
             </h2>
 
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm text-gray-800 dark:text-gray-200">
               <div className="flex justify-between">
-                <span>Base Flight Price:</span>
+                <span>{locale === 'es' ? 'Precio base del vuelo' : 'Base Flight Price'}:</span>
                 <span>${bookingData.base_price.toFixed(2)}</span>
               </div>
-              
+
               {selectedAddons.length > 0 && (
                 <>
-                  <div className="border-t border-primary-200 pt-2 mt-2">
-                    <div className="font-medium text-primary-800 mb-1">Add-ons:</div>
+                  <div className="border-t border-primary-200 dark:border-gray-600 pt-2 mt-2">
+                    <div className="font-medium text-primary-800 dark:text-gold-400 mb-1">{locale === 'es' ? 'Complementos' : 'Add-ons'}:</div>
                     {selectedAddons.map((addon) => {
                       const addonInfo = availableAddons.find(a => a.id === addon.addon_id)
                       return (
                         <div key={addon.addon_id} className="flex justify-between text-xs ml-4">
-                          <span>{addonInfo?.name} × {addon.quantity}:</span>
+                          <span>{addonInfo?.name} x {addon.quantity}:</span>
                           <span>${(addon.quantity * addon.unit_price).toFixed(2)}</span>
                         </div>
                       )
                     })}
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Add-ons Subtotal:</span>
+                    <span>{locale === 'es' ? 'Subtotal complementos' : 'Add-ons Subtotal'}:</span>
                     <span>${calculateAddonTotal().toFixed(2)}</span>
                   </div>
                 </>
               )}
-              
-              <div className="border-t border-primary-300 pt-2 flex justify-between font-bold text-lg">
+
+              <div className="border-t border-primary-300 dark:border-gray-600 pt-2 flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span className="text-primary-800">${calculateGrandTotal().toFixed(2)}</span>
+                <span className="text-primary-800 dark:text-gold-400">${calculateGrandTotal().toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -543,7 +669,7 @@ function PassengerDetailsContent() {
               type="button"
               onClick={() => router.back()}
               disabled={submitting}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:opacity-50"
+              className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
             >
               {t('passenger.back')}
             </button>

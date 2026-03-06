@@ -145,7 +145,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const body = await request.json()
     const allowedUpdates: Record<string, string[]> = {
-      client: ['notes', 'status', 'passenger_details', 'selected_addons', 'addon_total_price'], // clients can update passenger details
+      client: ['notes', 'status', 'passenger_details', 'selected_addons', 'addon_total_price', 'total_price'], // clients can update passenger details and total with addons
       pilot: ['status', 'admin_notes'],
       admin: ['status', 'pilot_id', 'admin_notes', 'total_price', 'payment_status', 'helicopter_id',
               'from_location', 'to_location', 'scheduled_date', 'scheduled_time',
