@@ -74,7 +74,7 @@ export async function POST(
         userId: authUser.userId,
         bookingId: booking._id,
         type: 'payment',
-        amount: -amount,
+        amount: amount,
         paymentMethod: 'account_balance',
         status: 'completed',
         reference: reference || `Flight payment - Booking ${id}`

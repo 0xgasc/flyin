@@ -365,7 +365,7 @@ export default function AdminDashboard() {
           kyc_verified: p.kyc_verified
         }))
         setPilots(transformedPilots)
-        setAvailablePilots(transformedPilots.filter((p: any) => p.kyc_verified))
+        setAvailablePilots(transformedPilots)
       } else {
         setPilots([])
         setAvailablePilots([])
@@ -3915,7 +3915,13 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                   </label>
                   <select
                     value={editUserData.role}
-                    onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value })}
+                    onChange={(e) => {
+                      const newRole = e.target.value
+                      if (selectedUser?.role === 'pilot' && newRole !== 'pilot') {
+                        if (!confirm('Changing this user from Pilot to ' + newRole + ' will remove them from the pilot list. Continue?')) return
+                      }
+                      setEditUserData({ ...editUserData, role: newRole })
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-primary-500"
                     required
                   >
@@ -3923,6 +3929,11 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                     <option value="pilot">{t('form.pilot')}</option>
                     <option value="admin">{t('form.admin')}</option>
                   </select>
+                  {selectedUser && editUserData.role !== selectedUser.role && (
+                    <p className="text-xs text-amber-600 mt-1 font-medium">
+                      Role changed from &quot;{selectedUser.role}&quot; to &quot;{editUserData.role}&quot;
+                    </p>
+                  )}
                 </div>
               </div>
               

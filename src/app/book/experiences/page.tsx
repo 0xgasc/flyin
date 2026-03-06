@@ -8,7 +8,7 @@ import { QuickSignUpModal } from '@/components/quick-signup-modal'
 import { BookingIntent } from '@/components/experience-booking-modal'
 import { useAuthStore } from '@/lib/auth-store'
 import { getAuthHeaders } from '@/lib/auth-client'
-import { Plane, ChevronDown, ChevronUp, Check, Minus, Plus } from 'lucide-react'
+import { Plane, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Check, Minus, Plus } from 'lucide-react'
 
 
 interface PricingTier {
@@ -55,6 +55,48 @@ interface Experience {
     is_primary: boolean
     order_index: number | null
   }>
+}
+
+// Image carousel component for experience cards
+function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const [current, setCurrent] = useState(0)
+
+  if (images.length <= 1) {
+    return (
+      <img src={images[0]} alt={alt} className="w-full h-full object-cover" />
+    )
+  }
+
+  return (
+    <>
+      <img src={images[current]} alt={alt} className="w-full h-full object-cover transition-opacity duration-300" />
+      {/* Navigation arrows */}
+      <button
+        onClick={(e) => { e.stopPropagation(); setCurrent(prev => (prev - 1 + images.length) % images.length) }}
+        className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <button
+        onClick={(e) => { e.stopPropagation(); setCurrent(prev => (prev + 1) % images.length) }}
+        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+      {/* Dots indicator */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            onClick={(e) => { e.stopPropagation(); setCurrent(i) }}
+            className={`w-1.5 h-1.5 rounded-full transition-all ${
+              i === current ? 'bg-white w-3' : 'bg-white/50'
+            }`}
+          />
+        ))}
+      </div>
+    </>
+  )
 }
 
 // Inline booking card component
@@ -114,9 +156,10 @@ function BookingCard({
   const totalPrice = basePrice + addonTotal
   const pricePerPerson = Math.round(basePrice / passengerCount)
 
+  const effectiveMaxPassengers = Math.max(experience.max_passengers, 6)
   const handlePassengerChange = (delta: number) => {
     const newCount = passengerCount + delta
-    if (newCount >= experience.min_passengers && newCount <= experience.max_passengers) {
+    if (newCount >= experience.min_passengers && newCount <= effectiveMaxPassengers) {
       setPassengerCount(newCount)
     }
   }
@@ -311,12 +354,19 @@ function BookingCard({
           </span>
           <button
             onClick={() => handlePassengerChange(1)}
-            disabled={passengerCount >= experience.max_passengers}
+            disabled={passengerCount >= effectiveMaxPassengers}
             className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
           >
             <Plus className="h-5 w-5" />
           </button>
         </div>
+        {passengerCount >= effectiveMaxPassengers && (
+          <p className="text-xs text-center text-primary-600 mt-1.5">
+            {locale === 'es'
+              ? '7+ pasajeros? Contáctenos para cotización especial'
+              : '7+ passengers? Contact us for a special quote'}
+          </p>
+        )}
       </div>
 
       {/* Date & Time */}
@@ -558,13 +608,16 @@ export default function BookExperiencesPage() {
     return locale === 'es' && experience.includes_es ? experience.includes_es : experience.includes
   }
 
-  // Get display price - use lowest tier price if available
+  // Get display price - use lowest non-zero tier price if available
   const getDisplayPrice = (experience: Experience): number => {
     if (experience.pricing_tiers && experience.pricing_tiers.length > 0) {
-      const lowestTier = experience.pricing_tiers.reduce((min, tier) =>
-        tier.price < min.price ? tier : min
-      , experience.pricing_tiers[0])
-      return lowestTier.price
+      const nonZeroTiers = experience.pricing_tiers.filter(t => t.price > 0)
+      if (nonZeroTiers.length > 0) {
+        const lowestTier = nonZeroTiers.reduce((min, tier) =>
+          tier.price < min.price ? tier : min
+        , nonZeroTiers[0])
+        return lowestTier.price
+      }
     }
     return experience.base_price
   }
@@ -691,25 +744,30 @@ export default function BookExperiencesPage() {
                         isExpanded ? 'border-slate-300 shadow-lg' : 'border-slate-200 hover:shadow-md'
                       }`}
                     >
-                      {/* Image */}
-                      <div className="aspect-[4/3] bg-slate-100 relative">
+                      {/* Image Carousel */}
+                      <div className="aspect-[4/3] bg-slate-100 relative group">
                         {(() => {
                           const images = experience.type === 'experience' ? experience.experience_images : experience.destination_images
-                          const primaryImage = images?.find(img => img.is_primary)?.image_url
-                          const firstImage = images?.[0]?.image_url
-                          const displayImage = primaryImage || firstImage || experience.image_url
+                          const allImages: string[] = []
+                          if (images && images.length > 0) {
+                            // Put primary image first, then the rest in order
+                            const primary = images.find(img => img.is_primary)
+                            if (primary) allImages.push(primary.image_url)
+                            images.filter(img => !img.is_primary).forEach(img => allImages.push(img.image_url))
+                          }
+                          if (allImages.length === 0 && experience.image_url) {
+                            allImages.push(experience.image_url)
+                          }
 
-                          return displayImage ? (
-                            <img
-                              src={displayImage}
-                              alt={getDisplayName(experience)}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center h-full">
-                              <Plane className="h-12 w-12 text-slate-300" />
-                            </div>
-                          )
+                          if (allImages.length === 0) {
+                            return (
+                              <div className="flex items-center justify-center h-full">
+                                <Plane className="h-12 w-12 text-slate-300" />
+                              </div>
+                            )
+                          }
+
+                          return <ImageCarousel images={allImages} alt={getDisplayName(experience)} />
                         })()}
                       </div>
 
