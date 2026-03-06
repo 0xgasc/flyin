@@ -350,6 +350,27 @@ export default function DashboardPage() {
   const handleBankDepositPayment = async (bookingId: string, amount: number, proofFile: File | null, reference?: string) => {
     setPaymentLoading(true)
     try {
+      // Upload proof file if provided
+      let proofUrl: string | null = null
+      if (proofFile) {
+        try {
+          const formData = new FormData()
+          formData.append('file', proofFile)
+          const uploadRes = await fetch('/api/upload/irys', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+          })
+          if (uploadRes.ok) {
+            const uploadJson = await uploadRes.json()
+            proofUrl = uploadJson.url
+          }
+        } catch {
+          // Upload failed, proceed without proof — it's optional
+          console.warn('Proof upload failed, proceeding without it')
+        }
+      }
+
       // Create transaction and update booking via API
       const res = await fetch(`/api/bookings/${bookingId}/pay`, {
         method: 'POST',
@@ -360,7 +381,8 @@ export default function DashboardPage() {
         credentials: 'include',
         body: JSON.stringify({
           paymentMethod: 'bank_transfer',
-          reference: reference || `Booking payment - ${bookingId}`
+          reference: reference || `Booking payment - ${bookingId}`,
+          paymentProofUrl: proofUrl
         })
       })
 
@@ -394,7 +416,7 @@ export default function DashboardPage() {
       case 'pending': return 'bg-yellow-100 text-yellow-800'
       case 'approved': return 'bg-blue-100 text-blue-800'
       case 'assigned': return 'bg-purple-100 text-purple-800'
-      case 'confirmed': return 'bg-green-100 text-green-800'
+      case 'accepted': return 'bg-indigo-100 text-indigo-800'
       case 'completed': return 'bg-green-100 text-green-800'
       case 'cancelled': return 'bg-red-100 text-red-800'
       case 'needs_revision': return 'bg-orange-100 text-orange-800'
@@ -407,7 +429,10 @@ export default function DashboardPage() {
     try {
       const res = await fetch(`/api/bookings/${bookingId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
         credentials: 'include',
         body: JSON.stringify({ status: 'cancelled' })
       })
@@ -668,7 +693,7 @@ export default function DashboardPage() {
                           </button>
                         )}
 
-                        {(booking.status === 'approved' || booking.status === 'assigned') && booking.paymentStatus !== 'paid' && (
+                        {(booking.status === 'approved' || booking.status === 'assigned' || booking.status === 'accepted') && booking.paymentStatus !== 'paid' && (
                           <>
                             <button
                               onClick={() => openPaymentModal(booking)}
@@ -677,13 +702,13 @@ export default function DashboardPage() {
                               Choose Payment
                             </button>
                             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                              {booking.status === 'approved' ? 'Flight approved!' : 'Flight Assigned!'}
+                              {booking.status === 'approved' ? 'Flight approved!' : booking.status === 'accepted' ? 'Pilot confirmed!' : 'Flight Assigned!'}
                               <br/>Ready for payment
                             </p>
                           </>
                         )}
 
-                        {booking.status === 'assigned' && booking.paymentStatus === 'paid' && (
+                        {(booking.status === 'assigned' || booking.status === 'accepted') && booking.paymentStatus === 'paid' && (
                           <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-soft p-2">
                             <p className="text-xs text-green-800 dark:text-green-400 font-medium text-center">
                               Ready to Fly!

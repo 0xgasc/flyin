@@ -20,12 +20,17 @@ export interface ISelectedAddon {
 }
 
 export interface IPriceBreakdown {
-  distance: number
-  flightTime: number
-  basePrice: number
-  passengerFee: number
-  multiplier: number | null
-  isRoundTrip: boolean
+  // Transport fields
+  distance?: number
+  flightTime?: number
+  basePrice?: number
+  passengerFee?: number
+  multiplier?: number | null
+  isRoundTrip?: boolean
+  // Experience fields
+  passengers?: number
+  perPerson?: number
+  addonTotal?: number
 }
 
 export interface IBooking extends Document {
@@ -163,12 +168,17 @@ const bookingSchema = new Schema<IBooking>({
   },
   priceBreakdown: {
     type: {
+      // Transport fields
       distance: { type: Number },
       flightTime: { type: Number },
       basePrice: { type: Number },
       passengerFee: { type: Number },
       multiplier: { type: Number, default: null },
-      isRoundTrip: { type: Boolean, default: false }
+      isRoundTrip: { type: Boolean, default: false },
+      // Experience fields
+      passengers: { type: Number },
+      perPerson: { type: Number },
+      addonTotal: { type: Number }
     },
     default: null
   },

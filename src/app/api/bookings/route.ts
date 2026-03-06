@@ -241,12 +241,39 @@ export async function POST(request: NextRequest) {
       returnTime: return_time || null,
       isRoundTrip: is_round_trip || false,
       passengerCount: passenger_count || 1,
-      passengerDetails: passenger_details || [],
-      selectedAddons: selected_addons || [],
+      passengerDetails: (passenger_details || []).map((p: any) => ({
+        name: p.name,
+        age: p.age,
+        weightLbs: p.weightLbs ?? p.weight_lbs ?? 0,
+        passport: p.passport ?? '',
+        emergencyContact: p.emergencyContact ?? p.emergency_contact ?? '',
+        dietaryRestrictions: p.dietaryRestrictions ?? p.dietary_restrictions ?? '',
+        specialRequests: p.specialRequests ?? p.special_requests ?? '',
+        baggageType: p.baggageType ?? p.baggage_type ?? 'none',
+        baggageWeightLbs: p.baggageWeightLbs ?? p.baggage_weight_lbs ?? 0,
+        baggageNotes: p.baggageNotes ?? p.baggage_notes ?? ''
+      })),
+      selectedAddons: (selected_addons || []).map((a: any) => ({
+        addonId: a.addonId ?? a.addon_id,
+        quantity: a.quantity,
+        unitPrice: a.unitPrice ?? a.unit_price
+      })),
       addonTotalPrice: addon_total_price || 0,
       notes: notes || null,
       totalPrice: total_price,
-      priceBreakdown: price_breakdown || null,
+      priceBreakdown: price_breakdown ? {
+        // Transport fields (camelCase passthrough)
+        distance: price_breakdown.distance,
+        flightTime: price_breakdown.flightTime ?? price_breakdown.flight_time,
+        basePrice: price_breakdown.basePrice ?? price_breakdown.base_price,
+        passengerFee: price_breakdown.passengerFee ?? price_breakdown.passenger_fee,
+        multiplier: price_breakdown.multiplier ?? null,
+        isRoundTrip: price_breakdown.isRoundTrip ?? price_breakdown.is_round_trip ?? false,
+        // Experience fields
+        passengers: price_breakdown.passengers,
+        perPerson: price_breakdown.perPerson ?? price_breakdown.per_person,
+        addonTotal: price_breakdown.addonTotal ?? price_breakdown.addon_total
+      } : null,
       aircraftPreference: aircraft_preference || null,
       status: 'pending',
       paymentStatus: 'pending'

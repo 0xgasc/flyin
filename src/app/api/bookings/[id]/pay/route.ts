@@ -18,7 +18,7 @@ export async function POST(
 
     const { id } = await params
     const body = await req.json()
-    const { paymentMethod, reference } = body
+    const { paymentMethod, reference, paymentProofUrl } = body
 
     await connectToDatabase()
 
@@ -97,7 +97,8 @@ export async function POST(
         amount: amount,
         paymentMethod: 'bank_transfer',
         status: 'pending',
-        reference: reference || `Booking payment - ${id}`
+        reference: reference || `Booking payment - ${id}`,
+        paymentProofUrl: paymentProofUrl || null
       })
 
       return NextResponse.json({

@@ -195,6 +195,25 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       if (body[key] !== undefined && userAllowed.includes(key)) {
         if (key === 'pilot_id' && body[key]) {
           updates[dbField] = new mongoose.Types.ObjectId(body[key])
+        } else if (key === 'passenger_details' && Array.isArray(body[key])) {
+          updates[dbField] = body[key].map((p: any) => ({
+            name: p.name,
+            age: p.age,
+            weightLbs: p.weightLbs ?? p.weight_lbs ?? 0,
+            passport: p.passport ?? '',
+            emergencyContact: p.emergencyContact ?? p.emergency_contact ?? '',
+            dietaryRestrictions: p.dietaryRestrictions ?? p.dietary_restrictions ?? '',
+            specialRequests: p.specialRequests ?? p.special_requests ?? '',
+            baggageType: p.baggageType ?? p.baggage_type ?? 'none',
+            baggageWeightLbs: p.baggageWeightLbs ?? p.baggage_weight_lbs ?? 0,
+            baggageNotes: p.baggageNotes ?? p.baggage_notes ?? ''
+          }))
+        } else if (key === 'selected_addons' && Array.isArray(body[key])) {
+          updates[dbField] = body[key].map((a: any) => ({
+            addonId: a.addonId ?? a.addon_id,
+            quantity: a.quantity,
+            unitPrice: a.unitPrice ?? a.unit_price
+          }))
         } else {
           updates[dbField] = body[key]
         }

@@ -2322,8 +2322,10 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
                           {dayBookings.map((booking, bookingIndex) => {
                             const statusColors = {
                               'pending': 'bg-yellow-400',
-                              'approved': 'bg-blue-400', 
+                              'approved': 'bg-blue-400',
                               'assigned': 'bg-green-400',
+                              'accepted': 'bg-indigo-400',
+                              'needs_revision': 'bg-orange-400',
                               'completed': 'bg-purple-400',
                               'cancelled': 'bg-gray-400'
                             }
