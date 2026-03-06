@@ -729,34 +729,15 @@ export default function BookExperiencesPage() {
                           </span>
                         </div>
 
-                        {/* Pricing Tiers - Display like in screenshot */}
-                        {pricingTiers && pricingTiers.filter(t => t.price > 0).length > 0 ? (
-                          <div className="space-y-0.5 mb-3 text-xs">
-                            {pricingTiers.filter(tier => tier.price > 0).map((tier, idx) => (
-                              <div key={idx} className="flex justify-between">
-                                <span className="text-slate-900 font-medium">
-                                  $ {tier.price.toLocaleString()} USD
-                                </span>
-                                <span className="text-slate-400">
-                                  / {locale === 'es' ? 'Para' : 'For'} {tier.min_passengers === tier.max_passengers
-                                    ? tier.min_passengers
-                                    : `${tier.min_passengers}-${tier.max_passengers}`
-                                  } {locale === 'es' ? 'pasajeros.' : 'passengers.'}
-                                </span>
-                              </div>
-                            ))}
-                            {experience.aircraft_options && (
-                              <div className="text-[10px] text-slate-400 mt-0.5">
-                                ({experience.aircraft_options})
-                              </div>
-                            )}
-                          </div>
-                        ) : experience.type === 'experience' && hasValidPrice(experience) ? (
+                        {/* Price hint - details shown when booking */}
+                        {hasValidPrice(experience) ? (
                           <div className="mb-3">
-                            <span className="text-base font-semibold text-slate-900">
-                              ${getDisplayPrice(experience).toLocaleString()}
+                            <span className="text-xs text-slate-500">
+                              {locale === 'es' ? 'Desde' : 'From'}{' '}
                             </span>
-                            <span className="text-slate-400 text-xs ml-1">USD</span>
+                            <span className="text-sm font-semibold text-slate-900">
+                              ${getDisplayPrice(experience).toLocaleString()} USD
+                            </span>
                           </div>
                         ) : (
                           <div className="mb-3 text-xs text-slate-400">

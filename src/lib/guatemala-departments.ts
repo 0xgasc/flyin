@@ -26,25 +26,29 @@ export const guatemalaDepartments: Department[] = [
       { name: 'La Aurora International Airport', code: 'GUA', type: 'international', coordinates: [14.5833, -90.5275] }
     ],
     destinations: ['Guatemala City', 'Mixco', 'Villa Nueva'],
-    experiences: ['Guatemala City Tour', 'La Aurora Airport']
+    experiences: ['Heli-Tour 35 min', 'Panoramic 45 min', 'Extended 60 min', '4 Volcanes', '7 Volcanes + Atitlán']
   },
   {
     id: 'sacatepequez',
     name: 'Sacatepéquez',
     coordinates: [14.5614, -90.7345],
     color: '#f59e0b',
-    airports: [],
-    destinations: ['Antigua Guatemala', 'Ciudad Vieja', 'San Lucas'],
-    experiences: ['Antigua Colonial Tour', 'Coffee Plantation Tour', 'Pacaya Volcano Adventure']
+    airports: [
+      { name: 'Antigua Helipad', code: 'ANT', type: 'private', coordinates: [14.5586, -90.7295] }
+    ],
+    destinations: ['Antigua Guatemala', 'Ciudad Vieja', 'San Lucas', 'Alotenango'],
+    experiences: ['Antigua Breakfast/Lunch', 'Finca San Cayetano', 'Heli-Tour Romántico']
   },
   {
     id: 'solola',
     name: 'Sololá',
     coordinates: [14.7727, -91.1825],
     color: '#10b981',
-    airports: [],
+    airports: [
+      { name: 'Lake Atitlán Helipad', code: 'ATI', type: 'private', coordinates: [14.7394, -91.1583] }
+    ],
     destinations: ['Panajachel', 'San Pedro La Laguna', 'Santiago Atitlán'],
-    experiences: ['Lake Atitlán Scenic Flight', 'Mayan Village Cultural Tour', 'Sunset Champagne Flight']
+    experiences: ['Hotel Atitlán', 'Hotel Casa Palopó', 'Romántica Hotel Atitlán']
   },
   {
     id: 'peten',
@@ -52,10 +56,11 @@ export const guatemalaDepartments: Department[] = [
     coordinates: [16.9131, -89.8907],
     color: '#3b82f6',
     airports: [
-      { name: 'Mundo Maya International Airport', code: 'FRS', type: 'international', coordinates: [16.9138, -89.8664] }
+      { name: 'Mundo Maya International Airport', code: 'FRS', type: 'international', coordinates: [16.9138, -89.8664] },
+      { name: 'Tikal Helipad', code: 'TIK', type: 'private', coordinates: [17.2220, -89.6237] }
     ],
-    destinations: ['Flores', 'Tikal', 'Yaxha', 'El Remate'],
-    experiences: ['Tikal Ruins Expedition', 'Yaxha Archaeological Tour', 'Sunrise Over the Rainforest']
+    destinations: ['Flores', 'Tikal', 'Yaxha', 'El Remate', 'El Mirador'],
+    experiences: ['Tikal 1-Day Experience', 'El Mirador - La Danta']
   },
   {
     id: 'izabal',
@@ -66,7 +71,7 @@ export const guatemalaDepartments: Department[] = [
       { name: 'Puerto Barrios Airport', code: 'PBR', type: 'regional', coordinates: [15.7306, -88.5839] }
     ],
     destinations: ['Puerto Barrios', 'Río Dulce', 'Livingston', 'El Estor'],
-    experiences: ['Río Dulce Canyon Flight', 'Caribbean Coast Explorer']
+    experiences: ['Río Dulce Helicopter', 'Río Dulce Airplane']
   },
   {
     id: 'quetzaltenango',
@@ -97,7 +102,7 @@ export const guatemalaDepartments: Department[] = [
       { name: 'Cobán Airport', code: 'CBV', type: 'regional', coordinates: [15.4689, -90.4067] }
     ],
     destinations: ['Cobán', 'Lanquín', 'Semuc Champey'],
-    experiences: ['Semuc Champey Paradise Tour', 'Cloud Forest Adventure']
+    experiences: ['Semuc Champey + Cuevas Kan\'ba']
   },
   {
     id: 'huehuetenango',
@@ -116,8 +121,8 @@ export const guatemalaDepartments: Department[] = [
     coordinates: [14.3050, -90.7852],
     color: '#84cc16',
     airports: [],
-    destinations: ['Escuintla', 'Puerto San José', 'Monterrico'],
-    experiences: ['Volcano Triple Tour (Fuego, Acatenango, Agua)']
+    destinations: ['Escuintla', 'Puerto San José', 'Monterrico', 'El Paredón'],
+    experiences: ['Hotel El Faro Monterrico', 'Villas La Mar Monterrico', 'Heli-Tour & Pesca Deportiva']
   },
   {
     id: 'san-marcos',
