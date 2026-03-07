@@ -106,22 +106,20 @@ export async function PATCH(
     // Update transaction
     await Transaction.findByIdAndUpdate(id, { $set: updates })
 
-    // If approving a deposit, update user balance
+    // If approving a deposit, atomically update user balance
     if (status === 'approved' && transaction.type === 'deposit') {
-      const user = await User.findById(transaction.userId)
-      if (user) {
-        const currentBalance = user.accountBalance || 0
-        const newBalance = currentBalance + transaction.amount
+      const updatedUser = await User.findByIdAndUpdate(
+        transaction.userId,
+        { $inc: { accountBalance: transaction.amount } },
+        { new: true }
+      )
 
-        await User.findByIdAndUpdate(transaction.userId, {
-          $set: { accountBalance: newBalance }
-        })
-
+      if (updatedUser) {
         return NextResponse.json({
           success: true,
           message: 'Transaction approved and balance updated',
           balance_updated: true,
-          new_balance: newBalance
+          new_balance: updatedUser.accountBalance
         })
       }
     }

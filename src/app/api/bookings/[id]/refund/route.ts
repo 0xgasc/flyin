@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import { Booking, User, Transaction } from '@/models'
-import { verifyToken } from '@/lib/jwt'
+import { extractToken, verifyToken } from '@/lib/jwt'
 
 export async function POST(
   req: NextRequest,
@@ -9,7 +9,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params
-    const token = req.cookies.get('auth-token')?.value
+    const token = extractToken(req)
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -17,16 +17,8 @@ export async function POST(
       )
     }
 
-    const decoded = await verifyToken(token)
-    if (!decoded) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid token' },
-        { status: 401 }
-      )
-    }
-
-    const user = await User.findById(decoded.userId)
-    if (!user || user.role !== 'admin') {
+    const decoded = verifyToken(token)
+    if (!decoded || decoded.role !== 'admin') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
         { status: 403 }
@@ -38,7 +30,7 @@ export async function POST(
     const body = await req.json()
     const { amount, reason, refundMethod = 'original' } = body
 
-    const booking: any = await Booking.findById(id).populate('user_id')
+    const booking = await Booking.findById(id)
     if (!booking) {
       return NextResponse.json(
         { success: false, error: 'Booking not found' },
@@ -46,24 +38,17 @@ export async function POST(
       )
     }
 
-    // Validation
-    if (booking.payment_status !== 'paid') {
+    // Validation - use correct camelCase field names matching Mongoose schema
+    if (booking.paymentStatus !== 'paid') {
       return NextResponse.json(
         { success: false, error: 'Booking has not been paid yet' },
         { status: 400 }
       )
     }
 
-    if (booking.refund_status === 'refunded') {
-      return NextResponse.json(
-        { success: false, error: 'Booking has already been refunded' },
-        { status: 400 }
-      )
-    }
+    const refundAmount = amount || booking.totalPrice
 
-    const refundAmount = amount || booking.final_price
-
-    if (refundAmount > booking.final_price) {
+    if (refundAmount > booking.totalPrice) {
       return NextResponse.json(
         { success: false, error: 'Refund amount cannot exceed booking price' },
         { status: 400 }
@@ -72,7 +57,7 @@ export async function POST(
 
     // Create refund transaction
     const refundTransaction = await Transaction.create({
-      userId: booking.user_id._id,
+      userId: booking.clientId,
       bookingId: booking._id,
       amount: refundAmount,
       type: 'refund',
@@ -81,24 +66,18 @@ export async function POST(
       reference: `Refund: ${booking._id}${reason ? ' - ' + reason : ''}`
     })
 
-    // Update booking
-    booking.refund_status = refundAmount >= booking.final_price ? 'refunded' : 'partial_refund'
-    booking.refund_amount = (booking.refund_amount || 0) + refundAmount
-    booking.refund_reason = reason
-    booking.refund_date = new Date()
+    // Update booking status
+    booking.paymentStatus = 'refunded'
     booking.status = 'cancelled'
-
+    booking.adminNotes = [booking.adminNotes, `Refund: $${refundAmount} - ${reason || 'No reason provided'}`].filter(Boolean).join('\n')
     await booking.save()
 
-    // TODO: Update user balance if refund method is wallet
-    // Note: User model doesn't currently have wallet_balance field
-    // if (refundMethod === 'wallet') {
-    //   const customer = await User.findById(booking.user_id._id)
-    //   if (customer) {
-    //     customer.wallet_balance = (customer.wallet_balance || 0) + refundAmount
-    //     await customer.save()
-    //   }
-    // }
+    // If refunding to wallet, atomically update user balance
+    if (refundMethod === 'wallet') {
+      await User.findByIdAndUpdate(booking.clientId, {
+        $inc: { accountBalance: refundAmount }
+      })
+    }
 
     return NextResponse.json({
       success: true,
@@ -107,9 +86,7 @@ export async function POST(
         bookingId: booking._id,
         amount: refundAmount,
         method: refundMethod,
-        transactionId: refundTransaction._id,
-        status: booking.refund_status,
-        totalRefunded: booking.refund_amount
+        transactionId: refundTransaction._id
       }
     })
   } catch (error) {
@@ -128,7 +105,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const token = req.cookies.get('auth-token')?.value
+    const token = extractToken(req)
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -136,7 +113,7 @@ export async function GET(
       )
     }
 
-    const decoded = await verifyToken(token)
+    const decoded = verifyToken(token)
     if (!decoded) {
       return NextResponse.json(
         { success: false, error: 'Invalid token' },
@@ -146,7 +123,7 @@ export async function GET(
 
     await connectToDatabase()
 
-    const booking: any = await Booking.findById(id)
+    const booking = await Booking.findById(id)
     if (!booking) {
       return NextResponse.json(
         { success: false, error: 'Booking not found' },
@@ -154,31 +131,34 @@ export async function GET(
       )
     }
 
-    const user = await User.findById(decoded.userId)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'User not found' },
-        { status: 404 }
-      )
-    }
-
-    // Check authorization
-    if (user.role !== 'admin' && booking.user_id.toString() !== decoded.userId) {
+    // Check authorization - use clientId not user_id
+    if (decoded.role !== 'admin' && booking.clientId.toString() !== decoded.userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 403 }
       )
     }
 
+    // Look up refund transactions for this booking
+    const refundTransactions = await Transaction.find({
+      bookingId: booking._id,
+      type: 'refund'
+    }).lean()
+
+    const totalRefunded = refundTransactions.reduce((sum, t) => sum + (t.amount || 0), 0)
+
     return NextResponse.json({
       success: true,
       refund: {
-        status: booking.refund_status || 'none',
-        amount: booking.refund_amount || 0,
-        reason: booking.refund_reason,
-        date: booking.refund_date,
-        totalPrice: booking.final_price,
-        remainingAmount: booking.final_price - (booking.refund_amount || 0)
+        status: booking.paymentStatus === 'refunded' ? 'refunded' : totalRefunded > 0 ? 'partial' : 'none',
+        amount: totalRefunded,
+        totalPrice: booking.totalPrice,
+        remainingAmount: booking.totalPrice - totalRefunded,
+        transactions: refundTransactions.map(t => ({
+          id: (t as any)._id.toString(),
+          amount: t.amount,
+          createdAt: t.createdAt
+        }))
       }
     })
   } catch (error) {

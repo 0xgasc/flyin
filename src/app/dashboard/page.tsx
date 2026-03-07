@@ -11,7 +11,7 @@ import { useToast } from '@/lib/toast-store'
 import {
   Plus, Calendar, MapPin, Clock, DollarSign, CreditCard, Building2, Coins, X,
   User, Mail, Phone, Save, Wallet, FileText, CheckCircle, Eye, EyeOff, MessageCircle,
-  Plane, Globe, AlertTriangle, Upload, Copy
+  Plane, Globe, AlertTriangle, Upload, Copy, ChevronRight, Users, Package, ArrowLeft
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { WhatsAppContactButton } from '@/components/whatsapp-contact-button'
@@ -48,6 +48,42 @@ interface Booking {
   } | null
 }
 
+interface BookingDetail {
+  id: string
+  clientId: string
+  client: { id: string; email: string; full_name: string; phone: string } | null
+  bookingType: 'transport' | 'experience'
+  status: string
+  fromLocation: string | null
+  toLocation: string | null
+  experienceId: string | null
+  experience: { name: string; description: string; base_price?: number } | null
+  scheduledDate: string
+  scheduledTime: string
+  returnDate: string | null
+  returnTime: string | null
+  isRoundTrip: boolean
+  passengerCount: number
+  passengerDetails: Array<{
+    name: string; age: number; weightLbs?: number; passport?: string
+    emergencyContact?: string; baggageType?: string; baggageWeightLbs?: number
+  }>
+  selectedAddons: Array<{ addonId: string; quantity: number; unitPrice: number }>
+  addonTotalPrice: number
+  notes: string | null
+  totalPrice: number
+  priceBreakdown: any
+  paymentStatus: string
+  pilotId: string | null
+  pilot: { id: string; email: string; full_name: string } | null
+  helicopterId: string | null
+  aircraftPreference: string | null
+  adminNotes: string | null
+  revisionRequested: boolean
+  revisionNotes: string | null
+  createdAt: string
+}
+
 interface PaymentProof {
   id: string
   createdAt: string
@@ -76,6 +112,10 @@ export default function DashboardPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   
+  // Booking detail state
+  const [selectedDetail, setSelectedDetail] = useState<BookingDetail | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+
   // Profile state
   const [profileData, setProfileData] = useState({
     fullName: profile?.fullName || '',
@@ -196,6 +236,57 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Error fetching payment proofs:', error)
+    }
+  }
+
+  const fetchBookingDetail = async (bookingId: string) => {
+    setDetailLoading(true)
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      })
+      const json = await res.json()
+      if (json.success && json.booking) {
+        const b = json.booking
+        setSelectedDetail({
+          id: b.id,
+          clientId: b.client_id,
+          client: b.client,
+          bookingType: b.booking_type,
+          status: b.status,
+          fromLocation: b.from_location,
+          toLocation: b.to_location,
+          experienceId: b.experience_id,
+          experience: b.experience,
+          scheduledDate: b.scheduled_date,
+          scheduledTime: b.scheduled_time,
+          returnDate: b.return_date,
+          returnTime: b.return_time,
+          isRoundTrip: b.is_round_trip,
+          passengerCount: b.passenger_count,
+          passengerDetails: b.passenger_details || [],
+          selectedAddons: b.selected_addons || [],
+          addonTotalPrice: b.addon_total_price || 0,
+          notes: b.notes,
+          totalPrice: b.total_price,
+          priceBreakdown: b.price_breakdown,
+          paymentStatus: b.payment_status,
+          pilotId: b.pilot_id,
+          pilot: b.pilot,
+          helicopterId: b.helicopter_id,
+          aircraftPreference: b.aircraft_preference,
+          adminNotes: b.admin_notes,
+          revisionRequested: b.revision_requested,
+          revisionNotes: b.revision_notes,
+          createdAt: b.created_at
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching booking detail:', error)
+      toast.error('Failed to load booking details')
+    } finally {
+      setDetailLoading(false)
     }
   }
 
@@ -452,12 +543,12 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-luxury-black">
       <MobileNav />
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-8">
+        <div className="flex overflow-x-auto scrollbar-hide space-x-1 mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
           <button
             onClick={() => setActiveTab('bookings')}
-            className={`px-6 py-3 rounded-t-soft font-medium transition-colors ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-t-soft font-medium transition-colors text-sm sm:text-base whitespace-nowrap ${
               activeTab === 'bookings'
                 ? 'bg-white dark:bg-luxury-charcoal text-primary-700 dark:text-gold-400 border-b-2 border-primary-600 dark:border-gold-500'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -467,39 +558,39 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 rounded-t-soft font-medium transition-colors ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-t-soft font-medium transition-colors text-sm sm:text-base whitespace-nowrap ${
               activeTab === 'profile'
                 ? 'bg-white dark:bg-luxury-charcoal text-primary-700 dark:text-gold-400 border-b-2 border-primary-600 dark:border-gold-500'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            Profile & Settings
+            Profile
           </button>
           <button
             onClick={() => setActiveTab('payments')}
-            className={`px-6 py-3 rounded-t-soft font-medium transition-colors ${
+            className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-t-soft font-medium transition-colors text-sm sm:text-base whitespace-nowrap ${
               activeTab === 'payments'
                 ? 'bg-white dark:bg-luxury-charcoal text-primary-700 dark:text-gold-400 border-b-2 border-primary-600 dark:border-gold-500'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            Payments & Top-up
+            Payments
           </button>
         </div>
 
         {/* Tab Content */}
         {activeTab === 'bookings' && (
           <div>
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">My Bookings</h1>
-              <div className="space-x-4">
-                <Link href="/book/transport" className="btn-primary inline-flex items-center">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Book Transport
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 dark:text-white">My Bookings</h1>
+              <div className="flex gap-2 sm:gap-4">
+                <Link href="/book/transport" className="btn-primary inline-flex items-center text-sm sm:text-base">
+                  <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+                  <span className="hidden sm:inline">Book </span>Transport
                 </Link>
                 <Link href="/book/experiences" className="btn-luxury inline-flex items-center text-sm">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Book Experience
+                  <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+                  <span className="hidden sm:inline">Book </span>Experience
                 </Link>
               </div>
             </div>
@@ -533,22 +624,22 @@ export default function DashboardPage() {
             ) : (
               <div className="space-y-4">
                 {bookings.map((booking) => (
-                  <div key={booking.id} className="card-luxury">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-4 mb-4">
-                          <h3 className="text-xl font-semibold">
+                  <div key={booking.id} className="card-luxury cursor-pointer hover:border-gold-500/50 dark:hover:border-gold-500/30 transition-all">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0">
+                      <div className="flex-1" onClick={() => fetchBookingDetail(booking.id)}>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                          <h3 className="text-base sm:text-xl font-semibold">
                             {booking.bookingType === 'transport'
                               ? `${booking.fromLocation} → ${booking.toLocation}`
                               : booking.experience?.name
                             }
                           </h3>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
+                          <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(booking.status)}`}>
                             {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                           </span>
                         </div>
 
-                        <div className="grid md:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-gray-400">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2 text-primary-600 dark:text-gold-500" />
                             {format(new Date(booking.scheduledDate), 'MMM dd, yyyy')}
@@ -640,7 +731,7 @@ export default function DashboardPage() {
                         })()}
                       </div>
 
-                      <div className="ml-4 flex flex-col space-y-2">
+                      <div className="sm:ml-4 flex flex-row sm:flex-col gap-2 sm:gap-2 flex-wrap">
                         {booking.status !== 'completed' && (
                           <WhatsAppContactButton
                             booking={{
@@ -775,7 +866,7 @@ export default function DashboardPage() {
 
         {activeTab === 'profile' && (
           <div className="max-w-2xl">
-            <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-8">Profile & Settings</h1>
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">Profile & Settings</h1>
 
             {profileError && (
               <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-soft mb-6">
@@ -846,13 +937,13 @@ export default function DashboardPage() {
 
         {activeTab === 'payments' && (
           <div>
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">Payments & Top-up</h1>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 dark:text-white">Payments & Top-up</h1>
               <button
                 onClick={() => setShowTopUpModal(true)}
-                className="btn-primary inline-flex items-center"
+                className="btn-primary inline-flex items-center text-sm sm:text-base"
               >
-                <Plus className="h-5 w-5 mr-2" />
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                 Top Up Balance
               </button>
             </div>
@@ -874,7 +965,7 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {paymentProofs.map((proof) => (
-                    <div key={proof.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-soft">
+                    <div key={proof.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800/50 rounded-soft">
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">
                           {proof.type === 'deposit' ? 'Top-up' : 'Payment'} - ${Math.abs(proof.amount)}
@@ -900,6 +991,22 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {/* Booking Detail Modal */}
+      {(selectedDetail || detailLoading) && (
+        <BookingDetailModal
+          booking={selectedDetail}
+          loading={detailLoading}
+          onClose={() => setSelectedDetail(null)}
+          onPayment={(booking) => {
+            setSelectedDetail(null)
+            const b = bookings.find(bk => bk.id === booking.id)
+            if (b) openPaymentModal(b)
+          }}
+          locale={locale}
+          getStatusColor={getStatusColor}
+        />
+      )}
+
       {/* Payment Modal (same as before) */}
       {showPaymentModal && selectedBooking && (
         <PaymentModal 
@@ -917,9 +1024,9 @@ export default function DashboardPage() {
       {/* Top-up Modal */}
       {showTopUpModal && (
         <div className="modal-overlay">
-          <div className="modal-content p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Top Up Balance</h2>
+          <div className="modal-content p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 dark:text-white">Top Up Balance</h2>
               <button
                 onClick={() => setShowTopUpModal(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -1065,10 +1172,10 @@ function PaymentModal({
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Choose Payment Method</h2>
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="modal-content p-4 sm:p-6">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 dark:text-white">Choose Payment Method</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -1240,6 +1347,289 @@ function PaymentModal({
              selectedPaymentMethod === 'balance' ? 'Pay Now' : 'Confirm Deposit'
             }
           </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Status Timeline Steps
+const STATUS_STEPS = [
+  { key: 'pending', label: 'Submitted', labelEs: 'Enviado', icon: FileText },
+  { key: 'approved', label: 'Approved', labelEs: 'Aprobado', icon: CheckCircle },
+  { key: 'assigned', label: 'Pilot Assigned', labelEs: 'Piloto Asignado', icon: User },
+  { key: 'accepted', label: 'Pilot Confirmed', labelEs: 'Piloto Confirmado', icon: CheckCircle },
+  { key: 'paid', label: 'Paid', labelEs: 'Pagado', special: 'payment' as const, icon: DollarSign },
+  { key: 'completed', label: 'Completed', labelEs: 'Completado', icon: Plane },
+]
+
+function BookingDetailModal({
+  booking,
+  loading,
+  onClose,
+  onPayment,
+  locale,
+  getStatusColor
+}: {
+  booking: BookingDetail | null
+  loading: boolean
+  onClose: () => void
+  onPayment: (booking: BookingDetail) => void
+  locale: string
+  getStatusColor: (status: string) => string
+}) {
+  if (loading) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content-lg p-6" onClick={e => e.stopPropagation()}>
+          <div className="flex items-center justify-center py-20">
+            <div className="loading-spinner-lg text-gold-500"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!booking) return null
+
+  const isCancelled = booking.status === 'cancelled'
+  const isRevision = booking.status === 'needs_revision'
+
+  // Determine which steps are completed
+  const getStepStatus = (stepKey: string) => {
+    if (isCancelled) return 'cancelled'
+    if (isRevision && stepKey !== 'pending') return stepKey === 'pending' ? 'completed' : 'pending'
+
+    const statusOrder = ['pending', 'approved', 'assigned', 'accepted', 'completed']
+    const currentIdx = statusOrder.indexOf(booking.status)
+    const stepIdx = statusOrder.indexOf(stepKey)
+
+    if (stepKey === 'paid') {
+      return booking.paymentStatus === 'paid' ? 'completed' :
+             booking.paymentStatus === 'processing' ? 'active' : 'pending'
+    }
+
+    if (stepIdx < currentIdx) return 'completed'
+    if (stepIdx === currentIdx) return 'active'
+    return 'pending'
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="bg-white dark:bg-luxury-charcoal rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border dark:border-gray-800" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="sticky top-0 bg-white dark:bg-luxury-charcoal border-b border-gray-200 dark:border-gray-700 p-4 sm:p-6 z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h2 className="text-lg sm:text-xl font-display font-bold text-gray-900 dark:text-white">
+                  {booking.bookingType === 'transport'
+                    ? `${booking.fromLocation} → ${booking.toLocation}`
+                    : booking.experience?.name || 'Experience Booking'
+                  }
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  #{booking.id.slice(-8).toUpperCase()} &middot; {format(new Date(booking.createdAt), 'MMM dd, yyyy')}
+                </p>
+              </div>
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+              {booking.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            </span>
+          </div>
+        </div>
+
+        <div className="p-4 sm:p-6 space-y-6">
+          {/* Status Timeline */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+              {locale === 'es' ? 'Estado del Vuelo' : 'Flight Status'}
+            </h3>
+            <div className="flex items-center justify-between relative">
+              {/* Progress line */}
+              <div className="absolute top-4 left-4 right-4 h-0.5 bg-gray-200 dark:bg-gray-700" />
+              {STATUS_STEPS.map((step, i) => {
+                const stepStatus = getStepStatus(step.key)
+                const Icon = step.icon
+                return (
+                  <div key={step.key} className="relative flex flex-col items-center z-10" style={{ width: `${100 / STATUS_STEPS.length}%` }}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                      stepStatus === 'completed' ? 'bg-green-500 border-green-500 text-white' :
+                      stepStatus === 'active' ? 'bg-gold-500 border-gold-500 text-white animate-pulse-slow' :
+                      stepStatus === 'cancelled' ? 'bg-red-500 border-red-500 text-white' :
+                      'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400'
+                    }`}>
+                      <Icon className="w-3.5 h-3.5" />
+                    </div>
+                    <span className={`text-[10px] mt-1.5 text-center leading-tight ${
+                      stepStatus === 'completed' || stepStatus === 'active' ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-400'
+                    }`}>
+                      {locale === 'es' ? step.labelEs : step.label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+            {isCancelled && (
+              <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-soft text-center">
+                <p className="text-xs text-red-700 dark:text-red-400 font-medium">
+                  {locale === 'es' ? 'Esta reserva fue cancelada' : 'This booking was cancelled'}
+                </p>
+              </div>
+            )}
+            {isRevision && booking.revisionNotes && (
+              <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-soft">
+                <p className="text-xs font-semibold text-amber-800 dark:text-amber-300 mb-1 flex items-center gap-1">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  {locale === 'es' ? 'Cambio solicitado por admin:' : 'Admin requested a change:'}
+                </p>
+                <p className="text-xs text-amber-700 dark:text-amber-400">{booking.revisionNotes}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Flight Details */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{locale === 'es' ? 'Fecha' : 'Date'}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-gold-500" />
+                  {format(new Date(booking.scheduledDate), 'EEEE, MMM dd, yyyy')}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{locale === 'es' ? 'Hora' : 'Time'}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-gold-500" />
+                  {booking.scheduledTime}
+                </p>
+              </div>
+              {booking.isRoundTrip && booking.returnDate && (
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{locale === 'es' ? 'Regreso' : 'Return'}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {format(new Date(booking.returnDate), 'MMM dd, yyyy')} {booking.returnTime && `at ${booking.returnTime}`}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{locale === 'es' ? 'Pasajeros' : 'Passengers'}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-gold-500" />
+                  {booking.passengerCount}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{locale === 'es' ? 'Tipo' : 'Type'}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white capitalize flex items-center gap-1.5">
+                  {booking.bookingType === 'transport' ? <Plane className="w-3.5 h-3.5 text-gold-500" /> : <Globe className="w-3.5 h-3.5 text-gold-500" />}
+                  {booking.bookingType}{booking.isRoundTrip ? ' (Round Trip)' : ''}
+                </p>
+              </div>
+              {booking.pilot && (
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{locale === 'es' ? 'Piloto' : 'Pilot'}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{booking.pilot.full_name}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Passenger Details */}
+          {booking.passengerDetails.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-gold-500" />
+                {locale === 'es' ? 'Pasajeros' : 'Passengers'} ({booking.passengerDetails.length})
+              </h3>
+              <div className="space-y-2">
+                {booking.passengerDetails.map((p, i) => (
+                  <div key={i} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-800/50 rounded-soft text-sm">
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-white">{p.name}</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-2">
+                        {locale === 'es' ? `${p.age} años` : `Age ${p.age}`}
+                        {p.weightLbs ? ` · ${p.weightLbs} lb` : ''}
+                      </span>
+                    </div>
+                    {p.baggageType && p.baggageType !== 'none' && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <Package className="w-3 h-3" />
+                        {p.baggageType.replace(/_/g, ' ')}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Add-ons */}
+          {booking.selectedAddons.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                {locale === 'es' ? 'Extras' : 'Add-ons'}
+              </h3>
+              <div className="space-y-1.5">
+                {booking.selectedAddons.map((addon, i) => (
+                  <div key={i} className="flex justify-between text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-soft">
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {addon.addonId} x{addon.quantity}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">${(addon.unitPrice * addon.quantity).toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Price Summary */}
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-soft p-4 border border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{locale === 'es' ? 'Total' : 'Total'}</span>
+              <span className="text-2xl font-bold text-gold-600 dark:text-gold-400">${booking.totalPrice.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center mt-1">
+              <span className="text-xs text-gray-500 dark:text-gray-400">{locale === 'es' ? 'Estado de pago' : 'Payment status'}</span>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                booking.paymentStatus === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400' :
+                booking.paymentStatus === 'processing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-400' :
+                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-400'
+              }`}>
+                {booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1)}
+              </span>
+            </div>
+          </div>
+
+          {/* Notes */}
+          {booking.notes && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{locale === 'es' ? 'Notas' : 'Notes'}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{booking.notes}</p>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            {(booking.status === 'approved' || booking.status === 'assigned' || booking.status === 'accepted') && booking.paymentStatus !== 'paid' && (
+              <button
+                onClick={() => onPayment(booking)}
+                className="flex-1 btn-primary flex items-center justify-center gap-2"
+              >
+                <DollarSign className="w-4 h-4" />
+                {locale === 'es' ? 'Pagar Ahora' : 'Pay Now'}
+              </button>
+            )}
+            <button onClick={onClose} className="flex-1 btn-ghost">
+              {locale === 'es' ? 'Cerrar' : 'Close'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import IrysUpload from '@/components/IrysUpload'
 import { AdminWhatsAppButton } from '@/components/whatsapp-contact-button'
+import AnalyticsCharts from './components/AnalyticsCharts'
 import { AdminLayout } from './components/AdminLayout'
 import type {
   AdminTab,
@@ -253,6 +254,8 @@ export default function AdminDashboard() {
         fetchCertifications()
       } else if (activeTab === 'analytics') {
         fetchFinancialData()
+        fetchBookings()
+        fetchTransactions()
       } else if (activeTab === 'experiences') {
         fetchExperiences()
       } else if (activeTab === 'destinations') {
@@ -3190,43 +3193,27 @@ const ExperiencesManagement = ({ experiences, fetchExperiences, loading }: any) 
               </div>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="card-luxury">
-                <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <span className="text-sm">New booking from John Doe</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">2 hours ago</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <span className="text-sm">Payment approved for Ana Rodriguez</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">5 hours ago</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm">New pilot registered: Miguel Santos</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">1 day ago</span>
-                  </div>
+            {/* Pending Actions */}
+            <div className="card-luxury mb-8">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Pending Actions</h3>
+              <div className="grid sm:grid-cols-3 gap-4">
+                <div className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                  <span className="text-sm text-yellow-700 dark:text-yellow-300">{bookings.filter(b => b.status === 'pending').length} bookings awaiting approval</span>
+                  <span className="text-xs bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">Action</span>
                 </div>
-              </div>
-              
-              <div className="card-luxury">
-                <h3 className="text-lg font-semibold mb-4">Pending Actions</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <span className="text-sm text-yellow-600">{bookings.filter(b => b.status === 'pending').length} bookings awaiting approval</span>
-                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-none">Action needed</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <span className="text-sm text-blue-600">{transactions.filter(t => t.status === 'pending').length} payments to review</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-none">Review</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm text-purple-600">{pilots.filter(p => !p.kyc_verified).length} pilots awaiting verification</span>
-                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-none">KYC</span>
-                  </div>
+                <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <span className="text-sm text-blue-700 dark:text-blue-300">{transactions.filter(t => t.status === 'pending').length} payments to review</span>
+                  <span className="text-xs bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">Review</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <span className="text-sm text-purple-700 dark:text-purple-300">{pilots.filter(p => !p.kyc_verified).length} pilots awaiting KYC</span>
+                  <span className="text-xs bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">KYC</span>
                 </div>
               </div>
             </div>
+
+            {/* Charts */}
+            <AnalyticsCharts bookings={bookings} transactions={transactions} />
           </div>
         )}
 
